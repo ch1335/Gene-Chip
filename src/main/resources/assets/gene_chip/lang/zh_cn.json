@@ -1,0 +1,69 @@
+{
+  "gene_chip.chip.head_shot_hunter.name": "爆头猎手",
+  "gene_chip.chip.head_shot_hunter.desc": "强化剂精准作用于视觉神经与反射弧，使你更擅长捕捉敌人弱点",
+  "gene_chip.chip.head_shot_hunter.desc.detailed": "暴击有%s几率直接杀死普通感染者",
+
+  "gene_chip.chip.make_living.name": "维持生计",
+  "gene_chip.chip.make_living.desc": "代谢强化剂让你在极端资源匮乏时，身体本能地回收每一分能量——包括子弹",
+  "gene_chip.chip.make_living.desc.detailed": "射击命中敌人时，有%s概率在消耗弹药的同时，回收一发对应子弹",
+
+  "gene_chip.chip.precision_shooting.name": "精准射击",
+  "gene_chip.chip.precision_shooting.desc": "神经突触强化后，你对枪械的掌控达到人枪合一之境",
+  "gene_chip.chip.precision_shooting.desc.detailed": "使用枪械造成的伤害提高+%s",
+
+  "gene_chip.chip.bloodthirsty.name": "嗜血",
+  "gene_chip.chip.bloodthirsty.desc": "强化剂激发远古狩猎本能，每一次收割生命都带来病态的满足与身体机能的短暂回补",
+  "gene_chip.chip.bloodthirsty.desc.detailed": "击杀敌对生物时，有%s概率恢复%s生命值",
+
+  "gene_chip.chip.combo_fever.name": "连击热潮",
+  "gene_chip.chip.combo_fever.desc": "战斗代谢强化后，身体会本能地追随杀戮的节奏，肾上腺素持续涌动",
+  "gene_chip.chip.combo_fever.desc.detailed": "5秒内击杀≥3个敌人时进入“战斗狂热”状态，获得力量I,抗性I和速度I效果，持续3秒",
+
+  "gene_chip.chip.melee_attack_master.name": "近战专家",
+  "gene_chip.chip.melee_attack_master.desc": "肌肉纤维强化后，你的每一次挥砍都带着千锤百炼的技巧与力量",
+  "gene_chip.chip.melee_attack_master.desc.detailed": "近战伤害提高+%s",
+
+  "gene_chip.chip.quick_adjustment.name": "快速调整",
+  "gene_chip.chip.quick_adjustment.desc": "神经反射速度强化，使你在战斗中能迅速调整姿态，追击下一个目标",
+  "gene_chip.chip.quick_adjustment.desc.detailed": "使用枪械或弓箭击杀敌人后，获得速度 I，持续%s秒",
+
+  "gene_chip.chip.desire_for_slaughter.name": "杀戮渴望",
+  "gene_chip.chip.desire_for_slaughter.desc": "强化剂将每一次近战击杀转化为短暂的肾上腺素爆发，让你在鲜血中渴求更多杀戮",
+  "gene_chip.chip.desire_for_slaughter.desc.detailed": "近战击杀敌人后，力量 I，持续%s秒",
+
+  "gene_chip.chip.mutation_adaptation.name": "突变适应",
+  "gene_chip.chip.mutation_adaptation.desc": "强化剂诱导细胞产生异变，使你对深渊污染产生奇异的耐性",
+  "gene_chip.chip.mutation_adaptation.desc.detailed": "在感染区内，免疫力下降速度减缓30%",
+
+  "gene_chip.chip.adrenal_gland_burst.name": "肾上腺爆发",
+  "gene_chip.chip.adrenal_gland_burst.desc": "濒死时，强化剂强制激发肾上腺髓质，榨干最后一丝潜能",
+  "gene_chip.chip.adrenal_gland_burst.desc.detailed": "当生命值低于%s时，获得力量II+速度II，持续%s秒。冷却时间%s秒",
+
+  "gene_chip.chip.growing_fervor.name": "愈发狂热",
+  "gene_chip.chip.growing_fervor.desc": "病毒与你共生，免疫力越低，深渊之力对你身体的“馈赠”越明显",
+  "gene_chip.chip.growing_fervor.desc.detailed": "根据免疫值提供攻击速度与移动速度加成：>75%无加成；50~75%攻速+5%，移速+5%；25~50%攻速+10%，移速+10%；<25%攻速+20%，移速+15%",
+
+  "gene_chip.chip.nutrient_extraction.name": "养分萃取",
+  "gene_chip.chip.nutrient_extraction.desc": "强化剂提升营养吸收效率，让每一口食物都发挥最大价值",
+  "gene_chip.chip.nutrient_extraction.desc.detailed": "食用食物时，额外恢复+%s饱和度和+%s生命值",
+
+  "gene_chip.chip.permafrost_walkers.name": "冻土行者",
+  "gene_chip.chip.permafrost_walkers.desc": "代谢产热与末梢循环强化，使你无视严寒",
+  "gene_chip.chip.permafrost_walkers.desc.detailed": "在低温环境中可以更好的生存，可在细雪上行走不下陷",
+
+  "gene_chip.chip.iron_lung.name": "铁肺",
+  "gene_chip.chip.iron_lung.desc": "肺活量与氧气利用效率提升，水下呼吸时间延长",
+  "gene_chip.chip.iron_lung.desc.detailed": "延长水下呼吸时间+%s",
+
+  "gene_chip.chip.thick_skinned.name": "皮糙肉厚",
+  "gene_chip.chip.thick_skinned.desc": "皮肤角质层与皮下脂肪强化，使你更能承受冲击",
+  "gene_chip.chip.thick_skinned.desc.detailed": "永久获得抗性I，蹲下时额外获得+4 护甲值",
+
+  "gene_chip.chip.photosynthesis.name": "光合作用",
+  "gene_chip.chip.photosynthesis.desc": "诱导细胞产生类似植物的光合作用机制，在阳光下汲取能量",
+  "gene_chip.chip.photosynthesis.desc.detailed": "在户外阳光直射下获得光照充能层数（最高5层），每层提供+1%%移速和每30秒恢复1点饱和度，室内/夜晚每30秒衰减1层",
+
+  "gene_chip.chip.sliding_tackle.name": "战术滑铲",
+  "gene_chip.chip.sliding_tackle.desc": "腿部肌肉强化与地面摩擦控制训练，使你在冲刺时能以低姿态快速接近目标",
+  "gene_chip.chip.sliding_tackle.desc.detailed": "冲刺时按下蹲键向前滑铲%s格（消耗2点饱和度），滑铲过程中伤害减免%s%%。冷却%s秒"
+}

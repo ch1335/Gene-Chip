@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "com.chen1335.geneChip.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["FoodDataMixins", "LivingEntityMixin", "PowderSnowBlockMixin", "thirst.WaterPurityMixin"],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}
