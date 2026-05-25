@@ -20,6 +20,10 @@ public class PlayerRunTimeData {
 
     public int slidingTackleTimer = 0;
 
+    public boolean canDoubleJump = true;
+
+    public boolean isOnGround = true;
+
     public void recordKill(long time) {
         if (comboFeversTime.size() >= 3) {
             comboFeversTime.removeFirst();
@@ -46,6 +50,12 @@ public class PlayerRunTimeData {
             if (slidingTackleTimer<=0) {
                 slidingTackleActive = false;
             }
+        }
+        
+        // 更新地面状态
+        isOnGround = entity.onGround();
+        if (isOnGround) {
+            canDoubleJump = true;
         }
     }
 

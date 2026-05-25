@@ -65,5 +65,24 @@
 
   "gene_chip.chip.sliding_tackle.name": "战术滑铲",
   "gene_chip.chip.sliding_tackle.desc": "腿部肌肉强化与地面摩擦控制训练，使你在冲刺时能以低姿态快速接近目标",
-  "gene_chip.chip.sliding_tackle.desc.detailed": "冲刺时按下蹲键向前滑铲%s格（消耗2点饱和度），滑铲过程中伤害减免%s%%。冷却%s秒"
+  "gene_chip.chip.sliding_tackle.desc.detailed": "冲刺时按下蹲键向前滑铲%s格（消耗2点饱和度），滑铲过程中伤害减免%s%%。冷却%s秒",
+
+  "gene_chip.chip.silent_walker.name": "静步者",
+  "gene_chip.chip.silent_walker.desc": "强化剂优化前庭系统与肌肉协调性，实现猫科动物般的落地缓冲",
+  "gene_chip.chip.silent_walker.desc.detailed": "摔落伤害减免%s%%~%s%%（坠落距离越远减免越少），参考距离%s米，且落地完全无声",
+
+  "gene_chip.chip.double_jump.name": "二段跳",
+  "gene_chip.chip.double_jump.desc": "腿部肌纤维爆发力强化，配合神经反射加速，可在空中进行第二次跳跃",
+  "gene_chip.chip.double_jump.desc.detailed": "在空中可额外跳跃一次，消耗%s点饱和度。落地后获得缓慢I，持续%s秒。冷却%s秒",
+
+  "gene_chip.chip.spider_climb.name": "蛛行",
+  "gene_chip.chip.spider_climb.desc": "强化剂增强指尖与脚掌的摩擦力，让你能攀附粗糙表面",
+  "gene_chip.chip.spider_climb.desc.detailed": "紧贴垂直的方块表面且向前移动时，可缓慢攀爬，攀爬速度为%s",
+
+  "gene_chip.config_value.max_damage_reduction": "最大伤害减免比例",
+  "gene_chip.config_value.min_damage_reduction": "最小伤害减免比例",
+  "gene_chip.config_value.reference_distance": "参考距离",
+  "gene_chip.config_value.saturation_cost": "饱和度消耗",
+  "gene_chip.config_value.exhaustion_duration": "体力透支持续时间",
+  "gene_chip.config_value.cooldown": "冷却时间"
 }

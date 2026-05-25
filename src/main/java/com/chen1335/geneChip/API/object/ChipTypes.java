@@ -8,7 +8,10 @@ import com.chen1335.geneChip.chip.chips.mutation.GrowingFervor;
 import com.chen1335.geneChip.chip.chips.mutation.MutationAdaptation;
 import com.chen1335.geneChip.chip.chips.survival.Photosynthesis;
 import com.chen1335.geneChip.chip.chips.survival.*;
+import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
+import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SlidingTackle;
+import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -53,4 +56,10 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, Photosynthesis> PHOTOSYNTHESIS = CHIPS.register("photosynthesis", Photosynthesis::new);
 
     public static final DeferredHolder<Chip, SlidingTackle> SLIDING_TACKLE = CHIPS.register("sliding_tackle", SlidingTackle::new);
+
+    public static final DeferredHolder<Chip, SilentWalker> SILENT_WALKER = CHIPS.register("silent_walker", SilentWalker::new);
+
+    public static final DeferredHolder<Chip, DoubleJump> DOUBLE_JUMP = CHIPS.register("double_jump", DoubleJump::new);
+
+    public static final DeferredHolder<Chip, SpiderClimb> SPIDER_CLIMB = CHIPS.register("spider_climb", SpiderClimb::new);
 }

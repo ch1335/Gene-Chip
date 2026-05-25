@@ -10,6 +10,7 @@ import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.combat.*;
 import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
+import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -20,6 +21,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 
@@ -48,6 +50,48 @@ public class GamePlayEventHandler {
                     GunData data = GunData.from(player.getMainHandItem());
                     data.ammo.set(data.ammo.get() + 1);
                 }
+            });
+        }
+    }
+
+    @SubscribeEvent
+    public static void LivingFallEvent(LivingFallEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SILENT_WALKER).ifPresent(chipInstance -> {
+                SilentWalker chip = chipInstance.getChip();
+
+                // 获取坠落距离（以方块为单位，1方块=1米）
+                float fallDistance = event.getDistance();
+
+                // 计算伤害减免比例：与坠落距离成反比
+                // 示例：10米减免50%，100米减免10%
+                // 使用插值算法：在referenceDistance处为maxReduction，在referenceDistance*10处为minReduction
+                float maxReduction = chip.maxDamageReduction.getValue(chipInstance.getLvl());
+                float minReduction = chip.minDamageReduction.getValue(chipInstance.getLvl());
+                float referenceDistance = chip.referenceDistance.getValue(chipInstance.getLvl());
+
+                // 计算实际的伤害减免比例（反比关系）
+                float reductionRatio;
+                if (fallDistance <= 0) {
+                    // 避免除以零
+                    reductionRatio = maxReduction;
+                } else if (fallDistance <= referenceDistance) {
+                    // 坠落距离小于等于参考距离时，使用最大减免
+                    reductionRatio = maxReduction;
+                } else {
+                    // 坠落距离大于参考距离时，使用对数衰减
+                    // 当 fallDistance = referenceDistance 时，ratio = maxReduction
+                    // 当 fallDistance = referenceDistance * 10 时，ratio ≈ minReduction
+                    float logFactor = (float) (Math.log10(fallDistance / referenceDistance));
+                    reductionRatio = maxReduction - (maxReduction - minReduction) * logFactor;
+
+                    // 限制在最小和最大减免之间
+                    reductionRatio = Math.max(minReduction, Math.min(maxReduction, reductionRatio));
+                }
+
+                // 应用伤害减免：使用伤害倍数
+                // reductionRatio为减免比例，所以damageMultiplier = 1 - reductionRatio
+                event.setDamageMultiplier(event.getDamageMultiplier() * 1 - reductionRatio);
             });
         }
     }
