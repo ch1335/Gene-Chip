@@ -79,6 +79,10 @@
   "gene_chip.chip.spider_climb.desc": "强化剂增强指尖与脚掌的摩擦力，让你能攀附粗糙表面",
   "gene_chip.chip.spider_climb.desc.detailed": "紧贴垂直的方块表面且向前移动时，可缓慢攀爬，攀爬速度为%s。攀爬时摔落伤害减免%s%%",
 
+  "gene_chip.chip.tactical_roll.name": "战术翻滚",
+  "gene_chip.chip.tactical_roll.desc": "肾上腺素短暂激发，让你能在危急时刻向后规避",
+  "gene_chip.chip.tactical_roll.desc.detailed": "双击后退键执行后向翻滚%s格，翻滚期间无敌并免疫击退（持续%s秒），之后获得%s秒失衡，移动速度降低%s%%。冷却%s秒",
+
   "gene_chip.config_value.max_damage_reduction": "最大伤害减免比例",
   "gene_chip.config_value.min_damage_reduction": "最小伤害减免比例",
   "gene_chip.config_value.reference_distance": "参考距离",

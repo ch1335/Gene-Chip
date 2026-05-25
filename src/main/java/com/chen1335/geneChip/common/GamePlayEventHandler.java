@@ -12,10 +12,14 @@ import com.chen1335.geneChip.chip.chips.combat.*;
 import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
+import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -24,6 +28,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 
 @EventBusSubscriber(modid = GeneChip.MODID)
@@ -129,6 +134,12 @@ public class GamePlayEventHandler {
                     event.setAmount(event.getAmount() * (1 - chipInstance.getChip().damageReduction.getValue(chipInstance.getLvl())));
                 }
             });
+
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
+                if (playerRunTimeData.tacticalRollInvincible) {
+                    event.setCanceled(true);
+                }
+            });
         }
     }
 
@@ -217,6 +228,16 @@ public class GamePlayEventHandler {
                 }
             });
 
+        }
+    }
+
+    @SubscribeEvent
+    public static void LivingKnockBackEvent(LivingKnockBackEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+            if (playerRunTimeData.tacticalRollInvincible) {
+                event.setCanceled(true);
+            }
         }
     }
 }

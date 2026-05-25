@@ -12,6 +12,7 @@ import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SlidingTackle;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
+import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -62,4 +63,6 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, DoubleJump> DOUBLE_JUMP = CHIPS.register("double_jump", DoubleJump::new);
 
     public static final DeferredHolder<Chip, SpiderClimb> SPIDER_CLIMB = CHIPS.register("spider_climb", SpiderClimb::new);
+
+    public static final DeferredHolder<Chip, TacticalRoll> TACTICAL_ROLL = CHIPS.register("tactical_roll", TacticalRoll::new);
 }

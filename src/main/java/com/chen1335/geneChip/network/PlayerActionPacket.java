@@ -7,6 +7,7 @@ import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
+import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -83,6 +84,23 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.DOUBLE_JUMP.get(), cooldown);
                 });
+            } else if (action == ActionType.TACTICAL_ROLL && context.player() instanceof ServerPlayer player) {
+                GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
+                    PlayerChipData playerChipData = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+                    if (playerChipData.getCoolDownInfos().isCoolDown(chipInstance.getChip())) {
+                        return;
+                    }
+
+                    TacticalRoll chip = chipInstance.getChip();
+                    PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+
+                    playerRunTimeData.tacticalRolling = true;
+                    playerRunTimeData.tacticalRollInvincible = true;
+                    playerRunTimeData.tacticalRollTimer = (int) (chip.invincibleTime.getValue(chipInstance.getLvl()) * 20);
+
+                    int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
+                    GeneChipAPI.addChipCooldown(player, ChipTypes.TACTICAL_ROLL.get(), cooldown);
+                });
             }
         });
     }
@@ -90,6 +108,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
 
     public enum ActionType {
         SLIDING_TACKLE,//滑铲
-        DOUBLE_JUMP//二段跳
+        DOUBLE_JUMP,//二段跳
+        TACTICAL_ROLL//战术翻滚
     }
 }
