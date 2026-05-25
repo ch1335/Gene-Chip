@@ -11,6 +11,7 @@ import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.combat.*;
 import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
+import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -92,6 +93,16 @@ public class GamePlayEventHandler {
                 // 应用伤害减免：使用伤害倍数
                 // reductionRatio为减免比例，所以damageMultiplier = 1 - reductionRatio
                 event.setDamageMultiplier(event.getDamageMultiplier() * 1 - reductionRatio);
+            });
+
+
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SPIDER_CLIMB).ifPresent(chipInstance -> {
+                PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+                if (playerRunTimeData.spiderClimbing || player.horizontalCollision) {
+                    SpiderClimb chip = chipInstance.getChip();
+                    float reduction = chip.fallDamageReduction.getValue(chipInstance.getLvl());
+                    event.setDamageMultiplier(event.getDamageMultiplier() * (1 - reduction));
+                }
             });
         }
     }

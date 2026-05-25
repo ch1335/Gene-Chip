@@ -77,7 +77,7 @@
 
   "gene_chip.chip.spider_climb.name": "蛛行",
   "gene_chip.chip.spider_climb.desc": "强化剂增强指尖与脚掌的摩擦力，让你能攀附粗糙表面",
-  "gene_chip.chip.spider_climb.desc.detailed": "紧贴垂直的方块表面且向前移动时，可缓慢攀爬，攀爬速度为%s",
+  "gene_chip.chip.spider_climb.desc.detailed": "紧贴垂直的方块表面且向前移动时，可缓慢攀爬，攀爬速度为%s。攀爬时摔落伤害减免%s%%",
 
   "gene_chip.config_value.max_damage_reduction": "最大伤害减免比例",
   "gene_chip.config_value.min_damage_reduction": "最小伤害减免比例",

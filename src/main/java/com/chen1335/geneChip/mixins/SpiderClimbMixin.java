@@ -2,8 +2,8 @@ package com.chen1335.geneChip.mixins;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
+import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,6 +25,7 @@ public abstract class SpiderClimbMixin extends Entity {
     private void onTravel(Vec3 travelVector, CallbackInfo ci) {
         if (LivingEntity.class.cast(this) instanceof Player player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SPIDER_CLIMB).ifPresent(chipInstance -> {
+                PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
                 if (player.horizontalCollision) {
                     SpiderClimb chip = chipInstance.getChip();
                     float climbSpeed = chip.climbSpeed.getValue(chipInstance.getLvl());
@@ -36,8 +37,10 @@ public abstract class SpiderClimbMixin extends Entity {
                     } else {
                         player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
                     }
-
+                    playerRunTimeData.spiderClimbing = true;
                     player.fallDistance = 0;
+                } else {
+                    playerRunTimeData.spiderClimbing = false;
                 }
             });
         }

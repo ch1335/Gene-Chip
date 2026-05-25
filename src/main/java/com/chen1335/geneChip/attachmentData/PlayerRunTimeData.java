@@ -24,6 +24,8 @@ public class PlayerRunTimeData {
 
     public boolean isOnGround = true;
 
+    public boolean spiderClimbing = false;
+
     public void recordKill(long time) {
         if (comboFeversTime.size() >= 3) {
             comboFeversTime.removeFirst();
