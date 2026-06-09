@@ -37,8 +37,8 @@ public class ChipWidget extends AbstractWidget {
         this.chipInstance = chipInstance;
         this.parent = parent;
         Vec2 windowScale = GuiUtil.getWindowScale();
-        xScale = windowScale.x * 2;
-        yScale = windowScale.y * 2;
+        xScale = windowScale.x * 4;
+        yScale = windowScale.y * 4;
         this.width = (int) (48 * xScale);
         this.height = (int) (78 * yScale);
     }

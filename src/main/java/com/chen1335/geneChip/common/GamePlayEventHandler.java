@@ -13,6 +13,10 @@ import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
+import com.chen1335.geneChip.chip.chips.special.VengefulFlame;
+import com.chen1335.geneChip.chip.chips.special.IronHeart;
+import com.chen1335.geneChip.chip.chips.special.CounterStorm;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -29,6 +33,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 
 @EventBusSubscriber(modid = GeneChip.MODID)
@@ -126,6 +131,17 @@ public class GamePlayEventHandler {
                 float value = chipInstance.getChip().damageMul.getValue(chipInstance.getLvl());
                 event.setAmount(event.getAmount() * (1 + value));
             });
+
+            // 反击风暴 - 附加累积受到的伤害
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.COUNTER_STORM).ifPresent(chipInstance -> {
+                PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+                if (playerRunTimeData.counterStormTimer > 0 && playerRunTimeData.counterStormAccumulatedDamage > 0) {
+                    float ratio = chipInstance.getChip().damageReflectRatio.getValue(chipInstance.getLvl());
+                    event.setAmount(event.getAmount() + playerRunTimeData.counterStormAccumulatedDamage * ratio);
+                    playerRunTimeData.counterStormAccumulatedDamage = 0;
+                    playerRunTimeData.counterStormTimer = 0;
+                }
+            });
         }
         if (event.getEntity() instanceof Player player) {
             PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
@@ -170,6 +186,13 @@ public class GamePlayEventHandler {
                         GeneChipAPI.addChipCooldown(player, chipInstance.getChip(), (int) (chip.cooldown.getValue(lvl) * 60));
                     }
                 }
+            });
+
+            // 反击风暴 - 记录受到的伤害
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.COUNTER_STORM).ifPresent(chipInstance -> {
+                PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+                playerRunTimeData.counterStormAccumulatedDamage += event.getNewDamage();
+                playerRunTimeData.counterStormTimer = (int) (chipInstance.getChip().reflectWindow.getValue(chipInstance.getLvl()) * 20);
             });
 
         }
@@ -238,6 +261,69 @@ public class GamePlayEventHandler {
             if (playerRunTimeData.tacticalRollInvincible) {
                 event.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void LivingDeathEvent$Player(LivingDeathEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.VENGEFUL_FLAME).ifPresent(chipInstance -> {
+
+                VengefulFlame chip = chipInstance.getChip();
+                float radius = chip.explosionRadius.getValue(chipInstance.getLvl());
+                int burnDuration = (int) (chip.burnDuration.getValue(chipInstance.getLvl()) * 20);
+
+                // 在死亡位置生成不破坏地形的爆炸
+                player.level().explode(
+                        player,
+                        player.getX(), player.getY(), player.getZ(),
+                        radius,
+                        net.minecraft.world.level.Level.ExplosionInteraction.NONE
+                );
+
+                // 对周围实体施加燃烧
+                for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class,
+                        player.getBoundingBox().inflate(radius))) {
+                    if (entity != player && entity.isAlive()) {
+                        entity.setRemainingFireTicks(burnDuration);
+                    }
+                }
+
+                // 生成粒子火焰效果
+                if (!player.level().isClientSide()) {
+                    net.minecraft.server.level.ServerLevel serverLevel = (net.minecraft.server.level.ServerLevel) player.level();
+                    for (int i = 0; i < 80; i++) {
+                        double offsetX = (player.getRandom().nextDouble() - 0.5) * radius * 2;
+                        double offsetY = player.getRandom().nextDouble() * radius;
+                        double offsetZ = (player.getRandom().nextDouble() - 0.5) * radius * 2;
+                        serverLevel.sendParticles(ParticleTypes.FLAME,
+                                player.getX() + offsetX, player.getY() + offsetY, player.getZ() + offsetZ,
+                                1, 0, 0.1, 0, 0);
+                    }
+                    for (int i = 0; i < 40; i++) {
+                        double offsetX = (player.getRandom().nextDouble() - 0.5) * radius * 2;
+                        double offsetY = player.getRandom().nextDouble() * radius;
+                        double offsetZ = (player.getRandom().nextDouble() - 0.5) * radius * 2;
+                        serverLevel.sendParticles(ParticleTypes.LAVA,
+                                player.getX() + offsetX, player.getY() + offsetY, player.getZ() + offsetZ,
+                                1, 0, 0.05, 0, 0);
+                    }
+                }
+            });
+        }
+    }
+
+    @SubscribeEvent
+    public static void MobEffectEvent$Added(MobEffectEvent.Added event) {
+        if (event.getEntity() instanceof Player player) {
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.IRON_HEART).ifPresent(chipInstance -> {
+                MobEffectInstance effectInstance = event.getEffectInstance();
+                if (!effectInstance.getEffect().value().isBeneficial()) {
+                    IronHeart chip = chipInstance.getChip();
+                    float reduction = chip.durationReduction.getValue(chipInstance.getLvl());
+                    effectInstance.duration = (int) (effectInstance.getDuration() * (1 - reduction));
+                }
+            });
         }
     }
 }

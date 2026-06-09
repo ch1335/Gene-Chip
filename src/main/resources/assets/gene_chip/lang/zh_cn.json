@@ -83,6 +83,30 @@
   "gene_chip.chip.tactical_roll.desc": "肾上腺素短暂激发，让你能在危急时刻向后规避",
   "gene_chip.chip.tactical_roll.desc.detailed": "双击后退键执行后向翻滚%s格，翻滚期间无敌并免疫击退（持续%s秒），之后获得%s秒失衡，移动速度降低%s%%。冷却%s秒",
 
+  "gene_chip.chip.vengeful_flame.name": "复仇火焰",
+  "gene_chip.chip.vengeful_flame.desc": "死亡瞬间，强化剂失控引发体内能量暴走，化为焚尽一切的烈焰",
+  "gene_chip.chip.vengeful_flame.desc.detailed": "死亡时在原地引发爆炸（不破坏地形），点燃半径%s格内的敌人，持续%s秒",
+
+  "gene_chip.chip.night_hunter.name": "暗夜猎手",
+  "gene_chip.chip.night_hunter.desc": "强化剂激活夜行性本能，让你在夜晚成为真正的猎手",
+  "gene_chip.chip.night_hunter.desc.detailed": "夜间自动获得力量I、夜视、速度I效果",
+
+  "gene_chip.chip.dawn_awakening.name": "黎明觉醒",
+  "gene_chip.chip.dawn_awakening.desc": "强化剂与昼夜节律同步，每日黎明时分焕然新生",
+  "gene_chip.chip.dawn_awakening.desc.detailed": "每日清晨清除所有负面状态，恢复%s点生命值和全部饱和度",
+
+  "gene_chip.chip.iron_heart.name": "钢铁之心",
+  "gene_chip.chip.iron_heart.desc": "强化剂增强神经稳定性，使你对负面效果产生抗性",
+  "gene_chip.chip.iron_heart.desc.detailed": "负面效果持续时间减少%s%%",
+
+  "gene_chip.chip.counter_storm.name": "反击风暴",
+  "gene_chip.chip.counter_storm.desc": "受伤瞬间，强化剂记录伤害并在下一次攻击中加倍奉还",
+  "gene_chip.chip.counter_storm.desc.detailed": "受到伤害后，%s秒内的下一次攻击将额外附加所受伤害的%s",
+
+  "gene_chip.chip.locksmith_intuition.name": "锁匠直觉",
+  "gene_chip.chip.locksmith_intuition.desc": "强化剂提升手指精细运动控制与触觉灵敏度，让你能感知锁芯的每一道卡榫。",
+  "gene_chip.chip.locksmith_intuition.desc.detailed": "开锁小游戏难度降低%s。完美开锁后额外获得稀有战利品",
+
   "gene_chip.config_value.max_damage_reduction": "最大伤害减免比例",
   "gene_chip.config_value.min_damage_reduction": "最小伤害减免比例",
   "gene_chip.config_value.reference_distance": "参考距离",

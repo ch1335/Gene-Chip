@@ -2,8 +2,9 @@
   "required": true,
   "package": "com.chen1335.geneChip.mixins",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["FoodDataMixins", "LivingEntityMixin", "PowderSnowBlockMixin", "SpiderClimbMixin", "thirst.WaterPurityMixin"],
+  "mixins": ["FoodDataMixins", "LivingEntityMixin", "PowderSnowBlockMixin", "SpiderClimbMixin", "clavis.ClavisLootMixin", "clavis.LockMixin", "thirst.WaterPurityMixin"],
   "client": [
+    "clavis.ClavisLockMixin"
   ],
   "minVersion": "0.8"
 }

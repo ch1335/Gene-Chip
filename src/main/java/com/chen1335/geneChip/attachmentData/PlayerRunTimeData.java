@@ -54,6 +54,12 @@ public class PlayerRunTimeData {
     // 战术翻滚芯片 - 失衡状态计时器（无敌结束后进入失衡，移速降低）
     public int tacticalRollOffBalanceTimer = 0;
 
+    // 反击风暴芯片 - 累积受到的伤害（用于下次攻击附加）
+    public float counterStormAccumulatedDamage = 0;
+
+    // 反击风暴芯片 - 反击窗口计时器（受伤害后开始计时，超时清除累积伤害）
+    public int counterStormTimer = 0;
+
     public void recordKill(long time) {
         if (comboFeversTime.size() >= 3) {
             comboFeversTime.removeFirst();
@@ -113,6 +119,14 @@ public class PlayerRunTimeData {
                         speedAttr.removeModifier(GeneChip.id("tactical_roll_off_balance"));
                     }
                 }
+            }
+        }
+
+        // 反击风暴计时
+        if (counterStormTimer > 0) {
+            counterStormTimer--;
+            if (counterStormTimer <= 0) {
+                counterStormAccumulatedDamage = 0;
             }
         }
 

@@ -30,7 +30,7 @@ public class WildHunterCondition implements LootItemCondition {
 
     @Override
     public boolean test(LootContext context) {
-        Entity param = context.getParam(LootContextParams.ATTACKING_ENTITY);
+        Entity param = context.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
         if (param instanceof Player player) {
             Optional<ChipInstance<WildHunter>> optional = GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.WILD_HUNTER);
             return optional.isPresent();

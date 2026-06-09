@@ -51,6 +51,7 @@ public class ChipConfigScreen extends Screen {
         chipWidgets.clear();
         equippedChipWidgets.clear();
         Vec2 windowScale = GuiUtil.getWindowScale();
+
         xScale = windowScale.x * 2;
         yScale = windowScale.y * 2;
         int chipIndex = 0;
@@ -98,12 +99,12 @@ public class ChipConfigScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
+        float s =2;
         int i = 0;
         for (ChipWidget chipWidget : chipWidgets) {
             if (!chipWidget.isFocused()) {
-                chipWidget.setX((int) ((170 + (i % 4) * 60) * xScale));
-                chipWidget.setY((int) ((int) ((22 + ((int) (i / 4)) * 85) * yScale) + scrollY));
+                chipWidget.setX((int) ((170 + (i % 4) * 60) * xScale * s));
+                chipWidget.setY((int) ((int) ((22 + ((int) (i / 4)) * 85) * yScale* s) + scrollY));
             }
             chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
             i++;
@@ -118,7 +119,9 @@ public class ChipConfigScreen extends Screen {
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         RenderSystem.enableBlend();
-        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale), (int) (20 * yScale), (int) (150 * xScale), (int) (240 * yScale), FastColor.ARGB32.color(150, 0, 0, 0), 1);
+
+        float s =2;
+        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale) * s, (int) (20 * yScale)* s, (int) (150 * xScale)* s, (int) (240 * yScale)* s, FastColor.ARGB32.color(150, 0, 0, 0), 1);
 
         hoveredSlot = -1;
         for (int i = 0; i < getSlots().size(); i++) {
@@ -144,11 +147,12 @@ public class ChipConfigScreen extends Screen {
         int ySize = 18;
         int y1 = ySize + 3;
         int y = 40;
+        float s =2;
         int color = FastColor.ARGB32.color(150, 0, 0, 0);
-        if (mouseX >= 10 * xScale && mouseX <= 160 * xScale && mouseY >= (20 + index * y1 + y) * yScale && mouseY <= (20 + ySize + index * y1 + y) * yScale) {
+        if (mouseX >= 10 * xScale* s && mouseX <= 160 * xScale* s && mouseY >= (20 + index * y1 + y) * yScale* s && mouseY <= (20 + ySize + index * y1 + y) * yScale* s) {
             hoveredSlot = index;
         }
-        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale), (int) ((20 + index * y1 + y) * yScale), (int) (150 * xScale), (int) (ySize * yScale), color, 1);
+        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale)* s, (int) ((20 + index * y1 + y) * yScale)* s, (int) (150 * xScale)* s, (int) (ySize * yScale)* s, color, 1);
 
     }
 

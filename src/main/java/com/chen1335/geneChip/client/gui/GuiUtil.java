@@ -17,12 +17,13 @@ import java.math.BigDecimal;
 public class GuiUtil {
     public static Vec2 getWindowScale() {
         Window window = Minecraft.getInstance().getWindow();
+        double guiScale = window.getGuiScale();
         GLFWVidMode glfwVidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
         if (glfwVidMode == null) {
             throw new IllegalStateException("Can't find a primary monitor");
         }
-        float xScale = (float) window.getWidth() / glfwVidMode.width();
-        float yScale = (float) window.getHeight() / glfwVidMode.height();
+        float xScale = (float) ( ((float) window.getWidth() / glfwVidMode.width())/guiScale);
+        float yScale = (float) ( ((float) window.getHeight() / glfwVidMode.height())/guiScale);
         return new Vec2(xScale, yScale);
     }
 

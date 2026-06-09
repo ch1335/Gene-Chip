@@ -25,8 +25,8 @@ public class EquippedChipWidget extends AbstractWidget {
         this.index = index;
         this.parent = parent;
         Vec2 windowScale = GuiUtil.getWindowScale();
-        xScale = windowScale.x * 2;
-        yScale = windowScale.y * 2;
+        xScale = windowScale.x * 4;
+        yScale = windowScale.y * 4;
         this.width = (int) (150 * xScale);
         this.height = (int) (18 * yScale);
         setX((int) (10 * xScale));

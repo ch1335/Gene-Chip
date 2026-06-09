@@ -13,6 +13,12 @@ import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SlidingTackle;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
+import com.chen1335.geneChip.chip.chips.special.VengefulFlame;
+import com.chen1335.geneChip.chip.chips.special.NightHunter;
+import com.chen1335.geneChip.chip.chips.special.DawnAwakening;
+import com.chen1335.geneChip.chip.chips.special.IronHeart;
+import com.chen1335.geneChip.chip.chips.special.CounterStorm;
+import com.chen1335.geneChip.chip.chips.special.LocksmithIntuition;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -65,4 +71,16 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, SpiderClimb> SPIDER_CLIMB = CHIPS.register("spider_climb", SpiderClimb::new);
 
     public static final DeferredHolder<Chip, TacticalRoll> TACTICAL_ROLL = CHIPS.register("tactical_roll", TacticalRoll::new);
+
+    public static final DeferredHolder<Chip, VengefulFlame> VENGEFUL_FLAME = CHIPS.register("vengeful_flame", VengefulFlame::new);
+
+    public static final DeferredHolder<Chip, NightHunter> NIGHT_HUNTER = CHIPS.register("night_hunter", NightHunter::new);
+
+    public static final DeferredHolder<Chip, DawnAwakening> DAWN_AWAKENING = CHIPS.register("dawn_awakening", DawnAwakening::new);
+
+    public static final DeferredHolder<Chip, IronHeart> IRON_HEART = CHIPS.register("iron_heart", IronHeart::new);
+
+    public static final DeferredHolder<Chip, CounterStorm> COUNTER_STORM = CHIPS.register("counter_storm", CounterStorm::new);
+
+    public static final DeferredHolder<Chip, LocksmithIntuition> LOCKSMITH_INTUITION = CHIPS.register("locksmith_intuition", LocksmithIntuition::new);
 }
