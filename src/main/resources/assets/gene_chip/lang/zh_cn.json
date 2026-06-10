@@ -107,6 +107,10 @@
   "gene_chip.chip.locksmith_intuition.desc": "强化剂提升手指精细运动控制与触觉灵敏度，让你能感知锁芯的每一道卡榫。",
   "gene_chip.chip.locksmith_intuition.desc.detailed": "开锁小游戏难度降低%s。完美开锁后额外获得稀有战利品",
 
+  "gene_chip.chip.hunter_instinct.name": "猎手本能",
+  "gene_chip.chip.hunter_instinct.desc": "强化剂激活捕食者本能，将猎物的弱点暴露在光天化日之下",
+  "gene_chip.chip.hunter_instinct.desc.detailed": "使用Ping Wheel标记实体时，消耗%s点饥饿值，使其发光且受到的伤害提升%s%%，持续%s秒。冷却%s秒",
+
   "gene_chip.config_value.max_damage_reduction": "最大伤害减免比例",
   "gene_chip.config_value.min_damage_reduction": "最小伤害减免比例",
   "gene_chip.config_value.reference_distance": "参考距离",

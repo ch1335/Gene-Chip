@@ -19,6 +19,7 @@ import com.chen1335.geneChip.chip.chips.special.DawnAwakening;
 import com.chen1335.geneChip.chip.chips.special.IronHeart;
 import com.chen1335.geneChip.chip.chips.special.CounterStorm;
 import com.chen1335.geneChip.chip.chips.special.LocksmithIntuition;
+import com.chen1335.geneChip.chip.chips.special.HunterInstinct;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -83,4 +84,6 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, CounterStorm> COUNTER_STORM = CHIPS.register("counter_storm", CounterStorm::new);
 
     public static final DeferredHolder<Chip, LocksmithIntuition> LOCKSMITH_INTUITION = CHIPS.register("locksmith_intuition", LocksmithIntuition::new);
+
+    public static final DeferredHolder<Chip, HunterInstinct> HUNTER_INSTINCT = CHIPS.register("hunter_instinct", HunterInstinct::new);
 }

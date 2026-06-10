@@ -36,8 +36,17 @@ import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 
+import java.util.*;
+
 @EventBusSubscriber(modid = GeneChip.MODID)
 public class GamePlayEventHandler {
+
+    // 猎手本能芯片 - 被标记的实体（实体UUID -> {伤害提升值, 过期tick}）
+    private static final Map<UUID, float[]> HUNTER_MARKED = new HashMap<>();
+
+    public static void markEntity(UUID entityId, float damageBoost, long expireTick) {
+        HUNTER_MARKED.put(entityId, new float[]{damageBoost, (float) expireTick});
+    }
 
     @SubscribeEvent
     public static void CriticalHitEvent(CriticalHitEvent event) {
@@ -119,6 +128,17 @@ public class GamePlayEventHandler {
 
     @SubscribeEvent
     public static void LivingIncomingDamageEvent(LivingIncomingDamageEvent event) {
+
+        // 猎手本能 - 被标记实体受到额外伤害
+        UUID entityUuid = event.getEntity().getUUID();
+        float[] markData = HUNTER_MARKED.get(entityUuid);
+        if (markData != null) {
+            if (event.getEntity().level().getGameTime() > (long) markData[1]) {
+                HUNTER_MARKED.remove(entityUuid);
+            } else {
+                event.setAmount(event.getAmount() * (1 + markData[0]));
+            }
+        }
 
         if (event.getSource().getEntity() instanceof Player player) {
             if (event.getSource().getDirectEntity() instanceof ProjectileEntity) {
