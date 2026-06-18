@@ -152,6 +152,15 @@ public class GamePlayEventHandler {
                 event.setAmount(event.getAmount() * (1 + value));
             });
 
+            // 痛觉封锁 - 近战伤害加成（无防具时生效）
+            PlayerRunTimeData attackerData = GeneChipAPI.getPlayerRunTimeData(player);
+            if (attackerData.painBlockadeActive && hasNoArmor(player) && !(event.getSource().getDirectEntity() instanceof ProjectileEntity)) {
+                GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.PAIN_BLOCKADE).ifPresent(chipInstance -> {
+                    float bonus = chipInstance.getChip().meleeDamageBonus.getValue(chipInstance.getLvl());
+                    event.setAmount(event.getAmount() * (1 + bonus));
+                });
+            }
+
             // 反击风暴 - 附加累积受到的伤害
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.COUNTER_STORM).ifPresent(chipInstance -> {
                 PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
@@ -176,6 +185,14 @@ public class GamePlayEventHandler {
                     event.setCanceled(true);
                 }
             });
+
+            // 痛觉封锁 - 减伤（无防具时生效）
+            if (playerRunTimeData.painBlockadeActive && hasNoArmor(player)) {
+                GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.PAIN_BLOCKADE).ifPresent(chipInstance -> {
+                    float reduction = chipInstance.getChip().damageReduction.getValue(chipInstance.getLvl());
+                    event.setAmount(event.getAmount() * (1 - reduction));
+                });
+            }
         }
     }
 
@@ -271,6 +288,14 @@ public class GamePlayEventHandler {
                 }
             });
 
+            // 痛觉封锁 - 击杀回复生命值（无防具时生效）
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.PAIN_BLOCKADE).ifPresent(chipInstance -> {
+                if (hasNoArmor(player)) {
+                    float healAmount = chipInstance.getChip().healOnKill.getValue(chipInstance.getLvl());
+                    player.heal(healAmount);
+                }
+            });
+
         }
     }
 
@@ -333,7 +358,7 @@ public class GamePlayEventHandler {
         }
     }
 
-    @SubscribeEvent
+@SubscribeEvent
     public static void MobEffectEvent$Added(MobEffectEvent.Added event) {
         if (event.getEntity() instanceof Player player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.IRON_HEART).ifPresent(chipInstance -> {
@@ -345,5 +370,14 @@ public class GamePlayEventHandler {
                 }
             });
         }
+    }
+
+    private static boolean hasNoArmor(Player player) {
+        for (net.minecraft.world.item.ItemStack armor : player.getInventory().armor) {
+            if (!armor.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

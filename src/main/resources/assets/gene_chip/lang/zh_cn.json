@@ -17,7 +17,7 @@
 
   "gene_chip.chip.combo_fever.name": "连击热潮",
   "gene_chip.chip.combo_fever.desc": "战斗代谢强化后，身体会本能地追随杀戮的节奏，肾上腺素持续涌动",
-  "gene_chip.chip.combo_fever.desc.detailed": "5秒内击杀≥3个敌人时进入“战斗狂热”状态，获得力量I,抗性I和速度I效果，持续3秒",
+  "gene_chip.chip.combo_fever.desc.detailed": "5秒内击杀≥3个敌人时进入战斗狂热状态，获得力量I,抗性I和速度I效果，持续3秒",
 
   "gene_chip.chip.melee_attack_master.name": "近战专家",
   "gene_chip.chip.melee_attack_master.desc": "肌肉纤维强化后，你的每一次挥砍都带着千锤百炼的技巧与力量",
@@ -40,8 +40,12 @@
   "gene_chip.chip.adrenal_gland_burst.desc.detailed": "当生命值低于%s时，获得力量II+速度II，持续%s秒。冷却时间%s秒",
 
   "gene_chip.chip.growing_fervor.name": "愈发狂热",
-  "gene_chip.chip.growing_fervor.desc": "病毒与你共生，免疫力越低，深渊之力对你身体的“馈赠”越明显",
+  "gene_chip.chip.growing_fervor.desc": "病毒与你共生，免疫力越低，深渊之力对你身体的馈赠越明显",
   "gene_chip.chip.growing_fervor.desc.detailed": "根据免疫值提供攻击速度与移动速度加成：>75%无加成；50~75%攻速+5%，移速+5%；25~50%攻速+10%，移速+10%；<25%攻速+20%，移速+15%",
+
+  "gene_chip.chip.pain_blockade.name": "痛觉封锁",
+  "gene_chip.chip.pain_blockade.desc": "强化剂彻底切断痛觉神经与触觉反馈，以牺牲防御换取纯粹的力量",
+  "gene_chip.chip.pain_blockade.desc.detailed": "禁用穿戴任何防具，获得%s减伤和+%s近战伤害，每次击杀回复%s点生命值。装备时扣除%s当前免疫力上限",
 
   "gene_chip.chip.nutrient_extraction.name": "养分萃取",
   "gene_chip.chip.nutrient_extraction.desc": "强化剂提升营养吸收效率，让每一口食物都发挥最大价值",
@@ -97,7 +101,7 @@
 
   "gene_chip.chip.iron_heart.name": "钢铁之心",
   "gene_chip.chip.iron_heart.desc": "强化剂增强神经稳定性，使你对负面效果产生抗性",
-  "gene_chip.chip.iron_heart.desc.detailed": "负面效果持续时间减少%s%%",
+  "gene_chip.chip.iron_heart.desc.detailed": "负面效果持续时间减少%s",
 
   "gene_chip.chip.counter_storm.name": "反击风暴",
   "gene_chip.chip.counter_storm.desc": "受伤瞬间，强化剂记录伤害并在下一次攻击中加倍奉还",

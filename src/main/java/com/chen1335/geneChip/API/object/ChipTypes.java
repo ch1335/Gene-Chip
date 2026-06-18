@@ -6,6 +6,7 @@ import com.chen1335.geneChip.chip.chips.combat.*;
 import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
 import com.chen1335.geneChip.chip.chips.mutation.GrowingFervor;
 import com.chen1335.geneChip.chip.chips.mutation.MutationAdaptation;
+import com.chen1335.geneChip.chip.chips.mutation.PainBlockade;
 import com.chen1335.geneChip.chip.chips.survival.Photosynthesis;
 import com.chen1335.geneChip.chip.chips.survival.*;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
@@ -42,6 +43,8 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, DesireForSlaughter> DESIRE_FOR_SLAUGHTER = CHIPS.register("desire_for_slaughter", DesireForSlaughter::new);
 
     public static final DeferredHolder<Chip, MutationAdaptation> MUTATION_ADAPTATION = CHIPS.register("mutation_adaptation", MutationAdaptation::new);
+
+    public static final DeferredHolder<Chip, PainBlockade> PAIN_BLOCKADE = CHIPS.register("pain_blockade", PainBlockade::new);
 
     public static final DeferredHolder<Chip, AdrenalGlandBurst> ADRENAL_GLAND_BURST = CHIPS.register("adrenal_gland_burst", AdrenalGlandBurst::new);
 

@@ -61,6 +61,9 @@ public class PlayerRunTimeData {
     // 反击风暴芯片 - 反击窗口计时器（受伤害后开始计时，超时清除累积伤害）
     public int counterStormTimer = 0;
 
+    // 痛觉封锁芯片 - 是否激活（用于伤害减免和近战加成判断）
+    public boolean painBlockadeActive = false;
+
     public void recordKill(long time) {
         if (comboFeversTime.size() >= 3) {
             comboFeversTime.removeFirst();
