@@ -3,6 +3,7 @@ package com.chen1335.geneChip;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.API.object.LootItemConditions;
+import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
 import com.chen1335.geneChip.config.ClothConfig;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +21,7 @@ import java.nio.file.Path;
 @Mod(GeneChip.MODID)
 public class GeneChip {
     public static final String MODID = "gene_chip";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final ScriptEngine JS_ENGINE = new ScriptEngineManager().getEngineByName("javascript");
 
@@ -35,7 +36,7 @@ public class GeneChip {
     }
 
     public void FMLCommonSetupEvent(FMLCommonSetupEvent setupEvent){
-
+        ChipConfig.load();
     }
 
     public static ResourceLocation id(String id) {

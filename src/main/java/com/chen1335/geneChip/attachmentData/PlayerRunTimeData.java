@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 
+//运行时数据，均不保存
 public class PlayerRunTimeData {
     // 连击热潮芯片 - 记录击杀时间戳（用于判断是否触发连击热潮）
     private final ArrayList<Long> comboFeversTime = new ArrayList<>();

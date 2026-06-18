@@ -2,6 +2,7 @@ package com.chen1335.geneChip.config;
 
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.minecraft.network.chat.Component;
@@ -24,9 +25,7 @@ public class ClothConfig {
                 entry.getValue().buildClothConfig(entry.getKey().location(), configBuilder, cardConfig);
             }
 
-            configBuilder.setSavingRunnable(() -> {
-
-            });
+            configBuilder.setSavingRunnable(ChipConfig::save);
             return configBuilder.build();
         });
 

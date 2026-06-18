@@ -104,4 +104,23 @@ public abstract class Chip {
 
     public void tick(Player player, ChipInstance<?> instance) {
     }
+
+    public void applyConfig(Map<String, String> config) {
+        config.forEach((id, calculator) -> {
+            JsValueCalculator valueCalculator = configValue.get(id);
+            if (valueCalculator != null) {
+                valueCalculator.cleanCapturedValue();
+                valueCalculator.setCalculator(calculator);
+            }
+        });
+    }
+
+    public Map<String, String> collectConfig() {
+        Map<String, String> result = new LinkedHashMap<>();
+        configValue.forEach((id, calculator) -> {
+            String current = calculator.getCalculator();
+            result.put(id, current);
+        });
+        return result;
+    }
 }
