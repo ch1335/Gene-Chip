@@ -21,8 +21,12 @@ public class ClothConfig {
             ConfigCategory cardConfig = configBuilder.getOrCreateCategory(Component.translatable("gene_chip.config.card"));
 
             for (Map.Entry<ResourceKey<Chip>, Chip> entry : RegisterTypes.CHIP.entrySet()) {
-                entry.getValue().buildClothConfig(entry.getKey().location(),configBuilder, cardConfig);
+                entry.getValue().buildClothConfig(entry.getKey().location(), configBuilder, cardConfig);
             }
+
+            configBuilder.setSavingRunnable(() -> {
+
+            });
             return configBuilder.build();
         });
 

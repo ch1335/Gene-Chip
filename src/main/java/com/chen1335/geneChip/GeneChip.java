@@ -9,10 +9,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import java.nio.file.Path;
 
 @Mod(GeneChip.MODID)
 public class GeneChip {
@@ -21,11 +24,18 @@ public class GeneChip {
 
     public static final ScriptEngine JS_ENGINE = new ScriptEngineManager().getEngineByName("javascript");
 
+    public static final Path CHIP_CONFIG = FMLPaths.CONFIGDIR.get().resolve("gene_chip").resolve("chip_config.json");
+
     public GeneChip(IEventBus modEventBus, ModContainer modContainer) {
         GCAttachmentTypes.ATTACHMENT_TYPES.register(modEventBus);
         ChipTypes.CHIPS.register(modEventBus);
         LootItemConditions.LOOT_ITEM_CONDITION_TYPES.register(modEventBus);
         ClothConfig.build(modContainer);
+        modEventBus.addListener(this::FMLCommonSetupEvent);
+    }
+
+    public void FMLCommonSetupEvent(FMLCommonSetupEvent setupEvent){
+
     }
 
     public static ResourceLocation id(String id) {
