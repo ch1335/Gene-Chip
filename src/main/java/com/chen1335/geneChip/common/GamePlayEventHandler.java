@@ -369,7 +369,30 @@ public class GamePlayEventHandler {
                     effectInstance.duration = (int) (effectInstance.getDuration() * (1 - reduction));
                 }
             });
+
+            // 感染者 - 处于感染区时正面效果持续时间延长
+            PlayerRunTimeData runtimeData = GeneChipAPI.getPlayerRunTimeData(player);
+            if (runtimeData.infectedInZone) {
+                GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.INFECTED).ifPresent(chipInstance -> {
+                    MobEffectInstance effectInstance = event.getEffectInstance();
+                    if (effectInstance.getEffect().value().isBeneficial()) {
+                        float extension = chipInstance.getChip().effectExtension.getValue(chipInstance.getLvl());
+                        effectInstance.duration = (int) (effectInstance.getDuration() * (1 + extension));
+                    }
+                });
+            }
         }
+    }
+
+    @SubscribeEvent
+    public static void RightClickItem(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
+        Player player = event.getEntity();
+        GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.INFECTED).ifPresent(chipInstance -> {
+            net.minecraft.world.item.ItemStack stack = event.getItemStack();
+            if (stack.getItem() instanceof com.immunity.item.InhibitorItem) {
+                event.setCanceled(true);
+            }
+        });
     }
 
     private static boolean hasNoArmor(Player player) {

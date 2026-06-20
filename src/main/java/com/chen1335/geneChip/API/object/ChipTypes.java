@@ -52,6 +52,10 @@ public class ChipTypes {
 
     public static final DeferredHolder<Chip, Endurance> ENDURANCE = CHIPS.register("endurance", Endurance::new);
 
+    public static final DeferredHolder<Chip, BigEater> BIG_EATER = CHIPS.register("big_eater", BigEater::new);
+
+    public static final DeferredHolder<Chip, Infected> INFECTED = CHIPS.register("infected", Infected::new);
+
     public static final DeferredHolder<Chip, WildHunter> WILD_HUNTER = CHIPS.register("wild_hunter", WildHunter::new);
 
     public static final DeferredHolder<Chip, SewagePurificationPack> SEWAGE_PURIFICATION_PACK = CHIPS.register("sewage_purification_pack", SewagePurificationPack::new);

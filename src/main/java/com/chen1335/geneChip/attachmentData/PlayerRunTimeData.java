@@ -64,6 +64,9 @@ public class PlayerRunTimeData {
     // 痛觉封锁芯片 - 是否激活（用于伤害减免和近战加成判断）
     public boolean painBlockadeActive = false;
 
+    // 感染者芯片 - 是否处于感染区（用于效果延长判断）
+    public boolean infectedInZone = false;
+
     public void recordKill(long time) {
         if (comboFeversTime.size() >= 3) {
             comboFeversTime.removeFirst();
