@@ -57,6 +57,6 @@ public class GeneChipTab extends SimpleItemTab {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         TabRegistry.registerTab(GeneChipTab.class, TabConfiguration.withOrder(100));
-        event.enqueueWork(() -> TabsMenu.register(new GeneChipTab()));
+        TabsMenu.register(new GeneChipTab());
     }
 }
