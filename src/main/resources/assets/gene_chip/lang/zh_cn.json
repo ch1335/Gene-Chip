@@ -15,9 +15,21 @@
   "gene_chip.chip.bloodthirsty.desc": "强化剂激发远古狩猎本能，每一次收割生命都带来病态的满足与身体机能的短暂回补",
   "gene_chip.chip.bloodthirsty.desc.detailed": "击杀敌对生物时，有%s概率恢复%s生命值",
 
+  "gene_chip.chip.wild_hunter.name": "野外猎手",
+  "gene_chip.chip.wild_hunter.desc": "感官强化让你能精准追踪并高效利用猎物的每一部分",
+  "gene_chip.chip.wild_hunter.desc.detailed": "击杀动物时，额外掉落1-2个对应肉类/皮革。",
+
+  "gene_chip.chip.sewage_purification_pack.name": "污水净化包",
+  "gene_chip.chip.sewage_purification_pack.desc": "感官强化让你能精准追踪并高效利用猎物的每一部分",
+  "gene_chip.chip.sewage_purification_pack.desc.detailed": "击杀动物时，额外掉落1-2个对应肉类/皮革。",
+
+  "gene_chip.chip.endurance.name": "持久耐力",
+  "gene_chip.chip.endurance.desc": "肌肉能量代谢优化，长途奔袭不再是负担",
+  "gene_chip.chip.endurance.desc.detailed": "奔跑与跳跃时饥饿消耗降低%s",
+
   "gene_chip.chip.combo_fever.name": "连击热潮",
-  "gene_chip.chip.combo_fever.desc": "战斗代谢强化后，身体会本能地追随杀戮的节奏，肾上腺素持续涌动",
-  "gene_chip.chip.combo_fever.desc.detailed": "5秒内击杀≥3个敌人时进入战斗狂热状态，获得力量I,抗性I和速度I效果，持续3秒",
+  "gene_chip.chip.combo_fever.desc": "消化系统强化，使你能耐受常人无法承受的污染水源",
+  "gene_chip.chip.combo_fever.desc.detailed": "饮用脏水时，不会获得负面效果",
 
   "gene_chip.chip.melee_attack_master.name": "近战专家",
   "gene_chip.chip.melee_attack_master.desc": "肌肉纤维强化后，你的每一次挥砍都带着千锤百炼的技巧与力量",

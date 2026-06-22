@@ -5,7 +5,7 @@ import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 
 public class Endurance extends Chip {
-    public final JsValueCalculator exhaustionReduce = new JsValueCalculator("0.3");
+    public final JsValueCalculator exhaustionReduce = new JsValueCalculator("0.3",true);
 
     public Endurance() {
         super(makeTexture("endurance"));
