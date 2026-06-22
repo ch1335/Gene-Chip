@@ -56,6 +56,8 @@ public class ChipTypes {
 
     public static final DeferredHolder<Chip, Infected> INFECTED = CHIPS.register("infected", Infected::new);
 
+    public static final DeferredHolder<Chip, ScrapCollector> SCRAP_COLLECTOR = CHIPS.register("scrap_collector", ScrapCollector::new);
+
     public static final DeferredHolder<Chip, WildHunter> WILD_HUNTER = CHIPS.register("wild_hunter", WildHunter::new);
 
     public static final DeferredHolder<Chip, SewagePurificationPack> SEWAGE_PURIFICATION_PACK = CHIPS.register("sewage_purification_pack", SewagePurificationPack::new);

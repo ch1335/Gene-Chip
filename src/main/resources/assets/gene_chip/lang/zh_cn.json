@@ -55,6 +55,10 @@
   "gene_chip.chip.infected.desc": "强化剂诱导细胞与深渊病毒深度共生，以人性的代价换取力量",
   "gene_chip.chip.infected.desc.detailed": "处于感染区时获得力量II，所有正面效果持续时间延长+%s；但永久无法使用深渊病毒免疫剂",
 
+  "gene_chip.chip.scrap_collector.name": "废品收集者",
+  "gene_chip.chip.scrap_collector.desc": "强化剂训练你发现被忽视的宝物，即使是最不起眼的角落也可能藏着惊喜",
+  "gene_chip.chip.scrap_collector.desc.detailed": "开启战利品箱时有%s概率额外获得一份随机物品",
+
   "gene_chip.chip.nutrient_extraction.name": "养分萃取",
   "gene_chip.chip.nutrient_extraction.desc": "强化剂提升营养吸收效率，让每一口食物都发挥最大价值",
   "gene_chip.chip.nutrient_extraction.desc.detailed": "食用食物时，额外恢复+%s饱和度和+%s生命值",

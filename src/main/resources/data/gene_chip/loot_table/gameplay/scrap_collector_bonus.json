@@ -1,0 +1,39 @@
+{
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:chests/simple_dungeon",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:chests/abandoned_mineshaft",
+          "weight": 20
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:chests/desert_pyramid",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:chests/jungle_temple",
+          "weight": 15
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:chests/igloo_chest",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:loot_table",
+          "value": "minecraft:chests/underwater_ruin_small",
+          "weight": 10
+        }
+      ]
+    }
+  ]
+}
