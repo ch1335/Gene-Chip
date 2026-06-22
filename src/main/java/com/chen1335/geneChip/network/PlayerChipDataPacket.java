@@ -7,6 +7,7 @@ import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.chip.SlotInfos;
 import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.network.util.ChipTypeSlot;
+import io.netty.util.collection.IntObjectMap;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -57,12 +58,12 @@ public record PlayerChipDataPacket(
             playerChipData.maxChipSlots = maxChipSlots;
             chipInfos1.copyFrom(playerChipData, chipInfos);
 
-            Map<String, NonNullList<ChipSlot>> slotsByName = slotInfos.slotsByName;
+            Map<String, IntObjectMap<ChipSlot>> slotsByName = slotInfos.slotsByName;
             slotsByName.clear();
             slots.forEach((name, slots) -> {
-                NonNullList<ChipSlot> slots1 = playerChipData.getSlotInfos().newEmptySlots(maxChipSlots);
+                IntObjectMap<ChipSlot> slots1 = playerChipData.getSlotInfos().newEmptySlots(maxChipSlots);
                 for (ChipTypeSlot slot : slots) {
-                    slots1.set(slot.index(), new ChipSlot(Optional.ofNullable(chipInfos1.getChips().getOrDefault(slot.chip().getType(), Map.of()).get(slot.chip())), slot.index()));
+                    slots1.put(slot.index(), new ChipSlot(Optional.ofNullable(chipInfos1.getChips().getOrDefault(slot.chip().getType(), Map.of()).get(slot.chip())), slot.index()));
                 }
                 slotsByName.put(name, slots1);
             });

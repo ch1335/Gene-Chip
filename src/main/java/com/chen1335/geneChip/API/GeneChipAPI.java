@@ -7,6 +7,8 @@ import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipSlot;
 import com.immunity.util.ImmunityServerUtil;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -64,7 +66,7 @@ public class GeneChipAPI {
 
     public static void setSlotChip(Player player, ChipSlot slot) {
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-        NonNullList<ChipSlot> slots = data.getSlotInfos().getSlots();
+        IntObjectMap<ChipSlot> slots = data.getSlotInfos().getSlots();
         Map<Chip, ChipInstance<?>> currentSlots = data.getSlotInfos().currentSlots;
         Optional<ChipInstance<?>> optional = slot.instance();
         if (optional.isPresent()) {
@@ -73,7 +75,7 @@ public class GeneChipAPI {
                 if (slot.index() < slots.size()) {
                     ChipSlot oldSlot = slots.get(slot.index());
                     oldSlot.instance().ifPresent(oldInstance -> oldInstance.getChip().onUnEquipped(player, oldInstance));
-                    slots.set(slot.index(), slot);
+                    slots.put(slot.index(), slot);
                     instance.getChip().onEquipped(player, instance);
                 }
                 data.getSlotInfos().bakeCurrent();
@@ -82,7 +84,7 @@ public class GeneChipAPI {
             if (slot.index() < slots.size()) {
                 ChipSlot oldSlot = slots.get(slot.index());
                 oldSlot.instance().ifPresent(oldInstance -> oldInstance.getChip().onUnEquipped(player, oldInstance));
-                slots.set(slot.index(), slot);
+                slots.put(slot.index(), slot);
             }
             data.getSlotInfos().bakeCurrent();
         }

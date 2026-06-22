@@ -1,5 +1,6 @@
 package com.chen1335.geneChip.client.gui.screen;
 
+import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -11,6 +12,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec2;
 
+import java.util.Optional;
+
 public class EquippedChipWidget extends AbstractWidget {
     private final float xScale;
     private final float yScale;
@@ -18,6 +21,8 @@ public class EquippedChipWidget extends AbstractWidget {
     private ChipSlot chipSlot;
     public int index = 0;
     private final ChipConfigScreen parent;
+
+    private ChipWidget chipWidget = null;
 
     public EquippedChipWidget(ChipSlot chipSlot, int index, ChipConfigScreen parent) {
         super(0, 0, 0, 0, Component.empty());
@@ -29,25 +34,34 @@ public class EquippedChipWidget extends AbstractWidget {
         yScale = windowScale.y * 4;
         this.width = (int) (150 * xScale);
         this.height = (int) (18 * yScale);
+
         setX((int) (10 * xScale));
 
         int ySize = 18;
         int y1 = ySize + 3;
         int y = 40;
         setY((int) ((20 + index * y1 + y) * yScale));
+
+        Optional<ChipInstance<?>> instance = chipSlot.instance();
+        instance.ifPresent(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent));
+    }
+
+    public ChipSlot getChipSlot() {
+        return chipSlot;
     }
 
     public void setChipSlot(ChipSlot chipSlot) {
         this.chipSlot = chipSlot;
+        chipSlot.instance().ifPresent(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent));
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        RenderSystem.enableDepthTest();
         chipSlot.instance().ifPresent(chipInstance -> {
             PoseStack pose = guiGraphics.pose();
             pose.pushPose();
             if (isFocused()) {
-                RenderSystem.enableDepthTest();
                 pose.translate(0, 0, 20);
             }
             guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
@@ -56,13 +70,22 @@ public class EquippedChipWidget extends AbstractWidget {
             GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics, getX() + 102 * xScale, getY() - 27 * yScale, 48 * xScale, 78 * yScale, 8, 1, 24, 39, 40, 40, 2);
             GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics, getX() + 110 * xScale, getY() - 9 * yScale, 32 * xScale, 32 * yScale, 2);
             guiGraphics.disableScissor();
-            if (isHovered && !isFocused()) {
-                RenderSystem.enableBlend();
-                int color = FastColor.ARGB32.color(150, 255, 255, 255);
-                GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), color, 3);
-            }
             pose.popPose();
         });
+        if (isHovered && !isFocused()) {
+            RenderSystem.enableBlend();
+            int color = FastColor.ARGB32.color(150, 255, 255, 255);
+            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), color, 3);
+            if (chipWidget != null) {
+                chipWidget.setX(mouseX);
+                chipWidget.setY(mouseY);
+                PoseStack pose = guiGraphics.pose();
+                pose.pushPose();
+                pose.translate(0,0,40);
+                chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+                pose.popPose();
+            }
+        }
     }
 
     @Override
@@ -93,6 +116,23 @@ public class EquippedChipWidget extends AbstractWidget {
         int y1 = ySize + 3;
         int y = 40;
         setY((int) ((20 + index * y1 + y) * yScale));
+
+        if (parent.hoveredSlot != -1) {
+            EquippedChipWidget old = parent.equippedChipWidgets.get(parent.hoveredSlot);
+            Optional<ChipInstance<?>> oldInstance = old.getChipSlot().instance();
+            Optional<ChipInstance<?>> newInstance = this.getChipSlot().instance();
+            if (oldInstance.isEmpty()) {
+                parent.setSlotChip(null, getChipSlot().index());
+            } else {
+                parent.setSlotChip(oldInstance.get(), getChipSlot().index());
+            }
+
+
+            newInstance.ifPresent(chipInstance -> {
+                parent.setSlotChip(chipInstance, parent.hoveredSlot);
+            });
+        }
+
         setFocused(false);
     }
 }

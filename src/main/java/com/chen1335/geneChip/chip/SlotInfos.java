@@ -2,8 +2,9 @@ package com.chen1335.geneChip.chip;
 
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -14,12 +15,13 @@ import org.jetbrains.annotations.UnknownNullability;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 public class SlotInfos implements INBTSerializable<CompoundTag> {
-    public final Map<String, NonNullList<ChipSlot>> slotsByName = new HashMap<>();
+    public final Map<String, IntObjectMap<ChipSlot>> slotsByName = new HashMap<>();
     public final Map<Chip, ChipInstance<?>> currentSlots = new HashMap<>();
     private final PlayerChipData playerChipData;
     private String currentSlotsName = "main";
@@ -30,7 +32,7 @@ public class SlotInfos implements INBTSerializable<CompoundTag> {
 
     public void bakeCurrent() {
         currentSlots.clear();
-        for (ChipSlot chipSlot : slotsByName.getOrDefault(currentSlotsName, NonNullList.create())) {
+        for (ChipSlot chipSlot : slotsByName.getOrDefault(currentSlotsName, new IntObjectHashMap<>()).values()) {
             chipSlot.instance().ifPresent(chipInstance -> {
                 currentSlots.put(chipInstance.getChip(), chipInstance);
             });
@@ -43,7 +45,7 @@ public class SlotInfos implements INBTSerializable<CompoundTag> {
         CompoundTag slotsByNameTag = new CompoundTag();
         slotsByName.forEach((name, slots) -> {
             ListTag listTag = new ListTag();
-            for (ChipSlot slot : slots) {
+            for (ChipSlot slot : slots.values()) {
                 Optional<ChipInstance<?>> instance = slot.instance();
                 if (instance.isPresent()) {
                     CompoundTag unit = new CompoundTag();
@@ -73,7 +75,7 @@ public class SlotInfos implements INBTSerializable<CompoundTag> {
                 if (unit.contains("chip")) {
                     Chip chip = RegisterTypes.CHIP.get(ResourceLocation.parse(unit.getString("chip")));
                     if (chip != null) {
-                        slotsByName.get(key).set(unit.getInt("index"), new ChipSlot(Optional.ofNullable(playerChipData.getChipInfos().getChips().getOrDefault(chip.getType(), Map.of()).get(chip)), unit.getInt("index")));
+                        slotsByName.get(key).put(unit.getInt("index"), new ChipSlot(Optional.ofNullable(playerChipData.getChipInfos().getChips().getOrDefault(chip.getType(), Map.of()).get(chip)), unit.getInt("index")));
                     }
                 }
             }
@@ -82,16 +84,16 @@ public class SlotInfos implements INBTSerializable<CompoundTag> {
         bakeCurrent();
     }
 
-    public NonNullList<ChipSlot> newEmptySlots(int size) {
-        NonNullList<ChipSlot> list = NonNullList.create();
+    public IntObjectMap<ChipSlot> newEmptySlots(int size) {
+        IntObjectHashMap<ChipSlot> map = new IntObjectHashMap<>();
         for (int i = 0; i < size; i++) {
-            list.add(new ChipSlot(Optional.empty(), i));
+            map.put(i, new ChipSlot(Optional.empty(), i));
         }
-        return list;
+        return map;
     }
 
 
-    public NonNullList<ChipSlot> getSlots() {
+    public IntObjectMap<ChipSlot> getSlots() {
         return slotsByName.computeIfAbsent(currentSlotsName, k -> newEmptySlots(playerChipData.maxChipSlots));
     }
 
@@ -109,5 +111,26 @@ public class SlotInfos implements INBTSerializable<CompoundTag> {
 
     public void tick(Player entity) {
         currentSlots.forEach((chip, chipInstance) -> chip.tick(entity, chipInstance));
+    }
+
+    public void resizeSlots(Player entity) {
+        for (IntObjectMap<ChipSlot> value : slotsByName.values()) {
+            int size = value.size();
+            int maxChipSlots = playerChipData.maxChipSlots;
+            if (size > maxChipSlots) {
+                Iterator<IntObjectMap.PrimitiveEntry<ChipSlot>> iterator = value.entries().iterator();
+                while (iterator.hasNext()) {
+                    IntObjectMap.PrimitiveEntry<ChipSlot> next = iterator.next();
+                    if (next.key() >= maxChipSlots) {
+                        iterator.remove();
+                    }
+                }
+            }
+
+            for (int i = 0; i < maxChipSlots; i++) {
+                value.computeIfAbsent(i, index -> new ChipSlot(Optional.empty(), index));
+            }
+        }
+        bakeCurrent();
     }
 }

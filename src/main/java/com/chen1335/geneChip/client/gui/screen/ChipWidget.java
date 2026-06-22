@@ -110,9 +110,17 @@ public class ChipWidget extends AbstractWidget {
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
+        setFocused(false);
         if (parent.hoveredSlot != -1) {
+            List<EquippedChipWidget> equippedChipWidgets = parent.equippedChipWidgets;
+            for (EquippedChipWidget equippedChipWidget : equippedChipWidgets) {
+                Optional<ChipInstance<?>> instance = equippedChipWidget.getChipSlot().instance();
+                if (instance.isPresent() && instance.get().getChip() == this.chipInstance.getChip()) {
+                    return;
+                }
+            }
+
             parent.setSlotChip(chipInstance, parent.hoveredSlot);
         }
-        setFocused(false);
     }
 }

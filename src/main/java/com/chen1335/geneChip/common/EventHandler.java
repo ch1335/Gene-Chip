@@ -67,7 +67,7 @@ public class EventHandler {
             PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
             Map<String, List<ChipTypeSlot>> map = new HashMap<>();
             data.getSlotInfos().slotsByName.forEach((name, slots) -> {
-                for (ChipSlot slot : slots) {
+                for (ChipSlot slot : slots.values()) {
                     slot.instance().ifPresent(chipInstance -> map.computeIfAbsent(name, k -> new ArrayList<>()).add(new ChipTypeSlot(chipInstance.getChip(), slot.index())));
                 }
             });

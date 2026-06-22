@@ -64,16 +64,16 @@ public class PlayerChipData implements INBTSerializable<CompoundTag> {
     public void tick(Player entity) {
         coolDownInfos.tick();
         slotInfos.tick(entity);
-        int value = (int) GCAttributes.MAX_CHIP_SLOT.get().getDefaultValue();
+        int value = (int) entity.getAttributeValue(GCAttributes.MAX_CHIP_SLOT);
         if (maxChipSlots != value) {
-            maxChipSlots = (int) GCAttributes.MAX_CHIP_SLOT.get().getDefaultValue();
-            resizeSlots();
+            maxChipSlots = value;
+            resizeSlots(entity);
         }
 
     }
 
-    private void resizeSlots() {
-
+    public void resizeSlots(Player entity) {
+        slotInfos.resizeSlots(entity);
     }
 
 
