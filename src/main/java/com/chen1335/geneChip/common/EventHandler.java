@@ -2,6 +2,7 @@ package com.chen1335.geneChip.common;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
+import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
@@ -25,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -36,6 +38,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -172,5 +175,10 @@ public class EventHandler {
         Player original = event.getOriginal();
         PlayerChipData data = original.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
         event.getEntity().setData(GCAttachmentTypes.PLAYER_CHIP_DATA, data);
+    }
+
+    @SubscribeEvent
+    public static void EntityAttributeModificationEvent(EntityAttributeModificationEvent event) {
+        event.add(EntityType.PLAYER, GCAttributes.MAX_CHIP_SLOT);
     }
 }

@@ -1,5 +1,6 @@
 package com.chen1335.geneChip.attachmentData;
 
+import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.chip.*;
 import com.chen1335.geneChip.network.AddChipPacket;
 import net.minecraft.core.HolderLookup;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerChipData implements INBTSerializable<CompoundTag> {
-    public int maxChipSlots = 2;
+    public int maxChipSlots = (int) GCAttributes.MAX_CHIP_SLOT.get().getDefaultValue();
 
     private final ChipInfos chipInfos = new ChipInfos();
 
@@ -63,7 +64,18 @@ public class PlayerChipData implements INBTSerializable<CompoundTag> {
     public void tick(Player entity) {
         coolDownInfos.tick();
         slotInfos.tick(entity);
+        int value = (int) GCAttributes.MAX_CHIP_SLOT.get().getDefaultValue();
+        if (maxChipSlots != value) {
+            maxChipSlots = (int) GCAttributes.MAX_CHIP_SLOT.get().getDefaultValue();
+            resizeSlots();
+        }
+
     }
+
+    private void resizeSlots() {
+
+    }
+
 
     public void addCoolDown(Chip chip, int tick) {
         coolDownInfos.addCoolDown(chip, tick);
