@@ -93,6 +93,11 @@ public abstract class Chip {
     public void onImmunityValueChanged(Player player, ChipInstance<?> instance, int immunityValue) {
     }
 
+    /**
+     * 世界因子发生变化（天数切换）时调用。需要响应因子联动的芯片应覆写此方法。
+     */
+    public void onDayChange(Player player, ChipInstance<?> instance) {
+    }
 
     public void onEquipped(Player player, ChipInstance<?> instance) {
 

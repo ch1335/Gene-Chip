@@ -8,6 +8,7 @@ import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
 import com.chen1335.geneChip.chip.chips.tactics.SlidingTackle;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.chen1335.geneChip.network.PlayerActionPacket;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -40,6 +41,10 @@ public class ClientEventHandler {
                 if (player.getFoodData().getFoodLevel() >= 2) {
                     SlidingTackle chip = chipInstance.getChip();
                     float slideDistance = chip.slideDistance.getValue(chipInstance.getLvl());
+                    // 丧尸暴动联动：滑铲距离+2格
+                    if (WorldFactorSynergy.isZombieRiot()) {
+                        slideDistance += 2;
+                    }
                     player.setDeltaMovement(player.getViewVector(0).scale(slideDistance));
 
                     PacketDistributor.sendToServer(new PlayerActionPacket(PlayerActionPacket.ActionType.SLIDING_TACKLE, new CompoundTag()));

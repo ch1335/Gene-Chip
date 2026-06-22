@@ -2,6 +2,7 @@ package com.chen1335.geneChip;
 
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
+import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.LootItemConditions;
 import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
 import com.chen1335.geneChip.config.ClothConfig;
@@ -31,6 +32,7 @@ public class GeneChip {
         GCAttachmentTypes.ATTACHMENT_TYPES.register(modEventBus);
         ChipTypes.CHIPS.register(modEventBus);
         LootItemConditions.LOOT_ITEM_CONDITION_TYPES.register(modEventBus);
+        GCAttributes.ATTRIBUTE_DEFERRED_REGISTER.register(modEventBus);
         ClothConfig.build(modContainer);
         modEventBus.addListener(this::FMLCommonSetupEvent);
     }

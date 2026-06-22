@@ -6,7 +6,9 @@ import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.immunity.data.InfectionZoneManager;
+import com.immunity.util.ImmunityServerUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -34,8 +36,22 @@ public class Infected extends Chip {
         runtimeData.infectedInZone = inZone;
 
         if (inZone) {
-            // 处于感染区时给予力量 II
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 39, 1, false, false));
+            int strengthLevel = 1; // 力量 II (amplifier=1)
+
+            // 血月联动：力量提升至III，但每分钟损失10点免疫力
+            if (WorldFactorSynergy.isBloodMoon()) {
+                strengthLevel = 2;
+                if (player.level().getGameTime() % 120 == 0) {
+                    ImmunityServerUtil.addImmunity(serverPlayer, -1);
+                }
+            }
+
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 39, strengthLevel, false, false));
+
+            // 感染溢出联动：攻击速度+15%
+            if (WorldFactorSynergy.isInfectionOverflow()) {
+                player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 39, 0, false, false));
+            }
         }
     }
 

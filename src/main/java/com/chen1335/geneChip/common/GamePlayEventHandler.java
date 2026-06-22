@@ -14,6 +14,7 @@ import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
 import com.chen1335.geneChip.chip.chips.special.VengefulFlame;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.chen1335.geneChip.chip.chips.special.IronHeart;
 import com.chen1335.geneChip.chip.chips.special.CounterStorm;
 import net.minecraft.core.particles.ParticleTypes;
@@ -67,6 +68,11 @@ public class GamePlayEventHandler {
                 MakeLiving chip = chipInstance.getChip();
                 float value = chip.recyclingChance.getValue(chipInstance.getLvl());
                 if (player.getRandom().nextFloat() < value) {
+                    GunData data = GunData.from(player.getMainHandItem());
+                    data.ammo.set(data.ammo.get() + 1);
+                }
+                // 丧尸暴动联动：5%概率额外获得一颗子弹
+                if (WorldFactorSynergy.isZombieRiot() && player.getRandom().nextFloat() < 0.05F) {
                     GunData data = GunData.from(player.getMainHandItem());
                     data.ammo.set(data.ammo.get() + 1);
                 }
@@ -144,6 +150,10 @@ public class GamePlayEventHandler {
             if (event.getSource().getDirectEntity() instanceof ProjectileEntity) {
                 GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.PRECISION_SHOOTING).ifPresent(chipInstance -> {
                     float value = chipInstance.getChip().damageMul.getValue(chipInstance.getLvl());
+                    // 阳光裂隙联动：枪械伤害+10%
+                    if (WorldFactorSynergy.isRaysOfSunlight()) {
+                        value += 0.1F;
+                    }
                     event.setAmount(event.getAmount() * (1 + value));
                 });
             }
@@ -261,6 +271,10 @@ public class GamePlayEventHandler {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.QUICK_ADJUSTMENT).ifPresent(chipInstance -> {
                 QuickAdjustment chip = chipInstance.getChip();
                 float timeValue = chip.effectTime.getValue(chipInstance.getLvl());
+                // 天气晴朗联动：远程击杀后速度效果+1秒
+                if (WorldFactorSynergy.isFineWeather()) {
+                    timeValue += 1;
+                }
                 Entity directEntity = event.getSource().getDirectEntity();
                 if (directEntity instanceof Arrow || directEntity instanceof ProjectileEntity) {
                     player.addEffect(new MobEffectInstance(
@@ -390,6 +404,11 @@ public class GamePlayEventHandler {
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.INFECTED).ifPresent(chipInstance -> {
             net.minecraft.world.item.ItemStack stack = event.getItemStack();
             if (stack.getItem() instanceof com.immunity.item.InhibitorItem) {
+                event.setCanceled(true);
+            }
+            // 感染溢出联动：禁用治疗物品
+            if (com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy.isInfectionOverflow()
+                    && stack.is(net.minecraft.tags.ItemTags.create(net.minecraft.resources.ResourceLocation.parse("c:foods/golden")))) {
                 event.setCanceled(true);
             }
         });

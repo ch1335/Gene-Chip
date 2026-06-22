@@ -6,6 +6,7 @@ import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -14,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 
 public class Photosynthesis extends Chip {
     private static final ResourceLocation SPEED_ID = GeneChip.id("photosynthesis_speed");
+    private static final int BASE_INTERVAL = 30 * 20;
+    private static final int BASE_MAX_STACKS = 5;
 
     public Photosynthesis() {
         super(makeTexture("photosynthesis"));
@@ -27,13 +30,26 @@ public class Photosynthesis extends Chip {
     @Override
     public void tick(Player player, ChipInstance<?> instance) {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+
+        int interval = BASE_INTERVAL;
+        int maxStacks = BASE_MAX_STACKS;
+
+        // 阳光裂隙联动：充能速度x3，上限8层
+        if (WorldFactorSynergy.isRaysOfSunlight()) {
+            interval = BASE_INTERVAL / 3;
+            maxStacks = 8;
+        } else if (WorldFactorSynergy.isFineWeather()) {
+            // 天气晴朗联动：充能速度x2
+            interval = BASE_INTERVAL / 2;
+        }
+
         playerRunTimeData.photosynthesisTimer++;
 
-        if (playerRunTimeData.photosynthesisTimer >= 30 * 20) {
+        if (playerRunTimeData.photosynthesisTimer >= interval) {
             playerRunTimeData.photosynthesisTimer = 0;
 
             if (isUnderDirectSunlight(player)) {
-                if (playerRunTimeData.photosynthesisStacks < 5) {
+                if (playerRunTimeData.photosynthesisStacks < maxStacks) {
                     playerRunTimeData.photosynthesisStacks++;
                     updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks);
                 }
@@ -46,7 +62,6 @@ public class Photosynthesis extends Chip {
 
             if (playerRunTimeData.photosynthesisStacks > 0) {
                 player.getFoodData().eat(2, 0);
-
             }
         }
     }

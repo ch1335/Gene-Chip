@@ -5,6 +5,7 @@ import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import net.mcbbs.uid1525632.hungerreworkedreforged.common.attachment.PlayerStomach;
 import net.mcbbs.uid1525632.hungerreworkedreforged.common.init.HRRAttachmentTypes;
 import net.mcbbs.uid1525632.hungerreworkedreforged.common.init.HRRAttributes;
@@ -45,6 +46,26 @@ public class BigEater extends Chip {
         AttributeInstance digestionRate = player.getAttribute(HRRAttributes.DIGESTION_RATE);
         if (digestionRate != null) {
             float bonus = digestionBoost.getValue(instance.getLvl());
+            // 饥荒前兆联动：消化速度+30%
+            if (WorldFactorSynergy.isSignsOfFamine()) {
+                bonus += 0.3F;
+            }
+            digestionRate.addTransientModifier(new AttributeModifier(
+                    DIGESTION_RATE_ID, bonus, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+            ));
+        }
+    }
+
+    @Override
+    public void onDayChange(Player player, ChipInstance<?> instance) {
+        // 世界因子变化时重新应用消化速度modifier
+        AttributeInstance digestionRate = player.getAttribute(HRRAttributes.DIGESTION_RATE);
+        if (digestionRate != null) {
+            digestionRate.removeModifier(DIGESTION_RATE_ID);
+            float bonus = digestionBoost.getValue(instance.getLvl());
+            if (WorldFactorSynergy.isSignsOfFamine()) {
+                bonus += 0.3F;
+            }
             digestionRate.addTransientModifier(new AttributeModifier(
                     DIGESTION_RATE_ID, bonus, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
             ));

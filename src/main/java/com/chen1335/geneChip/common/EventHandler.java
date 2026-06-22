@@ -1,7 +1,6 @@
 package com.chen1335.geneChip.common;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
-import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.GeneChip;
@@ -166,5 +165,12 @@ public class EventHandler {
                 instance.setScreen(new ChipConfigScreen());
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void PlayerCloneEvent(PlayerEvent.Clone event) {
+        Player original = event.getOriginal();
+        PlayerChipData data = original.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        event.getEntity().setData(GCAttachmentTypes.PLAYER_CHIP_DATA, data);
     }
 }

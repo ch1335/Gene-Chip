@@ -3,6 +3,7 @@ package com.chen1335.geneChip.chip.chips.special;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -21,9 +22,18 @@ public class NightHunter extends Chip {
     public void tick(Player player, ChipInstance<?> instance) {
         if (player.level().getGameTime() % 20 == 0) {
             if (isNight(player)) {
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 39, 0, false, false));
+                int strengthAmp = 0; // 力量 I
+                int speedAmp = 0;    // 速度 I
+
+                // 血月联动：夜间增益提升至力量 II + 速度 II
+                if (WorldFactorSynergy.isBloodMoon()) {
+                    strengthAmp = 1;
+                    speedAmp = 1;
+                }
+
+                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 39, strengthAmp, false, false));
                 player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 239, 0, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 39, 0, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 39, speedAmp, false, false));
             }
         }
     }

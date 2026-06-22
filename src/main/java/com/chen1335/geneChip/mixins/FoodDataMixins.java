@@ -4,6 +4,7 @@ import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 import com.chen1335.geneChip.chip.chips.survival.NutrientExtraction;
+import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +36,12 @@ public abstract class FoodDataMixins {
             GeneChipAPI.getPlayerEquippedChip(gc$player, ChipTypes.NUTRIENT_EXTRACTION).ifPresent(chipInstance -> {
                 NutrientExtraction chip = chipInstance.getChip();
                 eat((int) chip.foodAdd.getValue(chipInstance.getLvl()), 0F);
-                gc$player.heal(chip.heal.getValue(chipInstance.getLvl()));
+                float healAmount = chip.heal.getValue(chipInstance.getLvl());
+                // 饥荒前兆联动：额外恢复生命值+1
+                if (WorldFactorSynergy.isSignsOfFamine()) {
+                    healAmount += 1;
+                }
+                gc$player.heal(healAmount);
             });
         }
     }
