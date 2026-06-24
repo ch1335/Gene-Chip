@@ -78,8 +78,8 @@ public class ChipConfigScreen extends Screen {
     private void setupFilterBar() {
         int filterY = (int) (2 * yScale * 2);
         int searchX = (int) (170 * xScale * 2);
-        int searchW = 180;
-        int searchH = 16;
+        int searchW = (int) (80 * xScale*2);
+        int searchH = (int) (16 * yScale*2);
 
         searchBox = new EditBox(Minecraft.getInstance().font,
                 searchX, filterY, searchW, searchH,
@@ -94,23 +94,23 @@ public class ChipConfigScreen extends Screen {
 
         int unlockedX = searchX + searchW + 4;
         unlockedDropdown = new DropdownButton<>(
-                unlockedX, filterY - 2, 60, 20,
+                unlockedX, filterY, (int) (60 * xScale*2), (int) (16 * yScale*2),
                 List.of(Boolean.FALSE, Boolean.TRUE),
                 chipFilter.isShowAll(),
                 on -> on ? Component.translatable("gene_chip.filter.all")
-                         : Component.translatable("gene_chip.filter.unlocked"),
+                        : Component.translatable("gene_chip.filter.unlocked"),
                 value -> {
                     chipFilter.setShowAll(value);
                     rebuildChipWidgets();
                 });
         addWidget(unlockedDropdown);
 
-        int typeX = unlockedX + 60 + 4;
+        int typeX = unlockedX + (int) (60 * xScale*2) + 4;
         List<ChipType> typeOptions = new ArrayList<>();
         typeOptions.add(null);
         typeOptions.addAll(Arrays.asList(ChipType.values()));
         typeDropdown = new DropdownButton<>(
-                typeX, filterY - 2, 100, 20,
+                typeX, filterY, (int) (60 * xScale*2), (int) (16 * yScale*2),
                 typeOptions,
                 chipFilter.getTypeFilter(),
                 type -> type == null
@@ -190,7 +190,7 @@ public class ChipConfigScreen extends Screen {
         RenderSystem.enableBlend();
 
         float s = 2;
-        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale * s), (int) (20 * yScale* s), (int) (150 * xScale* s), (int) (240 * yScale* s), FastColor.ARGB32.color(150, 0, 0, 0), 1);
+        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale * s), (int) (20 * yScale * s), (int) (150 * xScale * s), (int) (240 * yScale * s), FastColor.ARGB32.color(150, 0, 0, 0), 1);
 
         GuiUtil.drawColorWithSize(guiGraphics,
                 (int) (170 * xScale * s), (int) (0 * yScale * s),
