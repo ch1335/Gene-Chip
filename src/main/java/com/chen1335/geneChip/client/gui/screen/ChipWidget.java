@@ -48,10 +48,9 @@ public class ChipWidget extends AbstractWidget {
         Minecraft instance = Minecraft.getInstance();
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
-        pose.translate(0, 0, 10);
         RenderSystem.enableDepthTest();
         if (isFocused()) {
-            pose.translate(0, 0, 20);
+            pose.translate(0, 0, 60);
         }
         GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics, getX(), getY(), 48 * xScale, 78 * yScale, 8, 1, 24, 39, 40, 40, 0);
         GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getBigCrystalIcon(), guiGraphics, getX() - 2 * xScale, getY() - 2 * yScale, 12 * xScale, 12 * yScale, 1, 1, 6, 6, 8, 8, 0);
@@ -68,7 +67,6 @@ public class ChipWidget extends AbstractWidget {
         pose.popPose();
 
         Component desc = chipInstance.getChip().detailDesc(chipInstance.getLvl());
-        int descWidth = instance.font.width(desc);
         List<FormattedCharSequence> split = instance.font.split(desc, 80);
 
         for (int i = 0; i < split.size(); i++) {

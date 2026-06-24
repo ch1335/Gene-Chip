@@ -9,6 +9,7 @@ import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.chen1335.geneChip.network.SetSlotChipPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import io.netty.util.collection.IntObjectMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -78,8 +79,8 @@ public class ChipConfigScreen extends Screen {
     private void setupFilterBar() {
         int filterY = (int) (2 * yScale * 2);
         int searchX = (int) (170 * xScale * 2);
-        int searchW = (int) (80 * xScale*2);
-        int searchH = (int) (16 * yScale*2);
+        int searchW = (int) (80 * xScale * 2);
+        int searchH = (int) (16 * yScale * 2);
 
         searchBox = new EditBox(Minecraft.getInstance().font,
                 searchX, filterY, searchW, searchH,
@@ -94,7 +95,7 @@ public class ChipConfigScreen extends Screen {
 
         int unlockedX = searchX + searchW + 4;
         unlockedDropdown = new DropdownButton<>(
-                unlockedX, filterY, (int) (60 * xScale*2), (int) (16 * yScale*2),
+                unlockedX, filterY, (int) (60 * xScale * 2), (int) (16 * yScale * 2),
                 List.of(Boolean.FALSE, Boolean.TRUE),
                 chipFilter.isShowAll(),
                 on -> on ? Component.translatable("gene_chip.filter.all")
@@ -105,12 +106,12 @@ public class ChipConfigScreen extends Screen {
                 });
         addWidget(unlockedDropdown);
 
-        int typeX = unlockedX + (int) (60 * xScale*2) + 4;
+        int typeX = unlockedX + (int) (60 * xScale * 2) + 4;
         List<ChipType> typeOptions = new ArrayList<>();
         typeOptions.add(null);
         typeOptions.addAll(Arrays.asList(ChipType.values()));
         typeDropdown = new DropdownButton<>(
-                typeX, filterY, (int) (60 * xScale*2), (int) (16 * yScale*2),
+                typeX, filterY, (int) (60 * xScale * 2), (int) (16 * yScale * 2),
                 typeOptions,
                 chipFilter.getTypeFilter(),
                 type -> type == null
@@ -152,6 +153,7 @@ public class ChipConfigScreen extends Screen {
             chipWidgets.add(chipWidget);
             chipIndex++;
         }
+        clampScrollY();
     }
 
     public IntObjectMap<ChipSlot> getSlots() {
@@ -161,16 +163,6 @@ public class ChipConfigScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        float s = 2;
-        int i = 0;
-        for (ChipWidget chipWidget : chipWidgets) {
-            if (!chipWidget.isFocused()) {
-                chipWidget.setX((int) ((170 + (i % 4) * 60) * xScale * s));
-                chipWidget.setY((int) ((int) ((CHIP_GRID_Y + ((int) (i / 4)) * 85) * yScale * s) + scrollY));
-            }
-            chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
-            i++;
-        }
 
         for (EquippedChipWidget equippedChipWidget : equippedChipWidgets) {
             equippedChipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -182,20 +174,39 @@ public class ChipConfigScreen extends Screen {
         if (typeDropdown != null) {
             typeDropdown.render(guiGraphics, mouseX, mouseY, partialTick);
         }
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        float s = 2;
+        int i = 0;
+        for (ChipWidget chipWidget : chipWidgets) {
+            if (!chipWidget.isFocused()) {
+                chipWidget.setX((int) ((170 + (i % 4) * 60) * xScale * s));
+                chipWidget.setY((int) ((int) ((CHIP_GRID_Y + ((int) (i / 4)) * 85) * yScale * s) + scrollY));
+            }
+            PoseStack pose = guiGraphics.pose();
+            pose.pushPose();
+            pose.translate(0, 0, -30);
+            chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+            pose.popPose();
+            i++;
+        }
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
-
         float s = 2;
-        GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale * s), (int) (20 * yScale * s), (int) (150 * xScale * s), (int) (240 * yScale * s), FastColor.ARGB32.color(150, 0, 0, 0), 1);
+        GuiUtil.drawColorWithSize(guiGraphics,
+                (int) (10 * xScale * s), (int) (20 * yScale * s),
+                (int) (150 * xScale * s), (int) (240 * yScale * s),
+                FastColor.ARGB32.color(100, 0, 0, 0), 1);
 
         GuiUtil.drawColorWithSize(guiGraphics,
-                (int) (170 * xScale * s), (int) (0 * yScale * s),
-                (int) (310 * xScale * s), (int) (FILTER_BAR_HEIGHT * yScale * s),
-                FastColor.ARGB32.color(150, 0, 0, 0), 1);
+                (int) (10 * xScale * s), (int) (0 * yScale * s),
+                (int) ((315 + 155) * xScale * s), (int) (20 * yScale * s),
+                FastColor.ARGB32.color(100, 0, 0, 0), 0);
 
         hoveredSlot = -1;
         for (int i = 0; i < getSlots().size(); i++) {
@@ -241,8 +252,24 @@ public class ChipConfigScreen extends Screen {
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (unlockedDropdown != null && unlockedDropdown.isExpanded()) return false;
         if (typeDropdown != null && typeDropdown.isExpanded()) return false;
-        this.scrollY = Math.min(this.scrollY + scrollY * 50, 0);
+        double minScrollY = computeMinScrollY();
+        this.scrollY = Math.max(minScrollY, Math.min(this.scrollY + scrollY * 50, 0));
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private double computeMinScrollY() {
+        int rows = (chipWidgets.size() + 3) / 4;
+        if (rows == 0) return 0;
+        float s = 2;
+        float contentBottomScaled = CHIP_GRID_Y + (rows - 1) * 85 + 78;
+        float contentBottomPx = contentBottomScaled * yScale * s;
+        double minScroll = this.height - contentBottomPx - 10;
+        return Math.min(0, minScroll);
+    }
+
+    private void clampScrollY() {
+        double minScrollY = computeMinScrollY();
+        this.scrollY = Math.max(minScrollY, Math.min(this.scrollY, 0));
     }
 
     public void renderSlotBox(GuiGraphics guiGraphics, int mouseX, int mouseY, int index, float partialTick) {
