@@ -167,6 +167,9 @@ public class ChipConfigScreen extends Screen {
         for (EquippedChipWidget equippedChipWidget : equippedChipWidgets) {
             equippedChipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
         }
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        renderEquippedTypeSummary(guiGraphics);
 
         if (unlockedDropdown != null) {
             unlockedDropdown.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -174,8 +177,7 @@ public class ChipConfigScreen extends Screen {
         if (typeDropdown != null) {
             typeDropdown.render(guiGraphics, mouseX, mouseY, partialTick);
         }
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
+
         float s = 2;
         int i = 0;
         for (ChipWidget chipWidget : chipWidgets) {
@@ -284,6 +286,54 @@ public class ChipConfigScreen extends Screen {
 
         GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale * s), (int) (((20 + index * y1 + y) * yScale) * s), (int) (150 * xScale) * s, (int) (ySize * yScale) * s, color, 1);
 
+    }
+
+    private void renderEquippedTypeSummary(GuiGraphics guiGraphics) {
+        EnumMap<ChipType, Integer> counts = new EnumMap<>(ChipType.class);
+        for (ChipType type : ChipType.values()) {
+            counts.put(type, 0);
+        }
+        IntObjectMap<ChipSlot> chipSlots = getSlots();
+        for (ChipSlot slot : chipSlots.values()) {
+            if (slot.instance().isPresent()) {
+                ChipType type = slot.instance().get().getChip().getType();
+                counts.merge(type, 1, Integer::sum);
+            }
+        }
+
+        int slotCount = chipSlots.size();
+        int ySize = 18;
+        int y1 = ySize + 3;
+        int yStart = 20 + 40;
+        int lastBottomScaled = yStart + Math.max(0, slotCount - 1) * y1 + ySize;
+        int summaryY = lastBottomScaled + 8;
+
+        float s = 2;
+        int entryWidth = 30;
+        int startX = 10;
+
+        Minecraft mc = Minecraft.getInstance();
+        int i = 0;
+        for (ChipType type : ChipType.values()) {
+            int count = counts.getOrDefault(type, 0);
+            if (count <= 0) continue;
+
+            int ex = startX + i * entryWidth;
+            int ey = summaryY;
+
+            GuiUtil.drawTextureWithSize(type.getSmallCrystalIcon(), guiGraphics,
+                    ex * xScale * s, ey * yScale * s,
+                    8 * xScale * s, 8 * yScale * s,
+                    2, 2, 4, 4, 8, 8, 5);
+
+            Component countText = Component.literal("" + count);
+            PoseStack pose = guiGraphics.pose();
+            pose.pushPose();
+            pose.translate(0,0,1);
+            guiGraphics.drawString(mc.font, countText, (int) ((ex + 9) * xScale * s), (int) ((ey + 1) * yScale * s), 0xFFFFFFFF, false);
+            pose.popPose();
+            i++;
+        }
     }
 
     public void setSlotChip(@Nullable ChipInstance<?> chipInstance, int slot) {

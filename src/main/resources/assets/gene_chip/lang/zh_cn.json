@@ -146,7 +146,7 @@
   "gene_chip.config_value.exhaustion_duration": "体力透支持续时间",
   "gene_chip.config_value.cooldown": "冷却时间",
 
-  "gene_chip.filter.search_hint": "搜索芯片...",
+  "gene_chip.filter.search_hint": "搜索卡牌...",
   "gene_chip.filter.all": "全部",
   "gene_chip.filter.unlocked": "已解锁",
   "gene_chip.filter.type.all": "全类型",

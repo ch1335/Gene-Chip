@@ -105,7 +105,7 @@ public class DropdownButton<T> extends AbstractWidget {
 
         drawBox(guiGraphics, getX(), getY(), width, baseHeight, triggerColor, borderColor);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0, RENDER_Z + 1);
+        guiGraphics.pose().translate(0, 0,   1);
         Component text = valueToText.apply(value);
         guiGraphics.drawString(font, text, getX() + 6, getY() + (baseHeight - font.lineHeight) / 2 + 1, 0xFFFFFFFF, false);
         String arrow = expanded ? "▲" : "▼";
@@ -122,7 +122,7 @@ public class DropdownButton<T> extends AbstractWidget {
                 boolean isCurrent = options.get(i) == value || (options.get(i) != null && options.get(i).equals(value));
                 int textColor = isCurrent ? 0xFFFFFF00 : 0xFFFFFFFF;
                 guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(0, 0, RENDER_Z + 1);
+                guiGraphics.pose().translate(0, 0,   1);
                 guiGraphics.drawString(font, optText, getX() + 6, oy + (optionHeight - font.lineHeight) / 2 + 1, textColor, false);
                 guiGraphics.pose().popPose();
             }
@@ -130,11 +130,11 @@ public class DropdownButton<T> extends AbstractWidget {
     }
 
     private static void drawBox(GuiGraphics guiGraphics, int x, int y, int w, int h, int fillColor, int borderColor) {
-        GuiUtil.drawColorWithSize(guiGraphics, x, y, w, h, fillColor, RENDER_Z);
-        GuiUtil.drawColorWithSize(guiGraphics, x, y, w, 1, borderColor, RENDER_Z + 1);
-        GuiUtil.drawColorWithSize(guiGraphics, x, y + h - 1, w, 1, borderColor, RENDER_Z + 1);
-        GuiUtil.drawColorWithSize(guiGraphics, x, y, 1, h, borderColor, RENDER_Z + 1);
-        GuiUtil.drawColorWithSize(guiGraphics, x + w - 1, y, 1, h, borderColor, RENDER_Z + 1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y, w, h, fillColor, 1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y, w, 1, borderColor,   1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y + h - 1, w, 1, borderColor,   1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y, 1, h, borderColor,   1);
+        GuiUtil.drawColorWithSize(guiGraphics, x + w - 1, y, 1, h, borderColor,   1);
     }
 
     @Override
