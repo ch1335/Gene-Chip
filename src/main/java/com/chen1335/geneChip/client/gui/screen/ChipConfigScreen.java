@@ -10,7 +10,9 @@ import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.chen1335.geneChip.network.SetSlotChipPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.netty.util.collection.IntObjectMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -25,6 +27,9 @@ import java.util.*;
 public class ChipConfigScreen extends Screen {
     private float xScale;
     private float yScale;
+
+    private static final int FILTER_BAR_HEIGHT = 25;
+    private static final int CHIP_GRID_Y = 22 + FILTER_BAR_HEIGHT;
 
     public ChipConfigScreen() {
         super(Component.empty());
@@ -42,26 +47,96 @@ public class ChipConfigScreen extends Screen {
 
     public int hoveredSlot = -1;
 
+    private EditBox searchBox;
+    private DropdownButton<Boolean> unlockedDropdown;
+    private DropdownButton<ChipType> typeDropdown;
+
     @Override
     protected void init() {
         super.init();
-        chipWidgets.clear();
-        equippedChipWidgets.clear();
         Vec2 windowScale = GuiUtil.getWindowScale();
 
         xScale = windowScale.x * 2;
         yScale = windowScale.y * 2;
-        int chipIndex = 0;
+
+        chipWidgets.clear();
+        equippedChipWidgets.clear();
+
+        setupFilterBar();
+        rebuildChipWidgets();
+
+        getSlots().values().forEach(chipSlot -> {
+            EquippedChipWidget equippedChipWidget = new EquippedChipWidget(chipSlot, chipSlot.index(), this);
+            addWidget(equippedChipWidget);
+            equippedChipWidgets.add(equippedChipWidget);
+        });
+        availableChips.clear();
+        availableChips.putAll(GeneChipClient.getPlayerChipData().getChipInfos().getChips());
+
+    }
+
+    private void setupFilterBar() {
+        int filterY = (int) (2 * yScale * 2);
+        int searchX = (int) (170 * xScale * 2);
+        int searchW = 180;
+        int searchH = 16;
+
+        searchBox = new EditBox(Minecraft.getInstance().font,
+                searchX, filterY, searchW, searchH,
+                Component.translatable("gene_chip.filter.search_hint"));
+        searchBox.setHint(Component.translatable("gene_chip.filter.search_hint"));
+        searchBox.setValue(chipFilter.getSearchText());
+        searchBox.setResponder(text -> {
+            chipFilter.setSearchText(text);
+            rebuildChipWidgets();
+        });
+        addRenderableWidget(searchBox);
+
+        int unlockedX = searchX + searchW + 4;
+        unlockedDropdown = new DropdownButton<>(
+                unlockedX, filterY - 2, 60, 20,
+                List.of(Boolean.FALSE, Boolean.TRUE),
+                chipFilter.isShowAll(),
+                on -> on ? Component.translatable("gene_chip.filter.all")
+                         : Component.translatable("gene_chip.filter.unlocked"),
+                value -> {
+                    chipFilter.setShowAll(value);
+                    rebuildChipWidgets();
+                });
+        addWidget(unlockedDropdown);
+
+        int typeX = unlockedX + 60 + 4;
+        List<ChipType> typeOptions = new ArrayList<>();
+        typeOptions.add(null);
+        typeOptions.addAll(Arrays.asList(ChipType.values()));
+        typeDropdown = new DropdownButton<>(
+                typeX, filterY - 2, 100, 20,
+                typeOptions,
+                chipFilter.getTypeFilter(),
+                type -> type == null
+                        ? Component.translatable("gene_chip.filter.type.all")
+                        : Component.translatable("gene_chip.chip_type." + type.getSerializedName()),
+                value -> {
+                    chipFilter.setTypeFilter(value);
+                    rebuildChipWidgets();
+                });
+        addWidget(typeDropdown);
+    }
+
+    public void rebuildChipWidgets() {
+        for (ChipWidget chipWidget : chipWidgets) {
+            removeWidget(chipWidget);
+        }
+        chipWidgets.clear();
 
         EnumMap<ChipType, List<Chip>> typeListEnumMap = new EnumMap<>(ChipType.class);
-
-
         for (Map.Entry<ResourceKey<Chip>, Chip> entry : RegisterTypes.CHIP.entrySet()) {
             typeListEnumMap.computeIfAbsent(entry.getValue().getType(), k -> new ArrayList<>()).add(entry.getValue());
         }
 
         List<Chip> availableChips1 = chipFilter.getAvailableChips(GeneChipClient.getClientPlayer(), typeListEnumMap);
 
+        int chipIndex = 0;
         for (Chip chip : availableChips1) {
             ChipInstance<Chip> playerChip = GeneChipClient.getPlayerChip(chip);
             ChipWidget chipWidget;
@@ -77,16 +152,6 @@ public class ChipConfigScreen extends Screen {
             chipWidgets.add(chipWidget);
             chipIndex++;
         }
-
-
-        getSlots().values().forEach(chipSlot -> {
-            EquippedChipWidget equippedChipWidget = new EquippedChipWidget(chipSlot, chipSlot.index(), this);
-            addWidget(equippedChipWidget);
-            equippedChipWidgets.add(equippedChipWidget);
-        });
-        availableChips.clear();
-        availableChips.putAll(GeneChipClient.getPlayerChipData().getChipInfos().getChips());
-
     }
 
     public IntObjectMap<ChipSlot> getSlots() {
@@ -101,7 +166,7 @@ public class ChipConfigScreen extends Screen {
         for (ChipWidget chipWidget : chipWidgets) {
             if (!chipWidget.isFocused()) {
                 chipWidget.setX((int) ((170 + (i % 4) * 60) * xScale * s));
-                chipWidget.setY((int) ((int) ((22 + ((int) (i / 4)) * 85) * yScale * s) + scrollY));
+                chipWidget.setY((int) ((int) ((CHIP_GRID_Y + ((int) (i / 4)) * 85) * yScale * s) + scrollY));
             }
             chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
             i++;
@@ -109,6 +174,13 @@ public class ChipConfigScreen extends Screen {
 
         for (EquippedChipWidget equippedChipWidget : equippedChipWidgets) {
             equippedChipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+
+        if (unlockedDropdown != null) {
+            unlockedDropdown.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
+        if (typeDropdown != null) {
+            typeDropdown.render(guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
@@ -120,6 +192,11 @@ public class ChipConfigScreen extends Screen {
         float s = 2;
         GuiUtil.drawColorWithSize(guiGraphics, (int) (10 * xScale * s), (int) (20 * yScale* s), (int) (150 * xScale* s), (int) (240 * yScale* s), FastColor.ARGB32.color(150, 0, 0, 0), 1);
 
+        GuiUtil.drawColorWithSize(guiGraphics,
+                (int) (170 * xScale * s), (int) (0 * yScale * s),
+                (int) (310 * xScale * s), (int) (FILTER_BAR_HEIGHT * yScale * s),
+                FastColor.ARGB32.color(150, 0, 0, 0), 1);
+
         hoveredSlot = -1;
         for (int i = 0; i < getSlots().size(); i++) {
             renderSlotBox(guiGraphics, mouseX, mouseY, i, partialTick);
@@ -127,15 +204,43 @@ public class ChipConfigScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean collapsed = false;
+        if (unlockedDropdown != null && unlockedDropdown.isExpanded() && !unlockedDropdown.isMouseOver(mouseX, mouseY)) {
+            unlockedDropdown.setExpanded(false);
+            collapsed = true;
+        }
+        if (typeDropdown != null && typeDropdown.isExpanded() && !typeDropdown.isMouseOver(mouseX, mouseY)) {
+            typeDropdown.setExpanded(false);
+            collapsed = true;
+        }
+        if (collapsed) {
+            return true;
+        }
+        if (unlockedDropdown != null && unlockedDropdown.isExpanded()) {
+            if (unlockedDropdown.mouseClicked(mouseX, mouseY, button)) {
+                return true;
+            }
+        }
+        if (typeDropdown != null && typeDropdown.isExpanded()) {
+            if (typeDropdown.mouseClicked(mouseX, mouseY, button)) {
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return super.keyPressed(keyCode, scanCode, modifiers);
-
     }
 
     private double scrollY = 0;
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (unlockedDropdown != null && unlockedDropdown.isExpanded()) return false;
+        if (typeDropdown != null && typeDropdown.isExpanded()) return false;
         this.scrollY = Math.min(this.scrollY + scrollY * 50, 0);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }

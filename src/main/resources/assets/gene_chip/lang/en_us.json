@@ -1,5 +1,16 @@
 {
   "gene_chip.chip.head_shot_hunter.name": "Head Shooter Hunter",
   "gene_chip.config": "Gene Chip Config",
-  "gene_chip.config.card": "Card Config"
+  "gene_chip.config.card": "Card Config",
+
+  "gene_chip.filter.search_hint": "Search chips...",
+  "gene_chip.filter.all": "All",
+  "gene_chip.filter.unlocked": "Unlocked",
+  "gene_chip.filter.type.all": "All Types",
+
+  "gene_chip.chip_type.combat": "Combat",
+  "gene_chip.chip_type.mutation": "Mutation",
+  "gene_chip.chip_type.survival": "Survival",
+  "gene_chip.chip_type.tactics": "Tactics",
+  "gene_chip.chip_type.special": "Special"
 }

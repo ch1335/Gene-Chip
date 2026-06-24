@@ -144,5 +144,16 @@
   "gene_chip.config_value.reference_distance": "参考距离",
   "gene_chip.config_value.saturation_cost": "饱和度消耗",
   "gene_chip.config_value.exhaustion_duration": "体力透支持续时间",
-  "gene_chip.config_value.cooldown": "冷却时间"
+  "gene_chip.config_value.cooldown": "冷却时间",
+
+  "gene_chip.filter.search_hint": "搜索芯片...",
+  "gene_chip.filter.all": "全部",
+  "gene_chip.filter.unlocked": "已解锁",
+  "gene_chip.filter.type.all": "全类型",
+
+  "gene_chip.chip_type.combat": "战斗",
+  "gene_chip.chip_type.mutation": "变异",
+  "gene_chip.chip_type.survival": "生存",
+  "gene_chip.chip_type.tactics": "战术",
+  "gene_chip.chip_type.special": "特殊"
 }
