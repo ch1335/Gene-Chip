@@ -12,5 +12,12 @@
   "gene_chip.chip_type.mutation": "Mutation",
   "gene_chip.chip_type.survival": "Survival",
   "gene_chip.chip_type.tactics": "Tactics",
-  "gene_chip.chip_type.special": "Special"
+  "gene_chip.chip_type.special": "Special",
+
+  "gene_chip.command.give.success": "Gave %s the chip %s (Level %s)",
+  "gene_chip.command.remove.success": "Removed chip %s from %s",
+  "gene_chip.command.remove.not_owned": "%s does not own the chip %s",
+  "gene_chip.command.chip_not_found": "Chip %s not found",
+
+  "gene_chip.chip.locked": "Locked"
 }

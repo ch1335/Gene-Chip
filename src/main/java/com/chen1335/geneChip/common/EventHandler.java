@@ -10,6 +10,7 @@ import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.client.gui.screen.ChipConfigScreen;
+import com.chen1335.geneChip.command.ChipCommand;
 import com.chen1335.geneChip.compat.coldsweat.tempModifiers.GeneChipTempModifier;
 import com.chen1335.geneChip.lootConditions.WildHunterCondition;
 import com.chen1335.geneChip.network.AddChipPacket;
@@ -38,6 +39,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -141,6 +143,11 @@ public class EventHandler {
         registrar.playToClient(AddChipPacket.TYPE, AddChipPacket.STREAM_CODEC, AddChipPacket::handler);
         registrar.playToServer(PlayerActionPacket.TYPE, PlayerActionPacket.STREAM_CODEC, PlayerActionPacket::handler);
         registrar.playBidirectional(SetSlotChipPacket.TYPE, SetSlotChipPacket.STREAM_CODEC, SetSlotChipPacket::handler);
+    }
+
+    @SubscribeEvent
+    public static void RegisterCommandsEvent(RegisterCommandsEvent event) {
+        ChipCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent()

@@ -7,6 +7,7 @@ import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -18,6 +19,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,18 +54,31 @@ public class ChipWidget extends AbstractWidget {
         if (isFocused()) {
             pose.translate(0, 0, 60);
         }
-        GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics, getX(), getY(), 48 * xScale, 78 * yScale, 8, 1, 24, 39, 40, 40, 0);
-        GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getBigCrystalIcon(), guiGraphics, getX() - 2 * xScale, getY() - 2 * yScale, 12 * xScale, 12 * yScale, 1, 1, 6, 6, 8, 8, 0);
-        GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getSmallCrystalIcon(), guiGraphics, getX() + 20 * xScale, getY() + 50 * yScale, 8 * xScale, 8 * yScale, 2, 2, 4, 4, 8, 8, 0);
-        GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics, getX() + 8 * xScale, getY() + 16 * yScale, 32 * xScale, 32 * yScale, 3);
 
+        boolean gray = !unlocked;
+        if (gray) {
+            RenderSystem.setShaderColor(0.35F, 0.35F, 0.35F, 1.0F);
+        }
+        try {
+            GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics, getX(), getY(), 48 * xScale, 78 * yScale, 8, 1, 24, 39, 40, 40, 0);
+            GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getBigCrystalIcon(), guiGraphics, getX() - 2 * xScale, getY() - 2 * yScale, 12 * xScale, 12 * yScale, 1, 1, 6, 6, 8, 8, 0);
+            GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getSmallCrystalIcon(), guiGraphics, getX() + 20 * xScale, getY() + 50 * yScale, 8 * xScale, 8 * yScale, 2, 2, 4, 4, 8, 8, 0);
+            GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics, getX() + 8 * xScale, getY() + 16 * yScale, 32 * xScale, 32 * yScale, 3);
+        } finally {
+            if (gray) {
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            }
+        }
+
+        int nameColor = gray ? 0x9A9A9A : 0xFFFFFF;
+        int descColor = gray ? 0x808080 : 0xFFFFFF;
 
         pose.pushPose();
         Component displayName = chipInstance.getChip().getDisplayName();
         int stringWidth = instance.font.width(displayName);
         pose.translate(getX() + 32 * xScale - (float) stringWidth * xScale / 2, getY() + 2 * yScale + 2, 0);
         pose.scale(xScale * 0.8F, yScale * 0.8F, 1);
-        guiGraphics.drawString(instance.font, displayName, 0, 0, 0xFFFFFF);
+        guiGraphics.drawString(instance.font, displayName, 0, 0, nameColor);
         pose.popPose();
 
         Component desc = chipInstance.getChip().detailDesc(chipInstance.getLvl());
@@ -74,12 +89,20 @@ public class ChipWidget extends AbstractWidget {
             pose.pushPose();
             pose.translate(getX() + 46 * xScale - (float) 40 * xScale, getY() + (67 + 5.5 * i) * yScale - split.size() * 2.5 * yScale, 0);
             pose.scale(xScale / 2, yScale / 2, 1);
-            guiGraphics.drawString(instance.font, formattedCharSequence, 0, 0, 0xFFFFFF);
+            guiGraphics.drawString(instance.font, formattedCharSequence, 0, 0, descColor);
             pose.popPose();
         }
 
         if (isHovered && !parent.isDragging()) {
-            guiGraphics.renderTooltip(instance.font, chipInstance.getChip().getDesc(), mouseX, mouseY);
+            if (gray) {
+                List<Component> lines = new ArrayList<>();
+                lines.add(chipInstance.getChip().getDisplayName().copy().withStyle(ChatFormatting.GRAY));
+                lines.add(chipInstance.getChip().getDesc());
+                lines.add(Component.translatable("gene_chip.chip.locked").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+                guiGraphics.renderComponentTooltip(instance.font, lines, mouseX, mouseY);
+            } else {
+                guiGraphics.renderTooltip(instance.font, chipInstance.getChip().getDesc(), mouseX, mouseY);
+            }
         }
         pose.popPose();
     }
@@ -97,6 +120,14 @@ public class ChipWidget extends AbstractWidget {
     @Override
     public boolean isHovered() {
         return super.isHovered();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!unlocked) {
+            return false;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

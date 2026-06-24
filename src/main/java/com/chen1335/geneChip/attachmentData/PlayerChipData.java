@@ -3,6 +3,9 @@ package com.chen1335.geneChip.attachmentData;
 import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.chip.*;
 import com.chen1335.geneChip.network.AddChipPacket;
+import com.chen1335.geneChip.network.PlayerChipDataPacket;
+import com.chen1335.geneChip.network.util.ChipTypeSlot;
+import io.netty.util.collection.IntObjectMap;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,8 +14,11 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.UnknownNullability;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class PlayerChipData implements INBTSerializable<CompoundTag> {
     public int maxChipSlots = (int) GCAttributes.MAX_CHIP_SLOT.get().getDefaultValue();
@@ -43,6 +49,36 @@ public class PlayerChipData implements INBTSerializable<CompoundTag> {
                 PacketDistributor.sendToPlayer(serverPlayer, new AddChipPacket(instance));
             }
         }
+    }
+
+    public void removeChip(Player player, Chip chip) {
+        Map<Chip, ChipInstance<?>> chips = chipInfos.getChips().get(chip.getType());
+        if (chips == null || !chips.containsKey(chip)) return;
+        chips.remove(chip);
+
+        IntObjectMap<ChipSlot> slots = slotInfos.getSlots();
+        slots.values().stream().filter(slot -> {
+            Optional<ChipInstance<?>> inst = slot.instance();
+            return inst.isPresent() && inst.get().getChip() == chip;
+        }).forEach(slot -> slots.put(slot.index(), new ChipSlot(Optional.empty(), slot.index())));
+        slotInfos.bakeCurrent();
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            syncToClient(serverPlayer);
+        }
+    }
+
+    public void syncToClient(ServerPlayer serverPlayer) {
+        Map<String, List<ChipTypeSlot>> map = new HashMap<>();
+        slotInfos.slotsByName.forEach((name, slots) -> {
+            List<ChipTypeSlot> list = new ArrayList<>();
+            for (ChipSlot slot : slots.values()) {
+                slot.instance().ifPresent(chipInstance -> list.add(new ChipTypeSlot(chipInstance.getChip(), slot.index())));
+            }
+            map.put(name, list);
+        });
+        PacketDistributor.sendToPlayer(serverPlayer,
+                new PlayerChipDataPacket(chipInfos, maxChipSlots, map, slotInfos.getCurrentSlotsName()));
     }
 
     @Override

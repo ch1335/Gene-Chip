@@ -1,0 +1,90 @@
+package com.chen1335.geneChip.command;
+
+import com.chen1335.geneChip.API.object.GCAttachmentTypes;
+import com.chen1335.geneChip.API.object.RegisterTypes;
+import com.chen1335.geneChip.attachmentData.PlayerChipData;
+import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipInstance;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.ResourceKeyArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+
+public class ChipCommand {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(
+                Commands.literal("genechip")
+                        .requires(src -> src.hasPermission(2))
+                        .then(Commands.literal("give")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .then(Commands.argument("chip", ResourceKeyArgument.key(RegisterTypes.CHIP_KEY))
+                                                .executes(ctx -> give(ctx, 0))
+                                                .then(Commands.argument("level", IntegerArgumentType.integer(0))
+                                                        .executes(ctx -> give(ctx, IntegerArgumentType.getInteger(ctx, "level")))
+                                                )
+                                        )
+                                )
+                        )
+                        .then(Commands.literal("remove")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .then(Commands.argument("chip", ResourceKeyArgument.key(RegisterTypes.CHIP_KEY))
+                                                .executes(ChipCommand::remove)
+                                        )
+                                )
+                        )
+        );
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static Chip resolveChip(CommandContext<CommandSourceStack> ctx) {
+        ResourceKey key = ctx.getArgument("chip", ResourceKey.class);
+        Chip chip = RegisterTypes.CHIP.get((ResourceKey<Chip>) key);
+        if (chip == null) {
+            ctx.getSource().sendFailure(Component.translatable("gene_chip.command.chip_not_found", key.location().toString()));
+            return null;
+        }
+        return chip;
+    }
+
+    private static int give(CommandContext<CommandSourceStack> ctx, int level) throws CommandSyntaxException {
+        ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+        Chip chip = resolveChip(ctx);
+        if (chip == null) return 0;
+        PlayerChipData data = target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        data.addNewChip(target, new ChipInstance<>(chip, level));
+
+        Component name = chip.getDisplayName();
+        ctx.getSource().sendSuccess(() ->
+                Component.translatable("gene_chip.command.give.success", target.getDisplayName(), name, level), true);
+        return 1;
+    }
+
+    private static int remove(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+        Chip chip = resolveChip(ctx);
+        if (chip == null) return 0;
+        PlayerChipData data = target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        boolean had = data.getChipInfos().getChips()
+                .getOrDefault(chip.getType(), java.util.Map.of())
+                .containsKey(chip);
+        if (had) {
+            data.removeChip(target, chip);
+        }
+        Component name = chip.getDisplayName();
+        if (had) {
+            ctx.getSource().sendSuccess(() ->
+                    Component.translatable("gene_chip.command.remove.success", target.getDisplayName(), name), true);
+        } else {
+            ctx.getSource().sendSuccess(() ->
+                    Component.translatable("gene_chip.command.remove.not_owned", target.getDisplayName(), name), false);
+        }
+        return had ? 1 : 0;
+    }
+}
