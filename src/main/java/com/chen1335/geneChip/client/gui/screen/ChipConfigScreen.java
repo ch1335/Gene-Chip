@@ -182,8 +182,8 @@ public class ChipConfigScreen extends Screen {
         int i = 0;
         for (ChipWidget chipWidget : chipWidgets) {
             if (!chipWidget.isFocused()) {
-                chipWidget.setX((int) ((170 + (i % 4) * 60) * xScale * s));
-                chipWidget.setY((int) ((int) ((CHIP_GRID_Y + ((int) (i / 4)) * 85) * yScale * s) + scrollY));
+                chipWidget.setX((int) ((170 + (i % 4) * 70) * xScale * s));
+                chipWidget.setY((int) ((int) ((CHIP_GRID_Y + ((int) (i / 4)) * 105) * yScale * s) + scrollY));
             }
             PoseStack pose = guiGraphics.pose();
             pose.pushPose();
@@ -263,7 +263,7 @@ public class ChipConfigScreen extends Screen {
         int rows = (chipWidgets.size() + 3) / 4;
         if (rows == 0) return 0;
         float s = 2;
-        float contentBottomScaled = CHIP_GRID_Y + (rows - 1) * 85 + 78;
+        float contentBottomScaled = CHIP_GRID_Y + (rows - 1) * 108 + 78;
         float contentBottomPx = contentBottomScaled * yScale * s;
         double minScroll = this.height - contentBottomPx - 10;
         return Math.min(0, minScroll);

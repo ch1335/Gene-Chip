@@ -39,8 +39,8 @@ public class ChipWidget extends AbstractWidget {
         this.chipInstance = chipInstance;
         this.parent = parent;
         Vec2 windowScale = GuiUtil.getWindowScale();
-        xScale = windowScale.x * 4;
-        yScale = windowScale.y * 4;
+        xScale = windowScale.x * 4*1.25F;
+        yScale = windowScale.y * 4*1.25F;
         this.width = (int) (48 * xScale);
         this.height = (int) (78 * yScale);
     }
@@ -82,13 +82,13 @@ public class ChipWidget extends AbstractWidget {
         pose.popPose();
 
         Component desc = chipInstance.getChip().detailDesc(chipInstance.getLvl());
-        List<FormattedCharSequence> split = instance.font.split(desc, 80);
+        List<FormattedCharSequence> split = instance.font.split(desc, 100);
 
         for (int i = 0; i < split.size(); i++) {
             FormattedCharSequence formattedCharSequence = split.get(i);
             pose.pushPose();
-            pose.translate(getX() + 46 * xScale - (float) 40 * xScale, getY() + (67 + 5.5 * i) * yScale - split.size() * 2.5 * yScale, 0);
-            pose.scale(xScale / 2, yScale / 2, 1);
+            pose.translate(getX() + (4.5) * xScale, getY() + (67 + 5.5 * i) * yScale - split.size() * 2.5 * yScale, 0);
+            pose.scale(xScale / 2.5F, yScale / 2.5F, 1);
             guiGraphics.drawString(instance.font, formattedCharSequence, 0, 0, descColor);
             pose.popPose();
         }

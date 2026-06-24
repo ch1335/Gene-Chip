@@ -52,7 +52,9 @@ public class EquippedChipWidget extends AbstractWidget {
 
     public void setChipSlot(ChipSlot chipSlot) {
         this.chipSlot = chipSlot;
-        chipSlot.instance().ifPresent(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent));
+        chipSlot.instance().ifPresentOrElse(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent),()->{
+            chipWidget = null;
+        });
     }
 
     @Override
@@ -77,6 +79,7 @@ public class EquippedChipWidget extends AbstractWidget {
             int color = FastColor.ARGB32.color(150, 255, 255, 255);
             GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), color, 3);
             if (chipWidget != null) {
+                chipWidget.unlocked = true;
                 chipWidget.setX(mouseX);
                 chipWidget.setY(mouseY);
                 PoseStack pose = guiGraphics.pose();
