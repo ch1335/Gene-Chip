@@ -1,6 +1,7 @@
 package com.chen1335.geneChip.common;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
+import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.RegisterTypes;
@@ -14,6 +15,8 @@ import com.chen1335.geneChip.command.ChipCommand;
 import com.chen1335.geneChip.compat.coldsweat.tempModifiers.GeneChipTempModifier;
 import com.chen1335.geneChip.lootConditions.WildHunterCondition;
 import com.chen1335.geneChip.network.AddChipPacket;
+import com.chen1335.geneChip.network.ChipSelectPacket;
+import com.chen1335.geneChip.network.ChipSelectedPacket;
 import com.chen1335.geneChip.network.PlayerActionPacket;
 import com.chen1335.geneChip.network.PlayerChipDataPacket;
 import com.chen1335.geneChip.network.SetSlotChipPacket;
@@ -143,6 +146,8 @@ public class EventHandler {
         registrar.playToClient(AddChipPacket.TYPE, AddChipPacket.STREAM_CODEC, AddChipPacket::handler);
         registrar.playToServer(PlayerActionPacket.TYPE, PlayerActionPacket.STREAM_CODEC, PlayerActionPacket::handler);
         registrar.playBidirectional(SetSlotChipPacket.TYPE, SetSlotChipPacket.STREAM_CODEC, SetSlotChipPacket::handler);
+        registrar.playToClient(ChipSelectPacket.TYPE, ChipSelectPacket.STREAM_CODEC, ChipSelectPacket::handler);
+        registrar.playToServer(ChipSelectedPacket.TYPE, ChipSelectedPacket.STREAM_CODEC, ChipSelectedPacket::handler);
     }
 
     @SubscribeEvent
@@ -173,6 +178,16 @@ public class EventHandler {
             } else {
                 Minecraft instance = Minecraft.getInstance();
                 instance.setScreen(new ChipConfigScreen());
+            }
+        }
+
+        if (event.getHand() == InteractionHand.MAIN_HAND && event.getItemStack().is(Items.DIAMOND)) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                PacketDistributor.sendToPlayer(serverPlayer,new ChipSelectPacket(List.of(
+                        ChipTypes.ENDURANCE.value().createInstance(),
+                        ChipTypes.BIG_EATER.value().createInstance(),
+                        ChipTypes.PERMAFROST_WALKERS.value().createInstance()
+                )));
             }
         }
     }

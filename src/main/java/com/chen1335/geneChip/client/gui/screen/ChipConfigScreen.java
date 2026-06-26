@@ -145,7 +145,7 @@ public class ChipConfigScreen extends Screen {
                 chipWidget = new ChipWidget(playerChip, this);
                 chipWidget.unlocked = true;
             } else {
-                chipWidget = new ChipWidget(new ChipInstance<>(chip, 0, 0), this);
+                chipWidget = new ChipWidget(new ChipInstance<>(chip, 0, 1), this);
                 chipWidget.unlocked = false;
             }
             chipWidget.index = chipIndex;

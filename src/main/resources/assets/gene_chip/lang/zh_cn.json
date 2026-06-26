@@ -162,5 +162,8 @@
   "gene_chip.command.remove.not_owned": "%s 未拥有卡牌 %s",
   "gene_chip.command.chip_not_found": "未找到卡牌 %s",
 
-  "gene_chip.chip.locked": "未解锁"
+  "gene_chip.chip.locked": "未解锁",
+
+  "gene_chip.chip_select.title": "抽卡",
+  "gene_chip.chip_select.hint": "选择一张卡牌"
 }

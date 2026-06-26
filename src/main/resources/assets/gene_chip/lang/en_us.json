@@ -19,5 +19,8 @@
   "gene_chip.command.remove.not_owned": "%s does not own the chip %s",
   "gene_chip.command.chip_not_found": "Chip %s not found",
 
-  "gene_chip.chip.locked": "Locked"
+  "gene_chip.chip.locked": "Locked",
+
+  "gene_chip.chip_select.title": "Chip Draw",
+  "gene_chip.chip_select.hint": "Choose a chip"
 }

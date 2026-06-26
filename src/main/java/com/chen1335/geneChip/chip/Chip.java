@@ -128,4 +128,8 @@ public abstract class Chip {
         });
         return result;
     }
+
+    public ChipInstance<?> createInstance() {
+        return new ChipInstance<>(this, 0, 1);
+    }
 }
