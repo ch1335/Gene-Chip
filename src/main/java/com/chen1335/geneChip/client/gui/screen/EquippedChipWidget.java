@@ -81,7 +81,7 @@ public class EquippedChipWidget extends AbstractWidget {
             if (chipWidget != null) {
                 chipWidget.unlocked = true;
                 chipWidget.setX(mouseX);
-                chipWidget.setY(mouseY);
+                chipWidget.setY((int) (mouseY-40*yScale));
                 PoseStack pose = guiGraphics.pose();
                 pose.pushPose();
                 pose.translate(0,0,40);

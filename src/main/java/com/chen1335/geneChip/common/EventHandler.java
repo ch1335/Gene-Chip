@@ -70,14 +70,7 @@ public class EventHandler {
         Player player = event.getEntity();
         if (player instanceof ServerPlayer serverPlayer) {
             PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-            Map<String, List<ChipTypeSlot>> map = new HashMap<>();
-            data.getSlotInfos().slotsByName.forEach((name, slots) -> {
-                for (ChipSlot slot : slots.values()) {
-                    slot.instance().ifPresent(chipInstance -> map.computeIfAbsent(name, k -> new ArrayList<>()).add(new ChipTypeSlot(chipInstance.getChip(), slot.index())));
-                }
-            });
-            PlayerChipDataPacket playerChipDataPacket = new PlayerChipDataPacket(data.getChipInfos(), data.maxChipSlots, map, data.getSlotInfos().getCurrentSlotsName());
-            PacketDistributor.sendToPlayer(serverPlayer, playerChipDataPacket);
+            data.syncToClient(serverPlayer);
             data.getSlotInfos().currentSlots.forEach((chip, instance) -> {
                 chip.onEquipped(player, instance);
             });

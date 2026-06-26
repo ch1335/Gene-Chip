@@ -31,6 +31,8 @@ public class ClientEventHandler {
     public static void ClientTickEvent(ClientTickEvent.Pre event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
+        GeneChipClient.getPlayerChipData().tick(player);
+
 
         // 滑铲芯片逻辑
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SLIDING_TACKLE).ifPresent(chipInstance -> {

@@ -57,7 +57,7 @@
 
   "gene_chip.chip.pain_blockade.name": "痛觉封锁",
   "gene_chip.chip.pain_blockade.desc": "强化剂彻底切断痛觉神经与触觉反馈，以牺牲防御换取纯粹的力量",
-  "gene_chip.chip.pain_blockade.desc.detailed": "禁用穿戴任何防具，获得%s减伤和+%s近战伤害，每次击杀回复%s点生命值。装备时扣除%s当前免疫力上限",
+  "gene_chip.chip.pain_blockade.desc.detailed": "不穿戴任何防具，获得%s减伤和+%s近战伤害，每次击杀回复%s点生命值。装备时扣除%s当前免疫力上限",
 
   "gene_chip.chip.big_eater.name": "大胃王",
   "gene_chip.chip.big_eater.desc": "强化剂扩张胃壁与加速消化酶分泌，让你成为真正的饕餮",

@@ -105,7 +105,8 @@ public class ChipSelectScreen extends Screen {
                 }
             }
         }
-
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
         Minecraft mc = Minecraft.getInstance();
         for (int i = 0; i < candidates.size(); i++) {
             float[] center = cardCenter(i, partialTick);
@@ -114,8 +115,11 @@ public class ChipSelectScreen extends Screen {
             if (hoveredIndex == i) {
                 y -= 10;
             }
+            pose.translate(0,0,30);
             renderCard(guiGraphics, candidates.get(i), x, y, CARD_SCALE, hoveredIndex == i);
+
         }
+        pose.popPose();
 
         if (animationTick >= EXPAND_PHASE_END && !selected) {
             Component hint = Component.translatable("gene_chip.chip_select.hint");

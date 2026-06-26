@@ -6,10 +6,9 @@ import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipSlot;
+import com.chen1335.geneChip.client.GeneChipClient;
 import com.immunity.util.ImmunityServerUtil;
-import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
-import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.apache.logging.log4j.util.Cast;
@@ -66,6 +65,9 @@ public class GeneChipAPI {
 
     public static void setSlotChip(Player player, ChipSlot slot) {
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        if (player.isLocalPlayer()) {
+            data = GeneChipClient.getPlayerChipData();
+        }
         IntObjectMap<ChipSlot> slots = data.getSlotInfos().getSlots();
         Map<Chip, ChipInstance<?>> currentSlots = data.getSlotInfos().currentSlots;
         Optional<ChipInstance<?>> optional = slot.instance();
