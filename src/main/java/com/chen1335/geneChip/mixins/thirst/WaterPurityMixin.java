@@ -2,7 +2,7 @@ package com.chen1335.geneChip.mixins.thirst;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
-import dev.ghen.thirst.content.purity.WaterPurity;
+import cn.mlus.thirst.content.purity.WaterPurity;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

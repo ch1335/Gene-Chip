@@ -150,7 +150,6 @@ dependencies {
     implementation "curse.maven:mmmmmmmmmmmm-225738:7206981"
     implementation "curse.maven:selene-499980:7522321"
     implementation "curse.maven:cold-sweat-506194:7898055"
-    implementation "curse.maven:thirst-was-taken-679270:7017923"
     implementation "curse.maven:ftb-teams-forge-404468:7878281"
     implementation "curse.maven:ftb-library-forge-404465:7746959"
     implementation "curse.maven:architectury-api-419699:5786327"

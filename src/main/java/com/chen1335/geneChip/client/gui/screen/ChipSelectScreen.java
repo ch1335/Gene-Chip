@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -18,11 +19,16 @@ public class ChipSelectScreen extends Screen {
     private static final int ENTER_DURATION = 20;
     private static final int EXPAND_DURATION = 15;
     private static final int EXPAND_PHASE_END = ENTER_DURATION + EXPAND_DURATION;
+    private static final int FLIP_DURATION = 12;
+    private static final int FLIP_PHASE_END = EXPAND_PHASE_END + FLIP_DURATION;
 
     private static final float CARD_SCALE = 1.6F;
     private static final int CARD_W = (int) (48 * CARD_SCALE);
     private static final int CARD_H = (int) (78 * CARD_SCALE);
     private static final int SPREAD = CARD_W + 20;
+
+    private static final ResourceLocation CARD_BACK =
+            ResourceLocation.fromNamespaceAndPath("gene_chip", "textures/chip/card_back.png");
 
     private final List<ChipInstance<?>> candidates;
 
@@ -42,7 +48,7 @@ public class ChipSelectScreen extends Screen {
 
     @Override
     public void tick() {
-        if (animationTick < EXPAND_PHASE_END) {
+        if (animationTick < FLIP_PHASE_END) {
             animationTick++;
         }
     }
@@ -66,6 +72,12 @@ public class ChipSelectScreen extends Screen {
         if (animationTick < ENTER_DURATION) return 0.0F;
         if (animationTick >= EXPAND_PHASE_END) return 1.0F;
         return easeOutCubic(((float)animationTick + partialTick - ENTER_DURATION) / EXPAND_DURATION);
+    }
+
+    private float flipProgress(float partialTick) {
+        if (animationTick < EXPAND_PHASE_END) return 0.0F;
+        if (animationTick >= FLIP_PHASE_END) return 1.0F;
+        return easeOutCubic(((float) animationTick + partialTick - EXPAND_PHASE_END) / FLIP_DURATION);
     }
 
     private float[] cardCenter(int i, float partialTick) {
@@ -94,7 +106,7 @@ public class ChipSelectScreen extends Screen {
         GuiUtil.drawColorWithSize(guiGraphics, 0, 0, this.width, this.height, 0xC0202020, 0);
 
         hoveredIndex = -1;
-        if (animationTick >= EXPAND_PHASE_END && !selected) {
+        if (animationTick >= FLIP_PHASE_END && !selected) {
             for (int i = 0; i < candidates.size(); i++) {
                 float[] center = cardCenter(i, partialTick);
                 float x = center[0] - (float) CARD_W / 2;
@@ -116,50 +128,70 @@ public class ChipSelectScreen extends Screen {
                 y -= 10;
             }
             pose.translate(0,0,30);
-            renderCard(guiGraphics, candidates.get(i), x, y, CARD_SCALE, hoveredIndex == i);
+            renderCard(guiGraphics, candidates.get(i), x, y, CARD_SCALE, hoveredIndex == i, partialTick);
 
         }
         pose.popPose();
 
-        if (animationTick >= EXPAND_PHASE_END && !selected) {
+        if (animationTick >= FLIP_PHASE_END && !selected) {
             Component hint = Component.translatable("gene_chip.chip_select.hint");
             guiGraphics.drawCenteredString(mc.font, hint, this.width / 2, this.height - 20, 0xFFFFFFFF);
         }
     }
 
-    private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, float scale, boolean hovered) {
+    private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, float scale, boolean hovered, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
         pose.translate(0, 0, hovered ? 50 : 10);
         RenderSystem.enableDepthTest();
 
-        GuiUtil.drawTextureWithSize(instance.getChip().getType().getCardFace(), guiGraphics,
-                x, y, 48 * scale, 78 * scale, 8, 1, 24, 39, 40, 40, 0);
-        GuiUtil.drawTextureWithSize(instance.getChip().getType().getBigCrystalIcon(), guiGraphics,
-                x - 2 * scale, y - 2 * scale, 12 * scale, 12 * scale, 1, 1, 6, 6, 8, 8, 0);
-        GuiUtil.drawTextureWithSize(instance.getChip().getType().getSmallCrystalIcon(), guiGraphics,
-                x + 20 * scale, y + 50 * scale, 8 * scale, 8 * scale, 2, 2, 4, 4, 8, 8, 0);
-        GuiUtil.drawTextureWithSize(instance.getChip().getTexture(), guiGraphics,
-                x + 8 * scale, y + 16 * scale, 32 * scale, 32 * scale, 3);
+        float flip = flipProgress(partialTick);
+        float scaleX;
+        boolean showFront;
+        if (flip < 0.5F) {
+            scaleX = 1.0F - flip * 2.0F;
+            showFront = false;
+        } else {
+            scaleX = (flip - 0.5F) * 2.0F;
+            showFront = true;
+        }
+        float cardCenterX = x + 24 * scale;
+        pose.translate(cardCenterX, 0, 0);
+        pose.scale(scaleX, 1, 1);
+        pose.translate(-cardCenterX, 0, 0);
 
-        pose.pushPose();
-        Component displayName = instance.getChip().getDisplayName();
-        int stringWidth = mc.font.width(displayName);
-        pose.translate(x + 32 * scale - stringWidth * scale * 0.8F / 2, y + 2 * scale + 2, 0);
-        pose.scale(scale * 0.8F, scale * 0.8F, 1);
-        guiGraphics.drawString(mc.font, displayName, 0, 0, 0xFFFFFFFF, false);
-        pose.popPose();
+        if (showFront) {
+            GuiUtil.drawTextureWithSize(instance.getChip().getType().getCardFace(), guiGraphics,
+                    x, y, 48 * scale, 78 * scale, 8, 1, 24, 39, 40, 40, 0);
+            GuiUtil.drawTextureWithSize(instance.getChip().getType().getBigCrystalIcon(), guiGraphics,
+                    x - 2 * scale, y - 2 * scale, 12 * scale, 12 * scale, 1, 1, 6, 6, 8, 8, 0);
+            GuiUtil.drawTextureWithSize(instance.getChip().getType().getSmallCrystalIcon(), guiGraphics,
+                    x + 20 * scale, y + 50 * scale, 8 * scale, 8 * scale, 2, 2, 4, 4, 8, 8, 0);
+            GuiUtil.drawTextureWithSize(instance.getChip().getTexture(), guiGraphics,
+                    x + 8 * scale, y + 16 * scale, 32 * scale, 32 * scale, 3);
 
-        Component desc = instance.getChip().detailDesc(instance.getLvl());
-        List<FormattedCharSequence> split = mc.font.split(desc, (int) (60 * scale));
-        for (int i = 0; i < split.size(); i++) {
-            FormattedCharSequence line = split.get(i);
             pose.pushPose();
-            pose.translate(x + 4.5 * scale, y + (67 + 5.5 * i) * scale - split.size() * 2.5 * scale, 0);
-            pose.scale(scale / 2.5F, scale / 2.5F, 1);
-            guiGraphics.drawString(mc.font, line, 0, 0, 0xFFFFFFFF, false);
+            Component displayName = instance.getChip().getDisplayName();
+            int stringWidth = mc.font.width(displayName);
+            pose.translate(x + 32 * scale - stringWidth * scale * 0.8F / 2, y + 2 * scale + 2, 0);
+            pose.scale(scale * 0.8F, scale * 0.8F, 1);
+            guiGraphics.drawString(mc.font, displayName, 0, 0, 0xFFFFFFFF, false);
             pose.popPose();
+
+            Component desc = instance.getChip().detailDesc(instance.getLvl());
+            List<FormattedCharSequence> split = mc.font.split(desc, (int) (60 * scale));
+            for (int i = 0; i < split.size(); i++) {
+                FormattedCharSequence line = split.get(i);
+                pose.pushPose();
+                pose.translate(x + 4.5 * scale, y + (67 + 5.5 * i) * scale - split.size() * 2.5 * scale, 0);
+                pose.scale(scale / 2.5F, scale / 2.5F, 1);
+                guiGraphics.drawString(mc.font, line, 0, 0, 0xFFFFFFFF, false);
+                pose.popPose();
+            }
+        } else {
+            GuiUtil.drawTextureWithSize(CARD_BACK, guiGraphics,
+                    x, y, 48 * scale, 78 * scale, 0);
         }
 
         pose.popPose();
@@ -169,7 +201,7 @@ public class ChipSelectScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != 0) return false;
         if (selected) return false;
-        if (animationTick < EXPAND_PHASE_END) return false;
+        if (animationTick < FLIP_PHASE_END) return false;
 
         for (int i = 0; i < candidates.size(); i++) {
             float[] center = cardCenter(i, 0);
