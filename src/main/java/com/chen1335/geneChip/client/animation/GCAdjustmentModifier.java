@@ -81,11 +81,15 @@ public class GCAdjustmentModifier extends AbstractModifier {
         this.source = source;
     }
 
+    /**
+     * 计算淡入系数，在动画的 beginTick 之前从 0 线性增长到 1，超过后保持 1。
+     * 非 KeyframeAnimationPlayer 直接返回 1。
+     */
     protected float getFadeIn(float delta) {
         float fadeIn = 1;
         IAnimation animation = this.getAnim();
         if (animation instanceof KeyframeAnimationPlayer) {
-            KeyframeAnimationPlayer player = (KeyframeAnimationPlayer) anim;
+            KeyframeAnimationPlayer player = (KeyframeAnimationPlayer) animation;
             float currentTick = player.getTick() + delta;
             fadeIn = currentTick / (float) player.getData().beginTick;
             fadeIn = Math.min(fadeIn, 1F);
@@ -113,6 +117,10 @@ public class GCAdjustmentModifier extends AbstractModifier {
         remainingFadeout = fadeOut + 1;
     }
 
+    /**
+     * 计算淡出系数：若手动触发 fadeOut(int) 则在 instructedFadeout 时间内从 1 线性降到 0；
+     * 否则在动画的 endTick~stopTick 区间从 1 线性降到 0。非 KeyframeAnimationPlayer 直接返回 1。
+     */
     protected float getFadeOut(float delta) {
         float fadeOut = 1;
         if (remainingFadeout > 0 && instructedFadeout > 0) {
@@ -123,7 +131,7 @@ public class GCAdjustmentModifier extends AbstractModifier {
         }
         IAnimation animation = this.getAnim();
         if (animation instanceof KeyframeAnimationPlayer) {
-            KeyframeAnimationPlayer player = (KeyframeAnimationPlayer) anim;
+            KeyframeAnimationPlayer player = (KeyframeAnimationPlayer) animation;
 
             float currentTick = player.getTick() + delta;
             float position = (-1F) * (currentTick - player.getData().stopTick);

@@ -19,6 +19,9 @@ import java.util.function.Supplier;
 
 public class GeneChipAPI {
 
+    /**
+     * 获取玩家的免疫值（仅服务端）
+     */
     public static int getImmunityValue(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             return ImmunityServerUtil.getImmunity(serverPlayer);
@@ -26,6 +29,9 @@ public class GeneChipAPI {
         return 100;
     }
 
+    /**
+     * 免疫值变化时通知所有已装备芯片
+     */
     public static void onImmunityValueChanged(Player player) {
         int immunityValue = getImmunityValue(player);
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
@@ -34,35 +40,47 @@ public class GeneChipAPI {
         });
     }
 
+    /**
+     * 获取玩家拥有的指定芯片实例，可能为 null
+     */
     public static <T extends Chip> ChipInstance<T> getPlayerChip(Player player, T chip) {
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
         return Cast.cast(data.getChipInfos().getChips().getOrDefault(chip.getType(), Map.of()).get(chip));
     }
 
-    public static <T extends Chip> ChipInstance<T> getPlayerEquippedChip(Player player, T chip) {
-        PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-        return Cast.cast(data.getSlotInfos().getCurrent().get(chip));
-    }
-
-
+    /**
+     * 获取玩家当前装备槽中指定芯片的实例（Supplier 变体），返回 Optional
+     */
     public static <T extends Chip> Optional<ChipInstance<T>> getPlayerEquippedChip(Player player, Supplier<T> chip) {
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
         return Optional.ofNullable(Cast.cast(data.getSlotInfos().getCurrent().get(chip.get())));
     }
 
+    /**
+     * 获取玩家运行时数据
+     */
     public static PlayerRunTimeData getPlayerRunTimeData(Player player) {
         return player.getData(GCAttachmentTypes.PLAYER_RUN_TIME_DATA);
     }
 
+    /**
+     * 为芯片添加冷却时间（tick 为单位）
+     */
     public static void addChipCooldown(Player player, Chip chip, int tick) {
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
         data.addCoolDown(chip, tick);
     }
 
+    /**
+     * 检查芯片是否处于冷却中
+     */
     public static boolean isChipCooldown(Player player, Chip chip) {
         return player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA).getCoolDownInfos().isCoolDown(chip);
     }
 
+    /**
+     * 设置指定槽位的芯片，自动处理旧芯片卸下和新芯片装备回调，重新烘焙 currentSlots
+     */
     public static void setSlotChip(Player player, ChipSlot slot) {
         PlayerChipData data = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
         if (player.isLocalPlayer()) {
