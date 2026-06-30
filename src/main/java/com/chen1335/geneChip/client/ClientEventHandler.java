@@ -8,13 +8,22 @@ import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
 import com.chen1335.geneChip.chip.chips.tactics.SlidingTackle;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
+import com.chen1335.geneChip.client.animation.AnimationHandler;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.chen1335.geneChip.network.PlayerActionPacket;
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.kosmx.playerAnim.api.layered.*;
+import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
+import dev.kosmx.playerAnim.core.util.Ease;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -34,8 +43,9 @@ public class ClientEventHandler {
         GeneChipClient.getPlayerChipData().tick(player);
 
 
+
         // 滑铲芯片逻辑
-        GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SLIDING_TACKLE).ifPresent(chipInstance -> {
+        GeneChipClient.getPlayerEquippedChip(ChipTypes.SLIDING_TACKLE).ifPresent(chipInstance -> {
             boolean isSprinting = player.isSprinting();
             boolean isSneaking = player.isShiftKeyDown();
 
@@ -53,6 +63,7 @@ public class ClientEventHandler {
 
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.SLIDING_TACKLE.get(), cooldown);
+                    AnimationHandler.playAnimationAndDistribute(ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "sliding_tackle"));
                 }
             }
         });
@@ -70,7 +81,7 @@ public class ClientEventHandler {
         // 检测后退键（S键）
         KeyMapping keyDown = Minecraft.getInstance().options.keyDown;
         if (event.getKey() == keyDown.getKey().getValue()) {
-            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
+            GeneChipClient.getPlayerEquippedChip(ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
                 PlayerRunTimeData runtimeData = player.getData(GCAttachmentTypes.PLAYER_RUN_TIME_DATA);
 
                 if (!GeneChipAPI.isChipCooldown(player, ChipTypes.TACTICAL_ROLL.get()) && !runtimeData.tacticalRolling) {
@@ -93,7 +104,7 @@ public class ClientEventHandler {
 
         if (event.getKey() == Minecraft.getInstance().options.keyJump.getKey().getValue()) {
             // 二段跳芯片逻辑
-            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.DOUBLE_JUMP).ifPresent(chipInstance -> {
+            GeneChipClient.getPlayerEquippedChip(ChipTypes.DOUBLE_JUMP).ifPresent(chipInstance -> {
                 PlayerRunTimeData runtimeData = player.getData(GCAttachmentTypes.PLAYER_RUN_TIME_DATA);
                 if (!player.onGround()) {
                     if (!GeneChipAPI.isChipCooldown(player, ChipTypes.DOUBLE_JUMP.get())) {

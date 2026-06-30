@@ -14,12 +14,7 @@ import com.chen1335.geneChip.client.gui.screen.ChipConfigScreen;
 import com.chen1335.geneChip.command.ChipCommand;
 import com.chen1335.geneChip.compat.coldsweat.tempModifiers.GeneChipTempModifier;
 import com.chen1335.geneChip.lootConditions.WildHunterCondition;
-import com.chen1335.geneChip.network.AddChipPacket;
-import com.chen1335.geneChip.network.ChipSelectPacket;
-import com.chen1335.geneChip.network.ChipSelectedPacket;
-import com.chen1335.geneChip.network.PlayerActionPacket;
-import com.chen1335.geneChip.network.PlayerChipDataPacket;
-import com.chen1335.geneChip.network.SetSlotChipPacket;
+import com.chen1335.geneChip.network.*;
 import com.chen1335.geneChip.network.util.ChipTypeSlot;
 import com.momosoftworks.coldsweat.api.event.core.init.DefaultTempModifiersEvent;
 import com.momosoftworks.coldsweat.api.event.core.registry.TempModifierRegisterEvent;
@@ -141,6 +136,8 @@ public class EventHandler {
         registrar.playBidirectional(SetSlotChipPacket.TYPE, SetSlotChipPacket.STREAM_CODEC, SetSlotChipPacket::handler);
         registrar.playToClient(ChipSelectPacket.TYPE, ChipSelectPacket.STREAM_CODEC, ChipSelectPacket::handler);
         registrar.playToServer(ChipSelectedPacket.TYPE, ChipSelectedPacket.STREAM_CODEC, ChipSelectedPacket::handler);
+
+        registrar.playBidirectional(AnimationPack.TYPE, AnimationPack.STREAM_CODEC, AnimationPack::handler);
     }
 
     @SubscribeEvent

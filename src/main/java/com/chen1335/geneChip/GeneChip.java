@@ -5,12 +5,14 @@ import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.LootItemConditions;
 import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
+import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.config.ClothConfig;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
@@ -35,10 +37,16 @@ public class GeneChip {
         GCAttributes.ATTRIBUTE_DEFERRED_REGISTER.register(modEventBus);
         ClothConfig.build(modContainer);
         modEventBus.addListener(this::FMLCommonSetupEvent);
+        modEventBus.addListener(this::FMLClientSetupEvent);
+        GeneChipClient.init();
     }
 
     public void FMLCommonSetupEvent(FMLCommonSetupEvent setupEvent) {
         ChipConfig.load();
+    }
+
+    public void FMLClientSetupEvent(FMLClientSetupEvent setupEvent) {
+        GeneChipClient.setup();
     }
 
     public static ResourceLocation id(String id) {
