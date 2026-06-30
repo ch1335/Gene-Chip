@@ -12,14 +12,19 @@ import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class AnimationHandler {
     public static ResourceLocation ANIMATION_RESOURCE = ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "animation");
 
     //播放客户端动画
-    public static void playAnimation(ResourceLocation location) {
-        ModifierLayer<IAnimation> animation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) GeneChipClient.getClientPlayer()).get(AnimationHandler.ANIMATION_RESOURCE);
+    public static void playAnimation(Player player, ResourceLocation location) {
+        if (location == null) {
+            location = AnimationPack.EMPTY_ANIMATION;
+        }
+
+        ModifierLayer<IAnimation> animation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
         if (animation == null) {
             return;
         }
@@ -36,8 +41,11 @@ public class AnimationHandler {
     }
 
     //播放并且分发动画包来通知服务器其他玩家
-    public static void playAnimationAndDistribute(ResourceLocation location) {
-        playAnimation(location);
-        PacketDistributor.sendToServer(new AnimationPack(GeneChipClient.getClientPlayer().getId(), location));
+    public static void playAnimationAndDistribute(Player player, ResourceLocation location) {
+        if (location == null) {
+            location = AnimationPack.EMPTY_ANIMATION;
+        }
+        playAnimation(player,location);
+        PacketDistributor.sendToServer(new AnimationPack(player.getId(), location));
     }
 }

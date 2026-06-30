@@ -12,23 +12,18 @@ import com.chen1335.geneChip.client.animation.AnimationHandler;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.chen1335.geneChip.network.PlayerActionPacket;
 import com.mojang.blaze3d.platform.InputConstants;
-import dev.kosmx.playerAnim.api.layered.*;
-import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
-import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
-import dev.kosmx.playerAnim.core.util.Ease;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = GeneChip.MODID, value = Dist.CLIENT)
@@ -41,8 +36,7 @@ public class ClientEventHandler {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         GeneChipClient.getPlayerChipData().tick(player);
-
-
+        PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
 
         // 滑铲芯片逻辑
         GeneChipClient.getPlayerEquippedChip(ChipTypes.SLIDING_TACKLE).ifPresent(chipInstance -> {
@@ -63,7 +57,7 @@ public class ClientEventHandler {
 
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.SLIDING_TACKLE.get(), cooldown);
-                    AnimationHandler.playAnimationAndDistribute(ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "sliding_tackle"));
+                    AnimationHandler.playAnimationAndDistribute(player, ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "sliding_tackle"));
                 }
             }
         });
@@ -126,6 +120,21 @@ public class ClientEventHandler {
                     }
                 }
             });
+        }
+    }
+
+    @SubscribeEvent
+    public static void PlayerTickEvent(PlayerTickEvent.Post event) {
+        Player entity = event.getEntity();
+        PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(entity);
+        int fallFlyingTicks = (int) entity.fallDistance;
+        if (fallFlyingTicks > 1 && !playerRunTimeData.isFalling) {
+            playerRunTimeData.isFalling = true;
+            AnimationHandler.playAnimation(entity, GeneChip.id("in_air_loop"));
+        }
+        if (playerRunTimeData.isFalling && entity.onGround()) {
+            AnimationHandler.playAnimation(entity, null);
+            playerRunTimeData.isFalling = false;
         }
     }
 }

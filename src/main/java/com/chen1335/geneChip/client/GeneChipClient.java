@@ -58,13 +58,14 @@ public class GeneChipClient {
             ModifierLayer<IAnimation> layer = new ModifierLayer<>();
             layer.addModifierBefore(new GCAdjustmentModifier((partName, partialTick) -> {
                 boolean handleHead = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
-                boolean handleRightLeg = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("rightLeg", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
-                boolean handleLeftLeg = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("leftLeg", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
 
                 switch (partName) {
                     case "head" -> {
-                        return Optional.of(new GCAdjustmentModifier.PartModifier(new Vec3f(Mth.lerp(partialTick, player.xRotO * Mth.DEG_TO_RAD, player.getXRot() * Mth.DEG_TO_RAD), Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
-
+                        if (handleHead) {
+                            return Optional.of(new GCAdjustmentModifier.PartModifier(new Vec3f(Mth.lerp(partialTick, player.xRotO, player.getXRot()) * Mth.DEG_TO_RAD, Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
+                        }else {
+                            return Optional.empty();
+                        }
                     }
                     case "rightLeg" -> {
 

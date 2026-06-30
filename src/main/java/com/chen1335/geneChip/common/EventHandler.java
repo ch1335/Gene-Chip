@@ -7,15 +7,14 @@ import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
+import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
-import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.client.gui.screen.ChipConfigScreen;
 import com.chen1335.geneChip.command.ChipCommand;
 import com.chen1335.geneChip.compat.coldsweat.tempModifiers.GeneChipTempModifier;
 import com.chen1335.geneChip.lootConditions.WildHunterCondition;
 import com.chen1335.geneChip.network.*;
-import com.chen1335.geneChip.network.util.ChipTypeSlot;
 import com.momosoftworks.coldsweat.api.event.core.init.DefaultTempModifiersEvent;
 import com.momosoftworks.coldsweat.api.event.core.registry.TempModifierRegisterEvent;
 import com.momosoftworks.coldsweat.api.util.Temperature;
@@ -49,9 +48,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @EventBusSubscriber(modid = GeneChip.MODID)
 public class EventHandler {
@@ -174,7 +171,6 @@ public class EventHandler {
         if (event.getHand() == InteractionHand.MAIN_HAND && event.getItemStack().is(Items.DIAMOND)) {
             if (player instanceof ServerPlayer serverPlayer) {
                 PacketDistributor.sendToPlayer(serverPlayer,new ChipSelectPacket(List.of(
-                        ChipTypes.ENDURANCE.value().createInstance(),
                         ChipTypes.BIG_EATER.value().createInstance(),
                         ChipTypes.PERMAFROST_WALKERS.value().createInstance()
                 )));
