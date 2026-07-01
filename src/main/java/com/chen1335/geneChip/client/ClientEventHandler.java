@@ -82,7 +82,7 @@ public class ClientEventHandler {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastBackKeyPress < DOUBLE_TAP_THRESHOLD) {
                         TacticalRoll chip = chipInstance.getChip();
-                        float rollDistance = chip.rollDistance.getValue(chipInstance.getLvl()) * 0.5F;
+                        float rollDistance = chip.rollDistance.getValue(chipInstance.getLvl()) * 0.7F;
 
                         player.setDeltaMovement(player.getViewVector(0).multiply(1, 0, 1).scale(-rollDistance));
 
@@ -90,6 +90,9 @@ public class ClientEventHandler {
 
                         int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                         GeneChipAPI.addChipCooldown(player, ChipTypes.TACTICAL_ROLL.get(), cooldown);
+
+                        AnimationHandler.playAnimationAndDistribute(player, ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "tactical_roll"));
+
                     }
                     lastBackKeyPress = currentTime;
                 }
@@ -116,6 +119,8 @@ public class ClientEventHandler {
 
                             int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                             GeneChipAPI.addChipCooldown(player, ChipTypes.DOUBLE_JUMP.get(), cooldown);
+                            AnimationHandler.playAnimationAndDistribute(player, ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "double_jump"));
+
                         }
                     }
                 }
@@ -126,15 +131,22 @@ public class ClientEventHandler {
     @SubscribeEvent
     public static void PlayerTickEvent(PlayerTickEvent.Post event) {
         Player entity = event.getEntity();
-        PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(entity);
-        int fallFlyingTicks = (int) entity.fallDistance;
-        if (fallFlyingTicks > 1 && !playerRunTimeData.isFalling) {
-            playerRunTimeData.isFalling = true;
-            AnimationHandler.playAnimation(entity, GeneChip.id("in_air_loop"));
-        }
-        if (playerRunTimeData.isFalling && entity.onGround()) {
-            AnimationHandler.playAnimation(entity, null);
-            playerRunTimeData.isFalling = false;
+        if (entity.isLocalPlayer()) {
+            PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(entity);
+            boolean isFalling = !entity.onGround() && (entity.getDeltaMovement().y <= -1);
+            if (isFalling) {
+                if (playerRunTimeData.fallingAnimationTick == 0) {
+                    AnimationHandler.playAnimation(entity, GeneChip.id("falling_start"));
+                } else if (playerRunTimeData.fallingAnimationTick == 3) {
+                    AnimationHandler.playAnimation(entity, GeneChip.id("falling"));
+                }
+                playerRunTimeData.fallingAnimationTick++;
+            } else {
+                if (playerRunTimeData.fallingAnimationTick != 0) {
+                    AnimationHandler.playAnimation(entity, GeneChip.id("falling_end"));
+                }
+                playerRunTimeData.fallingAnimationTick = 0;
+            }
         }
     }
 }

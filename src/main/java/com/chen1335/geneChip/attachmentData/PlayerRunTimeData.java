@@ -16,7 +16,7 @@ public class PlayerRunTimeData {
     // 连击热潮芯片 - 记录击杀时间戳（用于判断是否触发连击热潮）
     private final ArrayList<Long> comboFeversTime = new ArrayList<>();
 
-    public boolean isFalling = false;
+    public int fallingAnimationTick = 0;
 
     // 皮糙肉厚芯片 - 是否处于蹲下激活护甲加成状态
     public boolean thickSkinnedActive = false;
@@ -92,7 +92,7 @@ public class PlayerRunTimeData {
 
         if (slidingTackleActive) {
             slidingTackleTimer--;
-            if (slidingTackleTimer<=0) {
+            if (slidingTackleTimer <= 0) {
                 slidingTackleActive = false;
             }
         }

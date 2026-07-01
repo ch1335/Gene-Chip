@@ -3,6 +3,7 @@ package com.chen1335.geneChip.client.animation;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.network.AnimationPack;
+import dev.kosmx.playerAnim.api.IPlayable;
 import dev.kosmx.playerAnim.api.layered.IActualAnimation;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
@@ -31,10 +32,12 @@ public class AnimationHandler {
         if (location.equals(AnimationPack.EMPTY_ANIMATION)) {
             animation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), null);
         } else {
-            IActualAnimation<?> iActualAnimation = PlayerAnimationRegistry
-                    .getAnimation(location)
-                    .playAnimation();
-            animation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), iActualAnimation);
+            IPlayable animation1 = PlayerAnimationRegistry
+                    .getAnimation(location);
+            if (animation1 != null) {
+                IActualAnimation<?> iActualAnimation = animation1.playAnimation();
+                animation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), iActualAnimation);
+            }
 
         }
 

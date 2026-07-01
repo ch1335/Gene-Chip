@@ -57,7 +57,7 @@ public class GeneChipClient {
         PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(AnimationHandler.ANIMATION_RESOURCE, 42, player -> {
             ModifierLayer<IAnimation> layer = new ModifierLayer<>();
             layer.addModifierBefore(new GCAdjustmentModifier((partName, partialTick) -> {
-                boolean handleHead = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5f, Vec3f.ZERO).equals(Vec3f.ZERO);
+                boolean handleHead = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5F, Vec3f.ZERO).equals(Vec3f.ZERO);
 
                 switch (partName) {
                     case "head" -> {
