@@ -7,10 +7,12 @@ import com.chen1335.geneChip.client.animation.AnimationHandler;
 import com.chen1335.geneChip.client.animation.GCAdjustmentModifier;
 import com.chen1335.geneChip.network.AnimationPack;
 import dev.kosmx.playerAnim.api.TransformType;
+import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
 import dev.kosmx.playerAnim.api.layered.IActualAnimation;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.FirstPersonModifier;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
@@ -55,7 +57,7 @@ public class GeneChipClient {
 
     public static void init() {
         PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(AnimationHandler.ANIMATION_RESOURCE, 42, player -> {
-            ModifierLayer<IAnimation> layer = new ModifierLayer<>();
+            GCModifierLayer<IAnimation> layer = new GCModifierLayer<>(player);
             layer.addModifierBefore(new GCAdjustmentModifier((partName, partialTick) -> {
                 boolean handleHead = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5F, Vec3f.ZERO).equals(Vec3f.ZERO);
 
@@ -68,7 +70,6 @@ public class GeneChipClient {
                         }
                     }
                     case "rightLeg" -> {
-
                         return Optional.empty();
                     }
                     case "leftLeg" -> {
@@ -80,7 +81,9 @@ public class GeneChipClient {
                 }
             }));
 
-
+            FirstPersonModifier modifier = new FirstPersonModifier();
+            modifier.setCurrentFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL);
+            layer.addModifierBefore(modifier);
             return layer;
         });
     }

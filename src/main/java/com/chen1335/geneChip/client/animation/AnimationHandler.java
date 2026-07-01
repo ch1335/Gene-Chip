@@ -1,13 +1,14 @@
 package com.chen1335.geneChip.client.animation;
 
 import com.chen1335.geneChip.GeneChip;
-import com.chen1335.geneChip.client.GeneChipClient;
+import com.chen1335.geneChip.client.GCModifierLayer;
 import com.chen1335.geneChip.network.AnimationPack;
 import dev.kosmx.playerAnim.api.IPlayable;
 import dev.kosmx.playerAnim.api.layered.IActualAnimation;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
+import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
@@ -29,6 +30,7 @@ public class AnimationHandler {
         if (animation == null) {
             return;
         }
+
         if (location.equals(AnimationPack.EMPTY_ANIMATION)) {
             animation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), null);
         } else {
@@ -48,7 +50,12 @@ public class AnimationHandler {
         if (location == null) {
             location = AnimationPack.EMPTY_ANIMATION;
         }
-        playAnimation(player,location);
+        playAnimation(player, location);
         PacketDistributor.sendToServer(new AnimationPack(player.getId(), location));
+    }
+
+    public static SpeedModifier getSpeedModifier(Player player) {
+        GCModifierLayer<IAnimation> animation = (GCModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
+        return animation.speedModifier;
     }
 }

@@ -23,25 +23,9 @@ public abstract class SpiderClimbMixin extends Entity {
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void onTravel(Vec3 travelVector, CallbackInfo ci) {
-        if (LivingEntity.class.cast(this) instanceof Player player) {
+        if (LivingEntity.class.cast(this) instanceof Player player && player.isLocalPlayer()) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SPIDER_CLIMB).ifPresent(chipInstance -> {
-                PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
-                if (player.horizontalCollision) {
-                    SpiderClimb chip = chipInstance.getChip();
-                    float climbSpeed = chip.climbSpeed.getValue(chipInstance.getLvl());
-
-                    boolean isMovingUp = player.zza > 0;
-
-                    if (isMovingUp) {
-                        player.setDeltaMovement(player.getDeltaMovement().x, climbSpeed, player.getDeltaMovement().z);
-                    } else {
-                        player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
-                    }
-                    playerRunTimeData.spiderClimbing = true;
-                    player.fallDistance = 0;
-                } else {
-                    playerRunTimeData.spiderClimbing = false;
-                }
+                chipInstance.getChip().handleClimb(chipInstance,player);
             });
         }
     }

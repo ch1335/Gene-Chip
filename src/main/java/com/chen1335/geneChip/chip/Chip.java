@@ -3,15 +3,20 @@ package com.chen1335.geneChip.chip;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -132,4 +137,5 @@ public abstract class Chip {
     public ChipInstance<?> createInstance() {
         return new ChipInstance<>(this, 0, 1);
     }
+
 }
