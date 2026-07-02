@@ -34,7 +34,7 @@ public class SpiderClimb extends Chip {
         if (player.horizontalCollision) {
             ModifierLayer<IAnimation> animation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
             if (!animation.isActive() && !player.onGround()) {
-                AnimationHandler.playAnimation(player, GeneChip.id("climb"));
+                AnimationHandler.playAnimationAndDistribute(player, GeneChip.id("climb"));
             }
             SpiderClimb chip = chipInstance.getChip();
             float climbSpeed = chip.climbSpeed.getValue(chipInstance.getLvl());
@@ -66,7 +66,7 @@ public class SpiderClimb extends Chip {
         } else if (playerRunTimeData.spiderClimbing) {
             AnimationHandler.getSpeedModifier(player).speed = 1;
             playerRunTimeData.spiderClimbing = false;
-            AnimationHandler.playAnimation(player, null);
+            AnimationHandler.playAnimationAndDistribute(player, null);
         }
 
     }

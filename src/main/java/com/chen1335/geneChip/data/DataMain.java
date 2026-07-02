@@ -29,6 +29,9 @@ public class DataMain {
 
 
         generator.addProvider(event.includeServer(), new GCEntityTypeTagsProvider(generator.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
+
+        generator.addProvider(event.includeServer(), new GCItemModelProvider(generator.getPackOutput(), event.getExistingFileHelper()));
+
     }
 
 }
