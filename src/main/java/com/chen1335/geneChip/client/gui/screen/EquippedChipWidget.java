@@ -5,6 +5,8 @@ import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -23,6 +25,7 @@ public class EquippedChipWidget extends AbstractWidget {
     private final ChipConfigScreen parent;
 
     private ChipWidget chipWidget = null;
+
 
     public EquippedChipWidget(ChipSlot chipSlot, int index, ChipConfigScreen parent) {
         super(0, 0, 0, 0, Component.empty());
@@ -52,7 +55,7 @@ public class EquippedChipWidget extends AbstractWidget {
 
     public void setChipSlot(ChipSlot chipSlot) {
         this.chipSlot = chipSlot;
-        chipSlot.instance().ifPresentOrElse(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent),()->{
+        chipSlot.instance().ifPresentOrElse(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent), () -> {
             chipWidget = null;
         });
     }
@@ -69,8 +72,18 @@ public class EquippedChipWidget extends AbstractWidget {
             guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
             RenderSystem.enableBlend();
             GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), FastColor.ARGB32.color(150, 0, 0, 0), 1);
+
+            GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getSmallCrystalIcon(), guiGraphics, getX() + 10 * xScale, getY() + 5 * yScale, 8 * xScale, 8 * yScale, 2, 2, 4, 4, 8, 8, 2);
             GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics, getX() + 102 * xScale, getY() - 27 * yScale, 48 * xScale, 78 * yScale, 8, 1, 24, 39, 40, 40, 2);
             GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics, getX() + 110 * xScale, getY() - 9 * yScale, 32 * xScale, 32 * yScale, 2);
+
+            pose.pushPose();
+            Component displayName = chipInstance.getChip().getDisplayName();
+            Font font = Minecraft.getInstance().font;
+            pose.translate(getX() + 32 * xScale, getY() + 5 * yScale, 2);
+            guiGraphics.drawString(font, displayName, 0, 0, 0xFFFFFF);
+            pose.popPose();
+
             guiGraphics.disableScissor();
             pose.popPose();
         });
@@ -80,11 +93,12 @@ public class EquippedChipWidget extends AbstractWidget {
             GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), color, 3);
             if (chipWidget != null) {
                 chipWidget.unlocked = true;
+                chipWidget.renderHoverDesc = false;
                 chipWidget.setX(mouseX);
-                chipWidget.setY((int) (mouseY-40*yScale));
+                chipWidget.setY((int) (mouseY - 40 * yScale));
                 PoseStack pose = guiGraphics.pose();
                 pose.pushPose();
-                pose.translate(0,0,40);
+                pose.translate(0, 0, 40);
                 chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
                 pose.popPose();
             }

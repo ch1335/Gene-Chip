@@ -33,7 +33,7 @@ public class ChipWidget extends AbstractWidget {
     public int index = 0;
 
     public boolean unlocked = false;
-
+    public boolean renderHoverDesc = true;
     public ChipWidget(ChipInstance<?> chipInstance, ChipConfigScreen parent) {
         super(0, 0, 0, 0, Component.empty());
         this.chipInstance = chipInstance;
@@ -93,15 +93,17 @@ public class ChipWidget extends AbstractWidget {
             pose.popPose();
         }
 
-        if (isHovered && !parent.isDragging()) {
-            if (gray) {
-                List<Component> lines = new ArrayList<>();
-                lines.add(chipInstance.getChip().getDisplayName().copy().withStyle(ChatFormatting.GRAY));
-                lines.add(chipInstance.getChip().getDesc());
-                lines.add(Component.translatable("gene_chip.chip.locked").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
-                guiGraphics.renderComponentTooltip(instance.font, lines, mouseX, mouseY);
-            } else {
-                guiGraphics.renderTooltip(instance.font, chipInstance.getChip().getDesc(), mouseX, mouseY);
+        if (renderHoverDesc) {
+            if (isHovered && !parent.isDragging()) {
+                if (gray) {
+                    List<Component> lines = new ArrayList<>();
+                    lines.add(chipInstance.getChip().getDisplayName().copy().withStyle(ChatFormatting.GRAY));
+                    lines.add(chipInstance.getChip().getDesc());
+                    lines.add(Component.translatable("gene_chip.chip.locked").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+                    guiGraphics.renderComponentTooltip(instance.font, lines, mouseX, mouseY);
+                } else {
+                    guiGraphics.renderTooltip(instance.font, chipInstance.getChip().getDesc(), mouseX, mouseY);
+                }
             }
         }
         pose.popPose();
