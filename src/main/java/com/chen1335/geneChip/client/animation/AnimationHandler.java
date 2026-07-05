@@ -22,6 +22,9 @@ public class AnimationHandler {
 
     //播放客户端动画
     public static void playAnimation(Player player, ResourceLocation location) {
+        if (!player.isLocalPlayer()) {
+            return;
+        }
         if (location == null) {
             location = AnimationPack.EMPTY_ANIMATION;
         }
@@ -47,11 +50,15 @@ public class AnimationHandler {
 
     //播放并且分发动画包来通知服务器其他玩家
     public static void playAnimationAndDistribute(Player player, ResourceLocation location) {
+        if (!player.isLocalPlayer()) {
+            return;
+        }
         if (location == null) {
             location = AnimationPack.EMPTY_ANIMATION;
         }
         playAnimation(player, location);
         PacketDistributor.sendToServer(new AnimationPack(player.getId(), location));
+
     }
 
     public static SpeedModifier getSpeedModifier(Player player) {

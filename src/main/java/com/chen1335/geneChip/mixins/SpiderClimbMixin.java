@@ -23,7 +23,7 @@ public abstract class SpiderClimbMixin extends Entity {
 
     @Inject(method = "travel", at = @At("HEAD"))
     private void onTravel(Vec3 travelVector, CallbackInfo ci) {
-        if (LivingEntity.class.cast(this) instanceof Player player && player.isLocalPlayer()) {
+        if (LivingEntity.class.cast(this) instanceof Player player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SPIDER_CLIMB).ifPresent(chipInstance -> {
                 chipInstance.getChip().handleClimb(chipInstance,player);
             });

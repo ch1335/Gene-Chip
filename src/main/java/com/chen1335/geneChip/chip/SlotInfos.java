@@ -1,5 +1,6 @@
 package com.chen1335.geneChip.chip;
 
+import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import io.netty.util.collection.IntObjectHashMap;
@@ -116,7 +117,7 @@ public class SlotInfos implements INBTSerializable<CompoundTag> {
     public void resizeSlots(Player entity) {
         for (IntObjectMap<ChipSlot> value : slotsByName.values()) {
             int size = value.size();
-            int maxChipSlots = playerChipData.maxChipSlots;
+            int maxChipSlots = (int) entity.getAttributeValue(GCAttributes.MAX_CHIP_SLOT);
             if (size > maxChipSlots) {
                 Iterator<IntObjectMap.PrimitiveEntry<ChipSlot>> iterator = value.entries().iterator();
                 while (iterator.hasNext()) {

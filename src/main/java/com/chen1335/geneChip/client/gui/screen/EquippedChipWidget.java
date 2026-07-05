@@ -91,7 +91,7 @@ public class EquippedChipWidget extends AbstractWidget {
             RenderSystem.enableBlend();
             int color = FastColor.ARGB32.color(150, 255, 255, 255);
             GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), color, 3);
-            if (chipWidget != null) {
+            if (chipWidget != null && !parent.isDragging()) {
                 chipWidget.unlocked = true;
                 chipWidget.renderHoverDesc = false;
                 chipWidget.setX(mouseX);

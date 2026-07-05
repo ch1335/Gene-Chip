@@ -161,6 +161,7 @@
   "gene_chip.command.remove.success": "已移除 %s 的卡牌 %s",
   "gene_chip.command.remove.not_owned": "%s 未拥有卡牌 %s",
   "gene_chip.command.chip_not_found": "未找到卡牌 %s",
+  "gene_chip.command.remove_all.success": "已移除 %s 的 %s 张卡牌",
 
   "gene_chip.chip.locked": "未解锁",
 

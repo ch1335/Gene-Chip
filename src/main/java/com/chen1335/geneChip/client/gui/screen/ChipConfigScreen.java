@@ -8,6 +8,7 @@ import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.chen1335.geneChip.network.SetSlotChipPacket;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.netty.util.collection.IntObjectMap;
@@ -38,7 +39,6 @@ public class ChipConfigScreen extends Screen {
 
     public final Map<ChipType, Map<Chip, ChipInstance<?>>> availableChips = new HashMap<>();
 
-    public NonNullList<ChipSlot> slots = NonNullList.create();
 
     public ChipFilter chipFilter = new ChipFilter();
 
@@ -203,12 +203,12 @@ public class ChipConfigScreen extends Screen {
         GuiUtil.drawColorWithSize(guiGraphics,
                 (int) (10 * xScale * s), (int) (20 * yScale * s),
                 (int) (150 * xScale * s), (int) (240 * yScale * s),
-                FastColor.ARGB32.color(100, 0, 0, 0), 1);
+                FastColor.ARGB32.color(100, 160, 160, 160), 1);
 
         GuiUtil.drawColorWithSize(guiGraphics,
                 (int) (10 * xScale * s), (int) (0 * yScale * s),
                 (int) ((315 + 155) * xScale * s), (int) (20 * yScale * s),
-                FastColor.ARGB32.color(100, 0, 0, 0), 0);
+                FastColor.ARGB32.color(100, 160, 160, 160), 0);
 
         hoveredSlot = -1;
         for (int i = 0; i < getSlots().size(); i++) {
@@ -245,7 +245,14 @@ public class ChipConfigScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
+            this.onClose();
+            return true;
+        }
+        return false;
     }
 
     private double scrollY = 0;
@@ -329,7 +336,7 @@ public class ChipConfigScreen extends Screen {
             Component countText = Component.literal("" + count);
             PoseStack pose = guiGraphics.pose();
             pose.pushPose();
-            pose.translate(0,0,1);
+            pose.translate(0, 0, 1);
             guiGraphics.drawString(mc.font, countText, (int) ((ex + 9) * xScale * s), (int) ((ey + 1) * yScale * s), 0xFFFFFFFF, false);
             pose.popPose();
             i++;
@@ -358,4 +365,5 @@ public class ChipConfigScreen extends Screen {
 
         GeneChipClient.getPlayerChipData().getSlotInfos().bakeCurrent();
     }
+
 }

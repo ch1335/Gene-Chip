@@ -33,7 +33,7 @@ public class SpiderClimb extends Chip {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
         if (player.horizontalCollision) {
             ModifierLayer<IAnimation> animation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
-            if (!animation.isActive() && !player.onGround()) {
+            if (!animation.isActive() && !player.onGround() && player.isLocalPlayer()) {
                 AnimationHandler.playAnimationAndDistribute(player, GeneChip.id("climb"));
             }
             SpiderClimb chip = chipInstance.getChip();
@@ -41,13 +41,13 @@ public class SpiderClimb extends Chip {
             boolean isMovingUp = player.zza > 0;
 
             if (isMovingUp) {
-                AnimationHandler.getSpeedModifier(player).speed = 1;
+                if (player.isLocalPlayer()) {
+                    AnimationHandler.getSpeedModifier(player).speed = 1;
+                }
                 player.setDeltaMovement(player.getDeltaMovement().x, climbSpeed, player.getDeltaMovement().z);
             }
             playerRunTimeData.spiderClimbing = true;
             player.fallDistance = 0;
-
-        }else {
 
         }
 
@@ -56,17 +56,24 @@ public class SpiderClimb extends Chip {
             if (playerRunTimeData.spiderClimbing) {
                 if (player.isShiftKeyDown()) {
                     player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
-                    AnimationHandler.getSpeedModifier(player).speed = 0;
+
+                    if (player.isLocalPlayer()) {
+                        AnimationHandler.getSpeedModifier(player).speed = 0;
+                    }
                 } else if (player.zza == 0 && !player.onGround()) {
                     player.setDeltaMovement(player.getDeltaMovement().x, -0.5, player.getDeltaMovement().z);
-                    AnimationHandler.getSpeedModifier(player).speed = 1;
+                    if (player.isLocalPlayer()) {
+                        AnimationHandler.getSpeedModifier(player).speed = 1;
+                    }
                 }
             }
             player.fallDistance = 0;
         } else if (playerRunTimeData.spiderClimbing) {
-            AnimationHandler.getSpeedModifier(player).speed = 1;
             playerRunTimeData.spiderClimbing = false;
-            AnimationHandler.playAnimationAndDistribute(player, null);
+            if (player.isLocalPlayer()) {
+                AnimationHandler.getSpeedModifier(player).speed = 1;
+                AnimationHandler.playAnimationAndDistribute(player, null);
+            }
         }
 
     }

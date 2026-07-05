@@ -17,6 +17,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Map;
+
 public class ChipCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
@@ -37,6 +39,11 @@ public class ChipCommand {
                                         .then(Commands.argument("chip", ResourceKeyArgument.key(RegisterTypes.CHIP_KEY))
                                                 .executes(ChipCommand::remove)
                                         )
+                                )
+                        )
+                        .then(Commands.literal("remove_all")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ChipCommand::removeAll)
                                 )
                         )
         );
@@ -72,7 +79,7 @@ public class ChipCommand {
         if (chip == null) return 0;
         PlayerChipData data = target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
         boolean had = data.getChipInfos().getChips()
-                .getOrDefault(chip.getType(), java.util.Map.of())
+                .getOrDefault(chip.getType(), Map.of())
                 .containsKey(chip);
         if (had) {
             data.removeChip(target, chip);
@@ -86,5 +93,20 @@ public class ChipCommand {
                     Component.translatable("gene_chip.command.remove.not_owned", target.getDisplayName(), name), false);
         }
         return had ? 1 : 0;
+    }
+
+    private static int removeAll(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+        PlayerChipData data = target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        int count = 0;
+        for (Map<Chip, ChipInstance<?>> chips : data.getChipInfos().getChips().values()) {
+            count += chips.size();
+        }
+        data.getChipInfos().getChips().clear();
+        data.syncToClient(target);
+        int finalCount = count;
+        ctx.getSource().sendSuccess(() ->
+                Component.translatable("gene_chip.command.remove_all.success", target.getDisplayName(), finalCount), true);
+        return 1;
     }
 }
