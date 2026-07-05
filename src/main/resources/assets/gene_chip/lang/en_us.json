@@ -1,7 +1,195 @@
 {
   "gene_chip.chip.head_shot_hunter.name": "Head Shooter Hunter",
+  "gene_chip.chip.head_shot_hunter.desc": "Enhancer targets visual nerves and reflex arcs, making you better at exploiting enemy weaknesses",
+  "gene_chip.chip.head_shot_hunter.desc.detailed": "Critical hits have a %s chance to instantly kill common infected",
+
+  "gene_chip.chip.make_living.name": "Make a Living",
+  "gene_chip.chip.make_living.desc": "Metabolic enhancer forces your body to instinctively recycle every bit of energy—including bullets—in times of extreme scarcity",
+  "gene_chip.chip.make_living.desc.detailed": "When shooting an enemy, %s chance to recover one matching bullet while consuming ammo",
+
+  "gene_chip.chip.precision_shooting.name": "Precision Shooting",
+  "gene_chip.chip.precision_shooting.desc": "After neural synapse enhancement, your firearm mastery reaches the level of man-gun unity",
+  "gene_chip.chip.precision_shooting.desc.detailed": "Firearm damage increased by +%s",
+
+  "gene_chip.chip.bloodthirsty.name": "Bloodthirsty",
+  "gene_chip.chip.bloodthirsty.desc": "Enhancer awakens ancient hunting instincts—every life you reap brings morbid satisfaction and a brief bodily recovery",
+  "gene_chip.chip.bloodthirsty.desc.detailed": "When killing a hostile creature, %s chance to restore %s health",
+
+  "gene_chip.chip.wild_hunter.name": "Wild Hunter",
+  "gene_chip.chip.wild_hunter.desc": "Sensory enhancement allows you to precisely track and efficiently utilize every part of your prey",
+  "gene_chip.chip.wild_hunter.desc.detailed": "When killing animals, an extra 1-2 corresponding meat/leather drops",
+
+  "gene_chip.chip.sewage_purification_pack.name": "Sewage Purification Pack",
+  "gene_chip.chip.sewage_purification_pack.desc": "Sensory enhancement allows you to precisely track and efficiently utilize every part of your prey",
+  "gene_chip.chip.sewage_purification_pack.desc.detailed": "When killing animals, an extra 1-2 corresponding meat/leather drops",
+
+  "gene_chip.chip.endurance.name": "Endurance",
+  "gene_chip.chip.endurance.desc": "Muscle energy metabolism optimization—long-distance runs are no longer a burden",
+  "gene_chip.chip.endurance.desc.detailed": "Hunger consumption while running and jumping reduced by %s",
+
+  "gene_chip.chip.combo_fever.name": "Combo Fever",
+  "gene_chip.chip.combo_fever.desc": "Digestive system enhancement allows you to tolerate contaminated water that would defeat ordinary people",
+  "gene_chip.chip.combo_fever.desc.detailed": "No negative effects when drinking dirty water",
+
+  "gene_chip.chip.melee_attack_master.name": "Melee Attack Master",
+  "gene_chip.chip.melee_attack_master.desc": "After muscle fiber enhancement, every swing carries the skill and power of countless training",
+  "gene_chip.chip.melee_attack_master.desc.detailed": "Melee damage increased by +%s",
+
+  "gene_chip.chip.quick_adjustment.name": "Quick Adjustment",
+  "gene_chip.chip.quick_adjustment.desc": "Nerve reflex speed enhancement allows you to quickly reorient in combat to pursue the next target",
+  "gene_chip.chip.quick_adjustment.desc.detailed": "After killing an enemy with a firearm or bow, gain Speed I for %s seconds",
+
+  "gene_chip.chip.desire_for_slaughter.name": "Desire for Slaughter",
+  "gene_chip.chip.desire_for_slaughter.desc": "The enhancer converts every melee kill into a brief adrenaline surge, making you thirst for more bloodshed",
+  "gene_chip.chip.desire_for_slaughter.desc.detailed": "After a melee kill, gain Strength I for %s seconds",
+
+  "gene_chip.chip.mutation_adaptation.name": "Mutation Adaptation",
+  "gene_chip.chip.mutation_adaptation.desc": "The enhancer induces cellular mutation, giving you a strange tolerance to abyssal contamination",
+  "gene_chip.chip.mutation_adaptation.desc.detailed": "In infection zones, immunity decay rate slowed by 30%",
+
+  "gene_chip.chip.adrenal_gland_burst.name": "Adrenal Gland Burst",
+  "gene_chip.chip.adrenal_gland_burst.desc": "When near death, the enhancer forcibly triggers the adrenal medulla, squeezing out your last potential",
+  "gene_chip.chip.adrenal_gland_burst.desc.detailed": "When health is below %s, gain Strength II + Speed II for %s seconds. Cooldown %s seconds",
+
+  "gene_chip.chip.growing_fervor.name": "Growing Fervor",
+  "gene_chip.chip.growing_fervor.desc": "The virus coexists with you—the lower your immunity, the more the abyss bestows upon your body",
+  "gene_chip.chip.growing_fervor.desc.detailed": "Attack speed and movement speed based on immunity: >75% no bonus; 50~75% +5%% AS +5%% MS; 25~50% +10%% AS +10%% MS; <25% +20%% AS +15%% MS",
+
+  "gene_chip.chip.pain_blockade.name": "Pain Blockade",
+  "gene_chip.chip.pain_blockade.desc": "The enhancer completely severs pain nerves and tactile feedback, trading defense for pure power",
+  "gene_chip.chip.pain_blockade.desc.detailed": "Without any armor, gain %s damage reduction and +%s melee damage, each kill restores %s health. When equipped, deducts %s current max immunity",
+
+  "gene_chip.chip.big_eater.name": "Big Eater",
+  "gene_chip.chip.big_eater.desc": "The enhancer expands the stomach wall and accelerates digestive enzyme secretion, turning you into a true glutton",
+  "gene_chip.chip.big_eater.desc.detailed": "Max stomach bar increased to 20+%s, digestion speed +%s",
+
+  "gene_chip.chip.infected.name": "Infected",
+  "gene_chip.chip.infected.desc": "The enhancer induces deep cellular symbiosis with the abyssal virus, trading humanity for power",
+  "gene_chip.chip.infected.desc.detailed": "Gain Strength II in infection zones, all positive effect duration extended by +%s. Permanently unable to use abyssal virus immunity agents",
+
+  "gene_chip.chip.scrap_collector.name": "Scrap Collector",
+  "gene_chip.chip.scrap_collector.desc": "The enhancer trains you to spot overlooked treasures—even the most inconspicuous corners may hold surprises",
+  "gene_chip.chip.scrap_collector.desc.detailed": "%s chance to gain an extra random item when opening loot chests",
+
+  "gene_chip.chip.nutrient_extraction.name": "Nutrient Extraction",
+  "gene_chip.chip.nutrient_extraction.desc": "The enhancer improves nutrient absorption efficiency, making every bite of food count",
+  "gene_chip.chip.nutrient_extraction.desc.detailed": "When eating food, restore an extra +%s saturation and +%s health",
+
+  "gene_chip.chip.permafrost_walkers.name": "Permafrost Walkers",
+  "gene_chip.chip.permafrost_walkers.desc": "Metabolic heat production and peripheral circulation enhanced—ignore the bitter cold",
+  "gene_chip.chip.permafrost_walkers.desc.detailed": "Better survive in low temperature environments, can walk on powdered snow without sinking",
+
+  "gene_chip.chip.iron_lung.name": "Iron Lung",
+  "gene_chip.chip.iron_lung.desc": "Lung capacity and oxygen utilization efficiency improved, extending underwater breathing time",
+  "gene_chip.chip.iron_lung.desc.detailed": "Underwater breathing time extended by +%s",
+
+  "gene_chip.chip.thick_skinned.name": "Thick Skinned",
+  "gene_chip.chip.thick_skinned.desc": "Skin stratum corneum and subcutaneous fat reinforced, allowing you to withstand more impact",
+  "gene_chip.chip.thick_skinned.desc.detailed": "Permanently gain Resistance I, crouching grants additional +4 armor",
+
+  "gene_chip.chip.photosynthesis.name": "Photosynthesis",
+  "gene_chip.chip.photosynthesis.desc": "Induces cells to develop a plant-like photosynthesis mechanism, drawing energy from sunlight",
+  "gene_chip.chip.photosynthesis.desc.detailed": "In direct outdoor sunlight, gain Light Charge stacks (max 5). Each stack provides +1%% movement speed and restores 1 saturation every 30s. Indoors/night decays 1 stack every 30s",
+
+  "gene_chip.chip.sliding_tackle.name": "Sliding Tackle",
+  "gene_chip.chip.sliding_tackle.desc": "Leg muscle enhancement and ground friction control training allow you to approach targets rapidly in a low stance while sprinting",
+  "gene_chip.chip.sliding_tackle.desc.detailed": "Press crouch while sprinting to slide forward %s blocks (costs 2 saturation). %s%% damage reduction during slide. Cooldown %s seconds",
+
+  "gene_chip.chip.silent_walker.name": "Silent Walker",
+  "gene_chip.chip.silent_walker.desc": "The enhancer optimizes vestibular system and muscle coordination, achieving feline-like landing cushioning",
+  "gene_chip.chip.silent_walker.desc.detailed": "Fall damage reduced by %s~%s (less reduction at greater distances), reference distance %s meters. Landings are completely silent",
+
+  "gene_chip.chip.double_jump.name": "Double Jump",
+  "gene_chip.chip.double_jump.desc": "Leg muscle fiber explosive power enhanced, combined with nerve reflex acceleration—perform a second jump mid-air",
+  "gene_chip.chip.double_jump.desc.detailed": "Jump an extra time while in the air, costs %s saturation. After landing, gain Slowness I for %s seconds. Cooldown %s seconds",
+
+  "gene_chip.chip.spider_climb.name": "Spider Climb",
+  "gene_chip.chip.spider_climb.desc": "The enhancer increases fingertip and sole friction, allowing you to cling to rough surfaces",
+  "gene_chip.chip.spider_climb.desc.detailed": "While pressed against a vertical block surface and moving forward, slowly climb at %s speed. Fall damage reduced by %s%% while climbing",
+
+  "gene_chip.chip.tactical_roll.name": "Tactical Roll",
+  "gene_chip.chip.tactical_roll.desc": "Adrenaline briefly surges, allowing you to dodge backward in critical moments",
+  "gene_chip.chip.tactical_roll.desc.detailed": "Double-tap the back key to roll backward %s blocks, invincible and knockback immune during roll (%s seconds). Afterward, %s seconds of imbalance with %s%% speed reduction. Cooldown %s seconds",
+
+  "gene_chip.chip.vengeful_flame.name": "Vengeful Flame",
+  "gene_chip.chip.vengeful_flame.desc": "At the moment of death, the enhancer spirals out of control, triggering an internal energy rampage that becomes a scorching blaze",
+  "gene_chip.chip.vengeful_flame.desc.detailed": "On death, cause an explosion at your location (no terrain damage), igniting enemies within %s blocks for %s seconds",
+
+  "gene_chip.chip.night_hunter.name": "Night Hunter",
+  "gene_chip.chip.night_hunter.desc": "The enhancer activates nocturnal instincts, making you a true hunter at night",
+  "gene_chip.chip.night_hunter.desc.detailed": "Automatically gain Strength I, Night Vision, and Speed I at night",
+
+  "gene_chip.chip.dawn_awakening.name": "Dawn Awakening",
+  "gene_chip.chip.dawn_awakening.desc": "The enhancer synchronizes with your circadian rhythm, renewing you at each dawn",
+  "gene_chip.chip.dawn_awakening.desc.detailed": "At dawn each day, clear all negative effects, restore %s health and full saturation",
+
+  "gene_chip.chip.iron_heart.name": "Iron Heart",
+  "gene_chip.chip.iron_heart.desc": "The enhancer strengthens neural stability, granting you resistance to negative effects",
+  "gene_chip.chip.iron_heart.desc.detailed": "Negative effect duration reduced by %s",
+
+  "gene_chip.chip.counter_storm.name": "Counter Storm",
+  "gene_chip.chip.counter_storm.desc": "When wounded, the enhancer records the damage and returns it twofold on your next strike",
+  "gene_chip.chip.counter_storm.desc.detailed": "After taking damage, your next attack within %s seconds deals an additional %s of the damage taken",
+
+  "gene_chip.chip.locksmith_intuition.name": "Locksmith Intuition",
+  "gene_chip.chip.locksmith_intuition.desc": "The enhancer improves fine motor control and tactile sensitivity of your fingers, allowing you to sense every tumbler in a lock core",
+  "gene_chip.chip.locksmith_intuition.desc.detailed": "Lockpicking minigame difficulty reduced by %s. Perfect lockpicks grant additional rare loot",
+
+  "gene_chip.chip.hunter_instinct.name": "Hunter Instinct",
+  "gene_chip.chip.hunter_instinct.desc": "The enhancer awakens predatory instincts, exposing prey weaknesses in broad daylight",
+  "gene_chip.chip.hunter_instinct.desc.detailed": "When marking an entity, consume %s hunger to make it glow and take +%s increased damage for %s seconds. Cooldown %s seconds",
+
   "gene_chip.config": "Gene Chip Config",
   "gene_chip.config.card": "Card Config",
+
+  "gene_chip.config_value.burn_duration": "Burn Duration",
+  "gene_chip.config_value.climb_speed": "Climb Speed",
+  "gene_chip.config_value.cold_resistance": "Cold Resistance",
+  "gene_chip.config_value.cooldown": "Cooldown",
+  "gene_chip.config_value.damage_boost": "Damage Boost",
+  "gene_chip.config_value.damage_mul": "Damage Multiplier",
+  "gene_chip.config_value.damage_reduction": "Damage Reduction",
+  "gene_chip.config_value.damage_reflect_ratio": "Damage Reflect Ratio",
+  "gene_chip.config_value.decrease_air_supply_mul": "Air Supply Decrease Multiplier",
+  "gene_chip.config_value.difficulty_reduction": "Difficulty Reduction",
+  "gene_chip.config_value.digestion_boost": "Digestion Boost",
+  "gene_chip.config_value.drain_reduction": "Drain Reduction",
+  "gene_chip.config_value.duration_reduction": "Duration Reduction",
+  "gene_chip.config_value.effect_extension": "Effect Extension",
+  "gene_chip.config_value.effect_time": "Effect Duration",
+  "gene_chip.config_value.exhaustion_duration": "Exhaustion Duration",
+  "gene_chip.config_value.exhaustion_reduce": "Exhaustion Reduction",
+  "gene_chip.config_value.explosion_radius": "Explosion Radius",
+  "gene_chip.config_value.extra_loot_chance": "Extra Loot Chance",
+  "gene_chip.config_value.fall_damage_reduction": "Fall Damage Reduction",
+  "gene_chip.config_value.food_add": "Food Bonus",
+  "gene_chip.config_value.heal": "Heal Amount",
+  "gene_chip.config_value.heal_amount": "Heal Amount",
+  "gene_chip.config_value.heal_chance": "Heal Chance",
+  "gene_chip.config_value.heal_on_kill": "Heal on Kill",
+  "gene_chip.config_value.health_restore": "Health Restore",
+  "gene_chip.config_value.hunger_cost": "Hunger Cost",
+  "gene_chip.config_value.immunity_cost": "Immunity Cost",
+  "gene_chip.config_value.invincible_time": "Invincible Duration",
+  "gene_chip.config_value.kill_chance": "Kill Chance",
+  "gene_chip.config_value.mark_duration": "Mark Duration",
+  "gene_chip.config_value.max_damage_reduction": "Max Damage Reduction",
+  "gene_chip.config_value.max_time": "Max Duration",
+  "gene_chip.config_value.melee_damage_bonus": "Melee Damage Bonus",
+  "gene_chip.config_value.min_damage_reduction": "Min Damage Reduction",
+  "gene_chip.config_value.off_balance_slow": "Off-Balance Slow",
+  "gene_chip.config_value.off_balance_time": "Off-Balance Duration",
+  "gene_chip.config_value.quality_threshold": "Quality Threshold",
+  "gene_chip.config_value.recycling_chance": "Recycling Chance",
+  "gene_chip.config_value.reference_distance": "Reference Distance",
+  "gene_chip.config_value.reflect_window": "Reflect Window",
+  "gene_chip.config_value.roll_distance": "Roll Distance",
+  "gene_chip.config_value.saturation_cost": "Saturation Cost",
+  "gene_chip.config_value.slide_distance": "Slide Distance",
+  "gene_chip.config_value.slide_time": "Slide Duration",
+  "gene_chip.config_value.stomach_bonus": "Stomach Bonus",
+  "gene_chip.config_value.threshold": "Threshold",
+  "gene_chip.config_value.weight": "Weight",
 
   "gene_chip.filter.search_hint": "Search chips...",
   "gene_chip.filter.all": "All",
@@ -23,5 +211,6 @@
   "gene_chip.chip.locked": "Locked",
 
   "gene_chip.chip_select.title": "Chip Draw",
-  "gene_chip.chip_select.hint": "Choose a chip"
+  "gene_chip.chip_select.hint": "Choose a chip",
+  "item.gene_chip.gene_enhancer": "Gene Enhancer"
 }

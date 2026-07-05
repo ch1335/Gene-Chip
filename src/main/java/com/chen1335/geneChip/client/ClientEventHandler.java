@@ -18,6 +18,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -113,7 +114,7 @@ public class ClientEventHandler {
                             tag.putFloat("saturation_cost", saturationCost);
                             PacketDistributor.sendToServer(new PlayerActionPacket(PlayerActionPacket.ActionType.DOUBLE_JUMP, tag));
 
-                            player.jumpFromGround();
+                            player.addDeltaMovement(new Vec3(0,0.7,0));
 
                             runtimeData.canDoubleJump = false;
 
