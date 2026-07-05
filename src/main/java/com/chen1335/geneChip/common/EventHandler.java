@@ -154,31 +154,6 @@ public class EventHandler {
     }
 
     @SubscribeEvent
-    public static void RightClickItem(PlayerInteractEvent.RightClickItem event) {
-        Player player = event.getEntity();
-        if (event.getHand() == InteractionHand.MAIN_HAND && event.getItemStack().is(Items.STICK)) {
-            if (player instanceof ServerPlayer serverPlayer) {
-                PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-                for (Chip chip : RegisterTypes.CHIP) {
-                    data.addNewChip(player, new ChipInstance<>(chip, 0));
-                }
-            } else {
-                Minecraft instance = Minecraft.getInstance();
-                instance.setScreen(new ChipConfigScreen());
-            }
-        }
-
-        if (event.getHand() == InteractionHand.MAIN_HAND && event.getItemStack().is(Items.DIAMOND)) {
-            if (player instanceof ServerPlayer serverPlayer) {
-                PacketDistributor.sendToPlayer(serverPlayer,new ChipSelectPacket(List.of(
-                        ChipTypes.BIG_EATER.value().createInstance(),
-                        ChipTypes.PERMAFROST_WALKERS.value().createInstance()
-                )));
-            }
-        }
-    }
-
-    @SubscribeEvent
     public static void PlayerCloneEvent(PlayerEvent.Clone event) {
         Player original = event.getOriginal();
         PlayerChipData data = original.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
