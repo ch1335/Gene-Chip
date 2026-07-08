@@ -5,6 +5,7 @@ import com.chen1335.geneChip.client.gui.GuiUtil;
 import com.chen1335.geneChip.network.ChipSelectedPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,11 +17,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.List;
 
 public class ChipSelectScreen extends Screen {
-    private static final int ENTER_DURATION = 20;
-    private static final int EXPAND_DURATION = 15;
-    private static final int EXPAND_PHASE_END = ENTER_DURATION + EXPAND_DURATION;
-    private static final int FLIP_DURATION = 12;
-    private static final int FLIP_PHASE_END = EXPAND_PHASE_END + FLIP_DURATION;
+    // 动画各阶段时长（毫秒），墙钟时间驱动，与游戏刻/暂停/帧率解耦，插值天然连续
+    private static final long ENTER_DURATION = 1000;
+    private static final long EXPAND_DURATION = 750;
+    private static final long EXPAND_PHASE_END = ENTER_DURATION + EXPAND_DURATION;
+    private static final long FLIP_DURATION = 600;
+    private static final long FLIP_PHASE_END = EXPAND_PHASE_END + FLIP_DURATION;
 
     private static final float CARD_SCALE = 1.6F;
     private static final int CARD_W = (int) (48 * CARD_SCALE);
@@ -32,7 +34,7 @@ public class ChipSelectScreen extends Screen {
 
     private final List<ChipInstance<?>> candidates;
 
-    private int animationTick = 0;
+    private long startTimeMs = -1;
     private boolean selected = false;
     private int hoveredIndex = -1;
 
@@ -44,12 +46,8 @@ public class ChipSelectScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-    }
-
-    @Override
-    public void tick() {
-        if (animationTick < FLIP_PHASE_END) {
-            animationTick++;
+        if (startTimeMs < 0) {
+            startTimeMs = Util.getMillis();
         }
     }
 
@@ -58,37 +56,50 @@ public class ChipSelectScreen extends Screen {
         return false;
     }
 
+    /** 自界面打开以来经过的毫秒数（墙钟时间，与帧率/暂停无关）。 */
+    private long elapsed() {
+        if (startTimeMs < 0) return 0;
+        return Util.getMillis() - startTimeMs;
+    }
+
+    private boolean animationFinished() {
+        return elapsed() >= FLIP_PHASE_END;
+    }
+
     private float easeOutCubic(float t) {
         float x = Math.max(0.0F, Math.min(1.0F, t));
         return 1.0F - (1.0F - x) * (1.0F - x) * (1.0F - x);
     }
 
-    private float enterProgress(float partialTick) {
-        if (animationTick >= ENTER_DURATION) return 1.0F;
-        return easeOutCubic(((float) animationTick + partialTick) / ENTER_DURATION);
+    private float enterProgress() {
+        long e = elapsed();
+        if (e >= ENTER_DURATION) return 1.0F;
+        return easeOutCubic((float) e / ENTER_DURATION);
     }
 
-    private float expandProgress(float partialTick) {
-        if (animationTick < ENTER_DURATION) return 0.0F;
-        if (animationTick >= EXPAND_PHASE_END) return 1.0F;
-        return easeOutCubic(((float)animationTick + partialTick - ENTER_DURATION) / EXPAND_DURATION);
+    private float expandProgress() {
+        long e = elapsed();
+        if (e < ENTER_DURATION) return 0.0F;
+        if (e >= EXPAND_PHASE_END) return 1.0F;
+        return easeOutCubic((float) (e - ENTER_DURATION) / EXPAND_DURATION);
     }
 
-    private float flipProgress(float partialTick) {
-        if (animationTick < EXPAND_PHASE_END) return 0.0F;
-        if (animationTick >= FLIP_PHASE_END) return 1.0F;
-        return easeOutCubic(((float) animationTick + partialTick - EXPAND_PHASE_END) / FLIP_DURATION);
+    private float flipProgress() {
+        long e = elapsed();
+        if (e < EXPAND_PHASE_END) return 0.0F;
+        if (e >= FLIP_PHASE_END) return 1.0F;
+        return easeOutCubic((float) (e - EXPAND_PHASE_END) / FLIP_DURATION);
     }
 
-    private float[] cardCenter(int i, float partialTick) {
+    private float[] cardCenter(int i) {
         int n = candidates.size();
         int mid = n / 2;
         int targetOffsetX = (i - mid) * SPREAD;
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
-        float enter = enterProgress(partialTick);
-        float expand = expandProgress(partialTick);
+        float enter = enterProgress();
+        float expand = expandProgress();
 
         float endX = centerX + targetOffsetX;
         float curX = (float) centerX + (endX - (float) centerX) * expand;
@@ -106,9 +117,9 @@ public class ChipSelectScreen extends Screen {
         GuiUtil.drawColorWithSize(guiGraphics, 0, 0, this.width, this.height, 0xC0202020, 0);
 
         hoveredIndex = -1;
-        if (animationTick >= FLIP_PHASE_END && !selected) {
+        if (animationFinished() && !selected) {
             for (int i = 0; i < candidates.size(); i++) {
-                float[] center = cardCenter(i, partialTick);
+                float[] center = cardCenter(i);
                 float x = center[0] - (float) CARD_W / 2;
                 float y = center[1] - (float) CARD_H / 2;
                 if (mouseX >= x && mouseX <= x + CARD_W && mouseY >= y && mouseY <= y + CARD_H) {
@@ -121,32 +132,32 @@ public class ChipSelectScreen extends Screen {
         pose.pushPose();
         Minecraft mc = Minecraft.getInstance();
         for (int i = 0; i < candidates.size(); i++) {
-            float[] center = cardCenter(i, partialTick);
+            float[] center = cardCenter(i);
             float x = center[0] - (float) CARD_W / 2;
             float y = center[1] - (float) CARD_H / 2;
             if (hoveredIndex == i) {
                 y -= 10;
             }
             pose.translate(0,0,30);
-            renderCard(guiGraphics, candidates.get(i), x, y, CARD_SCALE, hoveredIndex == i, partialTick);
+            renderCard(guiGraphics, candidates.get(i), x, y, CARD_SCALE, hoveredIndex == i);
 
         }
         pose.popPose();
 
-        if (animationTick >= FLIP_PHASE_END && !selected) {
+        if (animationFinished() && !selected) {
             Component hint = Component.translatable("gene_chip.chip_select.hint");
             guiGraphics.drawCenteredString(mc.font, hint, this.width / 2, this.height - 20, 0xFFFFFFFF);
         }
     }
 
-    private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, float scale, boolean hovered, float partialTick) {
+    private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, float scale, boolean hovered) {
         Minecraft mc = Minecraft.getInstance();
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
         pose.translate(0, 0, hovered ? 50 : 10);
         RenderSystem.enableDepthTest();
 
-        float flip = flipProgress(partialTick);
+        float flip = flipProgress();
         float scaleX;
         boolean showFront;
         if (flip < 0.5F) {
@@ -201,10 +212,10 @@ public class ChipSelectScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != 0) return false;
         if (selected) return false;
-        if (animationTick < FLIP_PHASE_END) return false;
+        if (!animationFinished()) return false;
 
         for (int i = 0; i < candidates.size(); i++) {
-            float[] center = cardCenter(i, 0);
+            float[] center = cardCenter(i);
             float x = center[0] - (float) CARD_W / 2;
             float y = center[1] - (float) CARD_H / 2;
             if (mouseX >= x && mouseX <= x + CARD_W && mouseY >= y && mouseY <= y + CARD_H) {
