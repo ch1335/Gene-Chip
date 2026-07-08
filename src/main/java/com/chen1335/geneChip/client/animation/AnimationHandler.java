@@ -32,8 +32,12 @@ public class AnimationHandler {
         }
 
         if (location.equals(AnimationPack.EMPTY_ANIMATION)) {
+            // 先加淡出修饰器（记录当前姿态快照），再显式停止已触发的动画。
+            // 新库 triggerAnimation(null) 会直接 return 不做任何事，必须手动 stopTriggeredAnimation
+            // 才能真正停止循环动画并清除 triggeredAnimation，否则动画会持续播放/下一 tick 被重新拉起。
             controller.replaceAnimationWithFade(
                     AbstractFadeModifier.standardFadeIn(2, EasingType.EASE_IN_OUT_SINE), (RawAnimation) null);
+            controller.stopTriggeredAnimation();
         } else {
             controller.replaceAnimationWithFade(
                     AbstractFadeModifier.standardFadeIn(2, EasingType.EASE_IN_OUT_SINE), location);

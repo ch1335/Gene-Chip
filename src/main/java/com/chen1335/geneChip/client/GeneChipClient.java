@@ -54,7 +54,7 @@ public class GeneChipClient {
             controller.setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL);
             controller.addModifierBefore(new GCAdjustmentModifier((partName, partialTick) -> {
                 boolean handleHead = controller.getCurrentAnimation() != null
-                        && !controller.get3DTransform(new PlayerAnimBone("head")).getRotationVector().equals(Vec3f.ZERO);
+                        && !controller.get3DTransformRaw(new PlayerAnimBone("head")).getRotationVector().equals(Vec3f.ZERO);
 
                 if ("head".equals(partName)) {
                     if (handleHead) {

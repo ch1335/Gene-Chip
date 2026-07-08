@@ -37,7 +37,7 @@ public class GeneEnhancer extends Item {
 
     @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return 40;
+        return 35;
     }
 
     @Override
