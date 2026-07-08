@@ -86,9 +86,9 @@ file="META-INF/accesstransformer.cfg"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
-    modId="playeranimator"
+    modId="player_animation_library"
     type="required"
-    versionRange="[2.0.4,)"
+    versionRange="[1.1.4+mc.1.21.1,)"
     ordering="NONE"
     side="BOTH"
 

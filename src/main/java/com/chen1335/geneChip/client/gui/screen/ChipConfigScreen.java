@@ -202,7 +202,7 @@ public class ChipConfigScreen extends Screen {
         float s = 2;
         GuiUtil.drawColorWithSize(guiGraphics,
                 (int) (10 * xScale * s), (int) (20 * yScale * s),
-                (int) (150 * xScale * s), (int) (240 * yScale * s),
+                (int) (150 * xScale * s), (int) (242 * yScale * s),
                 FastColor.ARGB32.color(100, 160, 160, 160), 1);
 
         GuiUtil.drawColorWithSize(guiGraphics,
@@ -210,10 +210,39 @@ public class ChipConfigScreen extends Screen {
                 (int) ((315 + 155) * xScale * s), (int) (20 * yScale * s),
                 FastColor.ARGB32.color(100, 160, 160, 160), 0);
 
+        renderCardPanel(guiGraphics, s);
+
         hoveredSlot = -1;
         for (int i = 0; i < getSlots().size(); i++) {
             renderSlotBox(guiGraphics, mouseX, mouseY, i, partialTick);
         }
+    }
+
+    /**
+     * 绘制中间卡牌展示区的边框面板。
+     * 位置对齐：左接列表面板(x=160)右侧、上接顶栏(y=20)下方、右对齐顶栏(x=480)、下对齐列表面板(y=260)。
+     * z 深度用 1（与左侧列表面板一致），确保在游戏画面之上、卡牌(z=-30)之下，不会盖住卡牌。
+     */
+    private void renderCardPanel(GuiGraphics guiGraphics, float s) {
+        int x = 162;
+        int y = 22;
+        int w = 315;
+        int h = 238;
+        int border = 2;
+
+        int borderColor = FastColor.ARGB32.color(180, 200, 200, 200);
+        int fillColor = FastColor.ARGB32.color(110, 30, 30, 30);
+
+        // z 必须比卡牌的 -30 更靠后，否则会盖住卡牌（卡牌在 render() 里以 translate(0,0,-30) 渲染）
+        // 边框在 -42（最靠后），填充在 -41（叠在边框上、露出四周 border 宽度）
+        GuiUtil.drawColorWithSize(guiGraphics,
+                (int) ((x - border) * xScale * s), (int) ((y - border) * yScale * s),
+                (int) ((w + border*2) * xScale * s), (int) ((h + border*2) * yScale * s),
+                borderColor, -42);
+        GuiUtil.drawColorWithSize(guiGraphics,
+                (int) (x * xScale * s), (int) (y * yScale * s),
+                (int) (w * xScale * s), (int) (h * yScale * s),
+                fillColor, -41);
     }
 
     @Override
