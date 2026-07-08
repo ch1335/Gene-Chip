@@ -2,16 +2,13 @@ package com.chen1335.geneChip.client.animation;
 
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.client.GCModifierLayer;
+import com.chen1335.geneChip.client.animation.modifier.GCSpeedModifier;
 import com.chen1335.geneChip.network.AnimationPack;
-import dev.kosmx.playerAnim.api.IPlayable;
-import dev.kosmx.playerAnim.api.layered.IActualAnimation;
-import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.ModifierLayer;
-import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
-import dev.kosmx.playerAnim.api.layered.modifier.SpeedModifier;
-import dev.kosmx.playerAnim.core.util.Ease;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
+import com.zigythebird.playeranim.api.PlayerAnimationAccess;
+import com.zigythebird.playeranimcore.animation.RawAnimation;
+import com.zigythebird.playeranimcore.animation.layered.IAnimation;
+import com.zigythebird.playeranimcore.animation.layered.modifier.AbstractFadeModifier;
+import com.zigythebird.playeranimcore.easing.EasingType;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -29,23 +26,18 @@ public class AnimationHandler {
             location = AnimationPack.EMPTY_ANIMATION;
         }
 
-        ModifierLayer<IAnimation> animation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
-        if (animation == null) {
+        GCModifierLayer controller = getController(player);
+        if (controller == null) {
             return;
         }
 
         if (location.equals(AnimationPack.EMPTY_ANIMATION)) {
-            animation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), null);
+            controller.replaceAnimationWithFade(
+                    AbstractFadeModifier.standardFadeIn(2, EasingType.EASE_IN_OUT_SINE), (RawAnimation) null);
         } else {
-            IPlayable animation1 = PlayerAnimationRegistry
-                    .getAnimation(location);
-            if (animation1 != null) {
-                IActualAnimation<?> iActualAnimation = animation1.playAnimation();
-                animation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), iActualAnimation);
-            }
-
+            controller.replaceAnimationWithFade(
+                    AbstractFadeModifier.standardFadeIn(2, EasingType.EASE_IN_OUT_SINE), location);
         }
-
     }
 
     //播放并且分发动画包来通知服务器其他玩家
@@ -58,11 +50,16 @@ public class AnimationHandler {
         }
         playAnimation(player, location);
         PacketDistributor.sendToServer(new AnimationPack(player.getId(), location));
-
     }
 
-    public static SpeedModifier getSpeedModifier(Player player) {
-        GCModifierLayer<IAnimation> animation = (GCModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
-        return animation.speedModifier;
+    public static GCSpeedModifier getSpeedModifier(Player player) {
+        GCModifierLayer controller = getController(player);
+        return controller == null ? null : controller.speedModifier;
+    }
+
+    private static GCModifierLayer getController(Player player) {
+        IAnimation animation = PlayerAnimationAccess.getPlayerAnimationLayer(
+                (AbstractClientPlayer) player, AnimationHandler.ANIMATION_RESOURCE);
+        return animation instanceof GCModifierLayer controller ? controller : null;
     }
 }

@@ -3,6 +3,6 @@
   "package": "com.chen1335.geneChip.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": ["FoodDataMixins", "LivingEntityMixin", "PowderSnowBlockMixin", "RandomizableContainerMixin", "SpiderClimbMixin", "clavis.ClavisLootMixin", "clavis.LockMixin", "lootr.DefaultLootFillerMixin", "pingwheel.PingWheelMixin", "thirst.WaterPurityMixin"],
-  "client": ["ItemInHandLayerMixin", "clavis.ClavisLockMixin"],
+  "client": ["clavis.ClavisLockMixin"],
   "minVersion": "0.8"
 }

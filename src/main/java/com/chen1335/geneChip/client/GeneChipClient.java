@@ -6,18 +6,15 @@ import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.client.animation.AnimationHandler;
 import com.chen1335.geneChip.client.animation.GCAdjustmentModifier;
 import com.chen1335.geneChip.network.AnimationPack;
-import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
-import dev.kosmx.playerAnim.api.layered.IActualAnimation;
-import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.ModifierLayer;
-import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
-import dev.kosmx.playerAnim.api.layered.modifier.FirstPersonModifier;
-import dev.kosmx.playerAnim.core.util.Ease;
-import dev.kosmx.playerAnim.core.util.Vec3f;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
+import com.zigythebird.playeranim.api.PlayerAnimationAccess;
+import com.zigythebird.playeranim.api.PlayerAnimationFactory;
+import com.zigythebird.playeranimcore.animation.RawAnimation;
+import com.zigythebird.playeranimcore.animation.layered.IAnimation;
+import com.zigythebird.playeranimcore.animation.layered.modifier.AbstractFadeModifier;
+import com.zigythebird.playeranimcore.api.firstPerson.FirstPersonMode;
+import com.zigythebird.playeranimcore.bones.PlayerAnimBone;
+import com.zigythebird.playeranimcore.easing.EasingType;
+import com.zigythebird.playeranimcore.math.Vec3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +23,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.logging.log4j.util.Cast;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +39,6 @@ public class GeneChipClient {
         return Cast.cast(getPlayerChipData().getChipInfos().getChips().getOrDefault(chip.getType(), Map.of()).get(chip));
     }
 
-
     public static <T extends Chip> Optional<ChipInstance<T>> getPlayerEquippedChip(Supplier<T> chip) {
         PlayerChipData data = getPlayerChipData();
         return Optional.ofNullable(Cast.cast(data.getSlotInfos().getCurrent().get(chip.get())));
@@ -53,38 +48,28 @@ public class GeneChipClient {
         return PLAYER_CHIP_DATA;
     }
 
-    public static final ModifierLayer<IAnimation> LAYER = new ModifierLayer<>();
-
     public static void init() {
         PlayerAnimationFactory.ANIMATION_DATA_FACTORY.registerFactory(AnimationHandler.ANIMATION_RESOURCE, 42, player -> {
-            GCModifierLayer<IAnimation> layer = new GCModifierLayer<>(player);
-            layer.addModifierBefore(new GCAdjustmentModifier((partName, partialTick) -> {
-                boolean handleHead = layer.getAnimation() != null && !layer.getAnimation().get3DTransform("head", TransformType.ROTATION, 0.5F, Vec3f.ZERO).equals(Vec3f.ZERO);
+            GCModifierLayer controller = new GCModifierLayer(player);
+            controller.setFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL);
+            controller.addModifierBefore(new GCAdjustmentModifier((partName, partialTick) -> {
+                boolean handleHead = controller.getCurrentAnimation() != null
+                        && !controller.get3DTransform(new PlayerAnimBone("head")).getRotationVector().equals(Vec3f.ZERO);
 
-                switch (partName) {
-                    case "head" -> {
-                        if (handleHead) {
-                            return Optional.of(new GCAdjustmentModifier.PartModifier(new Vec3f(Mth.lerp(partialTick, player.xRotO, player.getXRot()) * Mth.DEG_TO_RAD, Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD, 0), Vec3f.ZERO));
-                        }else {
-                            return Optional.empty();
-                        }
+                if ("head".equals(partName)) {
+                    if (handleHead) {
+                        return Optional.of(new GCAdjustmentModifier.PartModifier(
+                                new Vec3f(
+                                        Mth.lerp(partialTick, player.xRotO, player.getXRot()) * Mth.DEG_TO_RAD,
+                                        Mth.lerp(partialTick, (player.yHeadRotO - player.yBodyRotO), (player.yHeadRot - player.yBodyRot)) * Mth.DEG_TO_RAD,
+                                        0),
+                                Vec3f.ZERO));
                     }
-                    case "rightLeg" -> {
-                        return Optional.empty();
-                    }
-                    case "leftLeg" -> {
-                        return Optional.empty();
-                    }
-                    default -> {
-                        return Optional.empty();
-                    }
+                    return Optional.empty();
                 }
+                return Optional.empty();
             }));
-
-            FirstPersonModifier modifier = new FirstPersonModifier();
-            modifier.setCurrentFirstPersonMode(FirstPersonMode.THIRD_PERSON_MODEL);
-            layer.addModifierBefore(modifier);
-            return layer;
+            return controller;
         });
     }
 
@@ -94,21 +79,16 @@ public class GeneChipClient {
 
     public static void handlePlayerAnimation(int entityId, ResourceLocation animationLocation, IPayloadContext iPayloadContext) {
         iPayloadContext.enqueueWork(() -> {
-
             Entity entity = iPayloadContext.player().level().getEntity(entityId);
             if (entity instanceof LocalPlayer player) {
-                @Nullable IAnimation animation = PlayerAnimationAccess.getPlayerAssociatedData(player).get(AnimationHandler.ANIMATION_RESOURCE);
-
-                ModifierLayer<IAnimation> modifierLayer = (ModifierLayer<IAnimation>) animation;
-                if (modifierLayer != null) {
+                IAnimation animation = PlayerAnimationAccess.getPlayerAnimationLayer(player, AnimationHandler.ANIMATION_RESOURCE);
+                if (animation instanceof GCModifierLayer controller) {
                     if (animationLocation.equals(AnimationPack.EMPTY_ANIMATION)) {
-                        modifierLayer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), null);
-
+                        controller.replaceAnimationWithFade(
+                                AbstractFadeModifier.standardFadeIn(2, EasingType.EASE_IN_OUT_SINE), (RawAnimation) null);
                     } else {
-                        IActualAnimation<?> iActualAnimation = PlayerAnimationRegistry
-                                .getAnimation(animationLocation)
-                                .playAnimation();
-                        modifierLayer.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(2, Ease.INOUTSINE), iActualAnimation);
+                        controller.replaceAnimationWithFade(
+                                AbstractFadeModifier.standardFadeIn(2, EasingType.EASE_IN_OUT_SINE), animationLocation);
                     }
                 }
             }

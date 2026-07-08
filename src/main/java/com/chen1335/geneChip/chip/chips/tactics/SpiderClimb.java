@@ -8,9 +8,8 @@ import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 import com.chen1335.geneChip.client.animation.AnimationHandler;
-import dev.kosmx.playerAnim.api.layered.IAnimation;
-import dev.kosmx.playerAnim.api.layered.ModifierLayer;
-import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
+import com.zigythebird.playeranim.api.PlayerAnimationAccess;
+import com.zigythebird.playeranimcore.animation.layered.IAnimation;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -32,8 +31,8 @@ public class SpiderClimb extends Chip {
     public void handleClimb(ChipInstance<SpiderClimb> chipInstance, Player player) {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
         if (player.horizontalCollision) {
-            ModifierLayer<IAnimation> animation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData((AbstractClientPlayer) player).get(AnimationHandler.ANIMATION_RESOURCE);
-            if (!animation.isActive() && !player.onGround() && player.isLocalPlayer()) {
+            IAnimation animation = PlayerAnimationAccess.getPlayerAnimationLayer((AbstractClientPlayer) player, AnimationHandler.ANIMATION_RESOURCE);
+            if (animation != null && !animation.isActive() && !player.onGround() && player.isLocalPlayer()) {
                 AnimationHandler.playAnimationAndDistribute(player, GeneChip.id("climb"));
             }
             SpiderClimb chip = chipInstance.getChip();

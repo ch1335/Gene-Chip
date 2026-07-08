@@ -8,7 +8,6 @@ import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
-import dev.kosmx.playerAnim.api.layered.AnimationStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
