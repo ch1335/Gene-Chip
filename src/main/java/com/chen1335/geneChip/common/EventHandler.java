@@ -135,6 +135,8 @@ public class EventHandler {
         registrar.playToServer(ChipSelectedPacket.TYPE, ChipSelectedPacket.STREAM_CODEC, ChipSelectedPacket::handler);
 
         registrar.playBidirectional(AnimationPack.TYPE, AnimationPack.STREAM_CODEC, AnimationPack::handler);
+
+        registrar.playToClient(HeadShotIconPacket.TYPE, HeadShotIconPacket.STREAM_CODEC, HeadShotIconPacket::handler);
     }
 
     @SubscribeEvent

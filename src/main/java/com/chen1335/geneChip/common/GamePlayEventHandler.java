@@ -36,6 +36,8 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import com.chen1335.geneChip.network.HeadShotIconPacket;
 
 import java.util.*;
 
@@ -56,6 +58,12 @@ public class GamePlayEventHandler {
                 float killChanceValue = chipInstance.getChip().killChance.getValue(chipInstance.getLvl());
                 if (event.getEntity().getRandom().nextFloat() < killChanceValue) {
                     target.hurt(target.level().damageSources().playerAttack(event.getEntity()), Float.MAX_VALUE);
+                    // 爆头触发：在怪物头顶生成一个爆头 icon 飘浮特效（发给追踪该实体的客户端）
+                    if (!target.level().isClientSide) {
+                        double iconY = target.getY() + target.getBbHeight() + 0.3;
+                        PacketDistributor.sendToPlayersTrackingEntity(target,
+                                new HeadShotIconPacket(target.getX(), iconY, target.getZ()));
+                    }
                 }
             });
         }

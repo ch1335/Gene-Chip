@@ -15,7 +15,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Chip {
@@ -49,7 +51,13 @@ public abstract class Chip {
     public Component detailDesc(int lvl) {
         ResourceKey<Chip> chipResourceKey = RegisterTypes.CHIP.getResourceKey(this).orElseThrow();
         ResourceLocation location = chipResourceKey.location();
-        Object[] args = configValue.values().stream().map(calculator -> calculator.getArgValue(lvl)).toArray();
+        List<Object> objects = new ArrayList<>();
+        configValue.forEach((key, jsValueCalculator) -> {
+            if (!key.equals("weight")) {
+                objects.add(jsValueCalculator.getArgValue(lvl));
+            }
+        });
+        Object[] args = objects.toArray();
         return Component.translatable("%s.chip.%s.desc.detailed".formatted(location.getNamespace(), location.getPath()), args);
 
     }
