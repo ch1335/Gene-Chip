@@ -28,8 +28,8 @@
   "gene_chip.chip.endurance.desc.detailed": "Hunger consumption while running and jumping reduced by %s",
 
   "gene_chip.chip.combo_fever.name": "Combo Fever",
-  "gene_chip.chip.combo_fever.desc": "Digestive system enhancement allows you to tolerate contaminated water that would defeat ordinary people",
-  "gene_chip.chip.combo_fever.desc.detailed": "No negative effects when drinking dirty water",
+  "gene_chip.chip.combo_fever.desc": "Rapid kills ignite your combat instincts and drive your body into a brief fever pitch",
+  "gene_chip.chip.combo_fever.desc.detailed": "Kill 3 enemies within %s seconds to gain Strength, Resistance, and Speed for %s seconds",
 
   "gene_chip.chip.melee_attack_master.name": "Melee Attack Master",
   "gene_chip.chip.melee_attack_master.desc": "After muscle fiber enhancement, every swing carries the skill and power of countless training",
@@ -209,6 +209,7 @@
   "gene_chip.command.remove_all.success": "Removed %s chips from %s",
 
   "gene_chip.chip.locked": "Locked",
+  "gene_chip.feedback.infected_item_blocked": "Infection symbiosis blocked this item",
 
   "gene_chip.chip_select.title": "Chip Draw",
   "gene_chip.chip_select.hint": "Choose a chip",

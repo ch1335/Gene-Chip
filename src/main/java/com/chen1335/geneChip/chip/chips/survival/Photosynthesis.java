@@ -29,6 +29,7 @@ public class Photosynthesis extends Chip {
 
     @Override
     public void tick(Player player, ChipInstance<?> instance) {
+        if (player.level().isClientSide) return;
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
 
         int interval = BASE_INTERVAL;
@@ -43,12 +44,15 @@ public class Photosynthesis extends Chip {
             interval = BASE_INTERVAL / 2;
         }
 
+        playerRunTimeData.photosynthesisInterval = interval;
+        playerRunTimeData.photosynthesisMaxStacks = maxStacks;
+        playerRunTimeData.photosynthesisCharging = isUnderDirectSunlight(player);
         playerRunTimeData.photosynthesisTimer++;
 
         if (playerRunTimeData.photosynthesisTimer >= interval) {
             playerRunTimeData.photosynthesisTimer = 0;
 
-            if (isUnderDirectSunlight(player)) {
+            if (playerRunTimeData.photosynthesisCharging) {
                 if (playerRunTimeData.photosynthesisStacks < maxStacks) {
                     playerRunTimeData.photosynthesisStacks++;
                     updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks);
@@ -89,6 +93,7 @@ public class Photosynthesis extends Chip {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
         playerRunTimeData.photosynthesisStacks = 0;
         playerRunTimeData.photosynthesisTimer = 0;
+        playerRunTimeData.photosynthesisCharging = false;
 
         AttributeInstance attributeInstance = player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED);
         if (attributeInstance != null) {

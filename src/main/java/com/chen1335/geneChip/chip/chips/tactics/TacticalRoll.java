@@ -8,7 +8,7 @@ public class TacticalRoll extends Chip {
     public final JsValueCalculator rollDistance = new JsValueCalculator("3");
     public final JsValueCalculator invincibleTime = new JsValueCalculator("0.5");
     public final JsValueCalculator offBalanceTime = new JsValueCalculator("1");
-    public final JsValueCalculator offBalanceSlow = new JsValueCalculator("0.7");
+    public final JsValueCalculator offBalanceSlow = new JsValueCalculator("0.7",true);
     public final JsValueCalculator cooldown = new JsValueCalculator("8");
 
     public TacticalRoll() {

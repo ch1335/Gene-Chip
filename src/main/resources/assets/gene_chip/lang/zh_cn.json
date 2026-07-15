@@ -31,8 +31,8 @@
   "gene_chip.chip.endurance.desc.detailed": "奔跑与跳跃时饥饿消耗降低%s",
 
   "gene_chip.chip.combo_fever.name": "连击热潮",
-  "gene_chip.chip.combo_fever.desc": "消化系统强化，使你能耐受常人无法承受的污染水源",
-  "gene_chip.chip.combo_fever.desc.detailed": "饮用脏水时，不会获得负面效果",
+  "gene_chip.chip.combo_fever.desc": "连续击杀会点燃战斗本能，让身体在短时间内进入高热战斗状态",
+  "gene_chip.chip.combo_fever.desc.detailed": "在%s秒内连续击杀3名敌人后，获得力量、抗性与速度效果，持续%s秒",
 
   "gene_chip.chip.melee_attack_master.name": "近战专家",
   "gene_chip.chip.melee_attack_master.desc": "肌肉纤维强化后，你的每一次挥砍都带着千锤百炼的技巧与力量",
@@ -209,6 +209,7 @@
   "gene_chip.command.remove_all.success": "已移除 %s 的 %s 张卡牌",
 
   "gene_chip.chip.locked": "未解锁",
+  "gene_chip.feedback.infected_item_blocked": "感染共生阻止了该物品",
 
   "gene_chip.chip_select.title": "抽卡",
   "gene_chip.chip_select.hint": "选择一张卡牌",

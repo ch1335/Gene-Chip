@@ -15,8 +15,13 @@ import java.util.ArrayList;
 public class PlayerRunTimeData {
     // 连击热潮芯片 - 记录击杀时间戳（用于判断是否触发连击热潮）
     private final ArrayList<Long> comboFeversTime = new ArrayList<>();
+    public int comboWindowTicks = 0;
+    public int comboWindowDuration = 0;
+    public int comboFeverTicks = 0;
 
     public int fallingAnimationTick = 0;
+
+    public int cardHudSyncTicker = 0;
 
     // 皮糙肉厚芯片 - 是否处于蹲下激活护甲加成状态
     public boolean thickSkinnedActive = false;
@@ -26,9 +31,15 @@ public class PlayerRunTimeData {
 
     // 光合作用芯片 - 层数变化计时器（每30秒检测一次）
     public int photosynthesisTimer = 0;
+    public int photosynthesisInterval = 30 * 20;
+    public int photosynthesisMaxStacks = 5;
+    public boolean photosynthesisCharging = false;
 
     // 免疫值变化检测 - 记录上一tick的免疫值（用于触发免疫值变化事件）
     public int oldImmunity = -1;
+
+    // 愈发狂热芯片 - 上一次服务端档位（用于避免每 tick 重复反馈）
+    public int lastGrowingFervorStage = -1;
 
     // 战术滑铲芯片 - 是否正在滑铲
     public boolean slidingTackleActive = false;
@@ -69,11 +80,14 @@ public class PlayerRunTimeData {
     // 感染者芯片 - 是否处于感染区（用于效果延长判断）
     public boolean infectedInZone = false;
 
-    public void recordKill(long time) {
+    public void recordKill(long time, int windowTicks) {
+        comboFeversTime.removeIf(killTime -> time - killTime >= windowTicks);
         if (comboFeversTime.size() >= 3) {
             comboFeversTime.removeFirst();
         }
         comboFeversTime.add(time);
+        comboWindowDuration = windowTicks;
+        comboWindowTicks = windowTicks;
     }
 
     public boolean isComboFever(int timeRequire) {
@@ -83,11 +97,30 @@ public class PlayerRunTimeData {
         return (comboFeversTime.getLast() - comboFeversTime.getFirst()) < timeRequire;
     }
 
+    public int getComboCount() {
+        return comboFeversTime.size();
+    }
+
+    public void triggerComboFever(int ticks) {
+        comboFeverTicks = ticks;
+        comboWindowTicks = 0;
+        comboFeversTime.clear();
+    }
+
     public void tick(Player entity) {
-        int immunityValue = GeneChipAPI.getImmunityValue(entity);
-        if (immunityValue != oldImmunity) {
-            GeneChipAPI.onImmunityValueChanged(entity);
-            oldImmunity = immunityValue;
+        if (comboWindowTicks > 0 && --comboWindowTicks <= 0) {
+            comboFeversTime.clear();
+        }
+        if (comboFeverTicks > 0) {
+            comboFeverTicks--;
+        }
+
+        if (!entity.level().isClientSide) {
+            int immunityValue = GeneChipAPI.getImmunityValue(entity);
+            if (immunityValue != oldImmunity) {
+                GeneChipAPI.onImmunityValueChanged(entity);
+                oldImmunity = immunityValue;
+            }
         }
 
         if (slidingTackleActive) {
@@ -139,9 +172,10 @@ public class PlayerRunTimeData {
             }
         }
 
-        // 更新地面状态
+        // 仅在真正落地的瞬间重置二段跳，避免动作包到达时服务端仍判定在地面而提前重置
+        boolean wasOnGround = isOnGround;
         isOnGround = entity.onGround();
-        if (isOnGround) {
+        if (isOnGround && !wasOnGround) {
             canDoubleJump = true;
         }
     }

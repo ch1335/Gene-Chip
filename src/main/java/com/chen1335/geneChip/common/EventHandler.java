@@ -63,6 +63,7 @@ public class EventHandler {
         if (player instanceof ServerPlayer serverPlayer) {
             PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
             data.syncToClient(serverPlayer);
+            CardHudSyncService.sync(serverPlayer);
             data.getSlotInfos().currentSlots.forEach((chip, instance) -> {
                 chip.onEquipped(player, instance);
             });
@@ -118,9 +119,9 @@ public class EventHandler {
     @SubscribeEvent
     public static void PlayerTickEvent(PlayerTickEvent.Pre event) {
         event.getEntity().getData(GCAttachmentTypes.PLAYER_CHIP_DATA).tick(event.getEntity());
+        GeneChipAPI.getPlayerRunTimeData(event.getEntity()).tick(event.getEntity());
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-            GeneChipAPI.getPlayerRunTimeData(event.getEntity()).tick(serverPlayer);
-            GeneChipAPI.onImmunityValueChanged(serverPlayer);
+            CardHudSyncService.tick(serverPlayer);
         }
     }
 
@@ -137,6 +138,8 @@ public class EventHandler {
         registrar.playBidirectional(AnimationPack.TYPE, AnimationPack.STREAM_CODEC, AnimationPack::handler);
 
         registrar.playToClient(HeadShotIconPacket.TYPE, HeadShotIconPacket.STREAM_CODEC, HeadShotIconPacket::handler);
+        registrar.playToClient(CardHudStatePacket.TYPE, CardHudStatePacket.STREAM_CODEC, CardHudStatePacket::handler);
+        registrar.playToClient(CardFeedbackPacket.TYPE, CardFeedbackPacket.STREAM_CODEC, CardFeedbackPacket::handler);
     }
 
     @SubscribeEvent

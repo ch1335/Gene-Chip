@@ -47,11 +47,27 @@ public class CoolDownInfos implements INBTSerializable<CompoundTag> {
         return chipCooldowns.containsKey(chip);
     }
 
+    public int getRemainingTicks(Chip chip) {
+        CooldownTicker ticker = chipCooldowns.get(chip);
+        return ticker == null ? 0 : Math.max(0, ticker.tick);
+    }
+
+    public int getTotalTicks(Chip chip) {
+        CooldownTicker ticker = chipCooldowns.get(chip);
+        return ticker == null ? 0 : Math.max(0, ticker.totalTick);
+    }
+
+    public Map<Chip, CooldownTicker> getCooldowns() {
+        return Map.copyOf(chipCooldowns);
+    }
+
     public static class CooldownTicker {
         public int tick;
+        public final int totalTick;
 
         public CooldownTicker(int tick) {
             this.tick = tick;
+            this.totalTick = tick;
         }
 
         public void tick() {

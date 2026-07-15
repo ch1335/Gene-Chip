@@ -37,6 +37,7 @@ public class ClientEventHandler {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         GeneChipClient.getPlayerChipData().tick(player);
+        ClientCardHudState.tick();
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
 
         // 滑铲芯片逻辑
@@ -79,7 +80,8 @@ public class ClientEventHandler {
             GeneChipClient.getPlayerEquippedChip(ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
                 PlayerRunTimeData runtimeData = player.getData(GCAttachmentTypes.PLAYER_RUN_TIME_DATA);
 
-                if (!GeneChipAPI.isChipCooldown(player, ChipTypes.TACTICAL_ROLL.get()) && !runtimeData.tacticalRolling) {
+                if (!GeneChipAPI.isChipCooldown(player, ChipTypes.TACTICAL_ROLL.get())
+                        && !runtimeData.tacticalRolling && !ClientCardHudState.tacticalRolling) {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastBackKeyPress < DOUBLE_TAP_THRESHOLD) {
                         TacticalRoll chip = chipInstance.getChip();
@@ -104,7 +106,7 @@ public class ClientEventHandler {
             // 二段跳芯片逻辑
             GeneChipClient.getPlayerEquippedChip(ChipTypes.DOUBLE_JUMP).ifPresent(chipInstance -> {
                 PlayerRunTimeData runtimeData = player.getData(GCAttachmentTypes.PLAYER_RUN_TIME_DATA);
-                if (!player.onGround()) {
+                if (!player.onGround() && runtimeData.canDoubleJump && ClientCardHudState.canDoubleJump) {
                     if (!GeneChipAPI.isChipCooldown(player, ChipTypes.DOUBLE_JUMP.get())) {
                         DoubleJump chip = chipInstance.getChip();
                         float saturationCost = chip.saturationCost.getValue(chipInstance.getLvl());

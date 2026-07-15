@@ -8,7 +8,7 @@ import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
-import net.minecraft.client.player.AbstractClientPlayer;
+import com.chen1335.geneChip.common.CardHudSyncService;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -37,7 +37,9 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
 
     public void handler(IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (action == ActionType.SLIDING_TACKLE && context.player() instanceof ServerPlayer player) {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            boolean[] accepted = {false};
+            if (action == ActionType.SLIDING_TACKLE) {
                 GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SLIDING_TACKLE).ifPresent(chipInstance -> {
                     PlayerChipData playerChipData = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
                     if (playerChipData.getCoolDownInfos().isCoolDown(chipInstance.getChip())) {
@@ -55,11 +57,15 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     playerRunTimeData.slidingTackleTimer = (int) (chipInstance.getChip().slideTime.getValue(chipInstance.getLvl()));
 
                     playerChipData.addCoolDown(chipInstance.getChip(), (int) (chipInstance.getChip().cooldown.getValue(chipInstance.getLvl()) * 20));
+                    accepted[0] = true;
                 });
-            } else if (action == ActionType.DOUBLE_JUMP && context.player() instanceof ServerPlayer player) {
+            } else if (action == ActionType.DOUBLE_JUMP) {
                 GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.DOUBLE_JUMP).ifPresent(chipInstance -> {
                     PlayerChipData playerChipData = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-                    if (playerChipData.getCoolDownInfos().isCoolDown(chipInstance.getChip())) {
+                    PlayerRunTimeData runtimeData = GeneChipAPI.getPlayerRunTimeData(player);
+                    // 跳跃请求可能早于服务端确认玩家离地，是否可用由每次落地重置的标记和冷却共同约束
+                    if (playerChipData.getCoolDownInfos().isCoolDown(chipInstance.getChip())
+                            || !runtimeData.canDoubleJump) {
                         return;
                     }
 
@@ -82,10 +88,12 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                             false,
                             false
                     ));
+                    runtimeData.canDoubleJump = false;
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.DOUBLE_JUMP.get(), cooldown);
+                    accepted[0] = true;
                 });
-            } else if (action == ActionType.TACTICAL_ROLL && context.player() instanceof ServerPlayer player) {
+            } else if (action == ActionType.TACTICAL_ROLL) {
                 GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
                     PlayerChipData playerChipData = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
                     if (playerChipData.getCoolDownInfos().isCoolDown(chipInstance.getChip())) {
@@ -101,8 +109,11 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
 
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.TACTICAL_ROLL.get(), cooldown);
+                    accepted[0] = true;
                 });
             }
+            CardHudSyncService.feedback(player, accepted[0] ? CardFeedbackPacket.FeedbackType.ACTION_ACCEPTED : CardFeedbackPacket.FeedbackType.ACTION_REJECTED, action.ordinal());
+            CardHudSyncService.sync(player);
         });
     }
 

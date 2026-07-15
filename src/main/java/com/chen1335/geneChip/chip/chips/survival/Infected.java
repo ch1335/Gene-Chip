@@ -9,6 +9,7 @@ import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.immunity.data.InfectionZoneManager;
 import com.immunity.util.ImmunityServerUtil;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -32,8 +33,13 @@ public class Infected extends Chip {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
 
         PlayerRunTimeData runtimeData = GeneChipAPI.getPlayerRunTimeData(player);
+        boolean wasInZone = runtimeData.infectedInZone;
         boolean inZone = isInInfectionZone(serverPlayer);
         runtimeData.infectedInZone = inZone;
+        if (inZone && !wasInZone) {
+            serverPlayer.serverLevel().sendParticles(ParticleTypes.FIREWORK,
+                    player.getX(), player.getY() + 1.0, player.getZ(), 8, 0.45, 0.5, 0.45, 0.035);
+        }
 
         if (inZone) {
             int strengthLevel = 1; // 力量 II (amplifier=1)

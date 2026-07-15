@@ -12,19 +12,14 @@ import com.chen1335.geneChip.chip.chips.combat.*;
 import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
-import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
 import com.chen1335.geneChip.chip.chips.special.VengefulFlame;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.chen1335.geneChip.chip.chips.special.IronHeart;
-import com.chen1335.geneChip.chip.chips.special.CounterStorm;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -38,6 +33,8 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.chen1335.geneChip.network.HeadShotIconPacket;
+import com.chen1335.geneChip.network.CardFeedbackPacket;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.*;
 
@@ -53,6 +50,7 @@ public class GamePlayEventHandler {
 
     @SubscribeEvent
     public static void CriticalHitEvent(CriticalHitEvent event) {
+        if (event.getEntity().level().isClientSide) return;
         if (event.getTarget() instanceof LivingEntity target && event.getTarget().getType().is(EntityTypeTags.HEAD_SHOT_HUNTER_TARGET)) {
             GeneChipAPI.getPlayerEquippedChip(event.getEntity(), ChipTypes.HEAD_SHOT_HUNTER).ifPresent(chipInstance -> {
                 float killChanceValue = chipInstance.getChip().killChance.getValue(chipInstance.getLvl());
@@ -63,6 +61,9 @@ public class GamePlayEventHandler {
                         double iconY = target.getY() + target.getBbHeight() + 0.3;
                         PacketDistributor.sendToPlayersTrackingEntity(target,
                                 new HeadShotIconPacket(target.getX(), iconY, target.getZ()));
+                        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                            CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.HEADSHOT, 1);
+                        }
                     }
                 }
             });
@@ -71,18 +72,17 @@ public class GamePlayEventHandler {
 
     @SubscribeEvent
     public static void ProjectileHitEvent(ProjectileHitEvent.HitEntity event) {
-        if (event.getOwner() instanceof Player player) {
+        if (event.getOwner() instanceof ServerPlayer player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.MAKE_LIVING).ifPresent(chipInstance -> {
                 MakeLiving chip = chipInstance.getChip();
                 float value = chip.recyclingChance.getValue(chipInstance.getLvl());
-                if (player.getRandom().nextFloat() < value) {
+                int recycled = 0;
+                if (player.getRandom().nextFloat() < value) recycled++;
+                if (WorldFactorSynergy.isZombieRiot() && player.getRandom().nextFloat() < 0.05F) recycled++;
+                if (recycled > 0) {
                     GunData data = GunData.from(player.getMainHandItem());
-                    data.ammo.set(data.ammo.get() + 1);
-                }
-                // 丧尸暴动联动：5%概率额外获得一颗子弹
-                if (WorldFactorSynergy.isZombieRiot() && player.getRandom().nextFloat() < 0.05F) {
-                    GunData data = GunData.from(player.getMainHandItem());
-                    data.ammo.set(data.ammo.get() + 1);
+                    data.ammo.set(data.ammo.get() + recycled);
+                    CardHudSyncService.feedback(player, CardFeedbackPacket.FeedbackType.AMMO_RECYCLED, recycled);
                 }
             });
         }
@@ -142,6 +142,7 @@ public class GamePlayEventHandler {
 
     @SubscribeEvent
     public static void LivingIncomingDamageEvent(LivingIncomingDamageEvent event) {
+        if (event.getEntity().level().isClientSide) return;
 
         // 猎手本能 - 被标记实体受到额外伤害
         UUID entityUuid = event.getEntity().getUUID();
@@ -184,9 +185,14 @@ public class GamePlayEventHandler {
                 PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
                 if (playerRunTimeData.counterStormTimer > 0 && playerRunTimeData.counterStormAccumulatedDamage > 0) {
                     float ratio = chipInstance.getChip().damageReflectRatio.getValue(chipInstance.getLvl());
-                    event.setAmount(event.getAmount() + playerRunTimeData.counterStormAccumulatedDamage * ratio);
+                    float bonus = playerRunTimeData.counterStormAccumulatedDamage * ratio;
+                    event.setAmount(event.getAmount() + bonus);
                     playerRunTimeData.counterStormAccumulatedDamage = 0;
                     playerRunTimeData.counterStormTimer = 0;
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.COUNTER_RELEASED, Math.round(bonus));
+                        CardHudSyncService.sync(serverPlayer);
+                    }
                 }
             });
         }
@@ -216,6 +222,7 @@ public class GamePlayEventHandler {
 
     @SubscribeEvent
     public static void LivingDamageEvent$Post(LivingDamageEvent.Post event) {
+        if (event.getEntity().level().isClientSide) return;
         if (event.getEntity() instanceof Player player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.ADRENAL_GLAND_BURST).ifPresent(chipInstance -> {
                 int lvl = chipInstance.getLvl();
@@ -238,7 +245,13 @@ public class GamePlayEventHandler {
                                 false,
                                 false
                         ));
-                        GeneChipAPI.addChipCooldown(player, chipInstance.getChip(), (int) (chip.cooldown.getValue(lvl) * 60));
+                        GeneChipAPI.addChipCooldown(player, chipInstance.getChip(), (int) (chip.cooldown.getValue(lvl) * 20));
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            serverPlayer.serverLevel().sendParticles(ParticleTypes.FIREWORK,
+                                    player.getX(), player.getY() + 1.0, player.getZ(), 12, 0.5, 0.6, 0.5, 0.045);
+                            CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.ADRENAL_TRIGGERED, 0);
+                            CardHudSyncService.sync(serverPlayer);
+                        }
                     }
                 }
             });
@@ -248,6 +261,7 @@ public class GamePlayEventHandler {
                 PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
                 playerRunTimeData.counterStormAccumulatedDamage += event.getNewDamage();
                 playerRunTimeData.counterStormTimer = (int) (chipInstance.getChip().reflectWindow.getValue(chipInstance.getLvl()) * 20);
+                if (player instanceof ServerPlayer serverPlayer) CardHudSyncService.sync(serverPlayer);
             });
 
         }
@@ -255,17 +269,26 @@ public class GamePlayEventHandler {
 
     @SubscribeEvent
     public static void LivingDeathEvent(LivingDeathEvent event) {
+        if (event.getEntity().level().isClientSide) return;
         if (event.getSource().getEntity() instanceof Player player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.COMBO_FEVER).ifPresent(chipInstance -> {
                 PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
-                playerRunTimeData.recordKill(player.level().getGameTime());
                 ComboFever chip = chipInstance.getChip();
-                if (playerRunTimeData.isComboFever((int) (chip.maxTime.getValue(chipInstance.getLvl()) * 20))) {
+                int window = (int) (chip.maxTime.getValue(chipInstance.getLvl()) * 20);
+                playerRunTimeData.recordKill(player.level().getGameTime(), window);
+                if (playerRunTimeData.isComboFever(window)) {
                     int time = (int) (chip.effectTime.getValue(chipInstance.getLvl()) * 20);
                     player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, time));
                     player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, time));
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, time));
+                    playerRunTimeData.triggerComboFever(time);
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.COMBO_TRIGGERED, 3);
+                    }
+                } else if (player instanceof ServerPlayer serverPlayer) {
+                    CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.COMBO_PROGRESS, playerRunTimeData.getComboCount());
                 }
+                if (player instanceof ServerPlayer serverPlayer) CardHudSyncService.sync(serverPlayer);
             });
 
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.BLOODTHIRSTY).ifPresent(chipInstance -> {
@@ -411,13 +434,15 @@ public class GamePlayEventHandler {
         Player player = event.getEntity();
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.INFECTED).ifPresent(chipInstance -> {
             net.minecraft.world.item.ItemStack stack = event.getItemStack();
-            if (stack.getItem() instanceof com.immunity.item.InhibitorItem) {
-                event.setCanceled(true);
-            }
+            boolean blocked = stack.getItem() instanceof com.immunity.item.InhibitorItem;
             // 感染溢出联动：禁用治疗物品
-            if (com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy.isInfectionOverflow()
-                    && stack.is(net.minecraft.tags.ItemTags.create(net.minecraft.resources.ResourceLocation.parse("c:foods/golden")))) {
+            blocked |= WorldFactorSynergy.isInfectionOverflow()
+                    && stack.is(net.minecraft.tags.ItemTags.create(net.minecraft.resources.ResourceLocation.parse("c:foods/golden")));
+            if (blocked) {
                 event.setCanceled(true);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.INFECTED_ITEM_BLOCKED, 0);
+                }
             }
         });
     }
