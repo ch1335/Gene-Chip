@@ -15,6 +15,13 @@ public class WaterPurityMixin {
     private static void givePurityEffects(Player player, int purity, CallbackInfoReturnable<Boolean> cir) {
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SEWAGE_PURIFICATION_PACK).ifPresent(chipInstance -> {
             cir.setReturnValue(true);
+            // 仅在净化实际生效（脏水被净化）时反馈：玩家附近白色烟花粒子 + HUD icon
+            if (purity < 2 && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                serverPlayer.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.FIREWORK,
+                        player.getX(), player.getY() + 1.0, player.getZ(), 8, 0.4, 0.5, 0.4, 0.04);
+                com.chen1335.geneChip.common.CardHudSyncService.feedback(serverPlayer,
+                        com.chen1335.geneChip.network.CardFeedbackPacket.FeedbackType.SEWAGE_PURIFIED, 0);
+            }
         });
     }
 }

@@ -42,6 +42,13 @@ public abstract class FoodDataMixins {
                     healAmount += 1;
                 }
                 gc$player.heal(healAmount);
+                // 进食收益提升时反馈：玩家附近白色烟花粒子 + HUD icon
+                if (gc$player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    serverPlayer.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.FIREWORK,
+                            gc$player.getX(), gc$player.getY() + 1.0, gc$player.getZ(), 8, 0.4, 0.5, 0.4, 0.04);
+                    com.chen1335.geneChip.common.CardHudSyncService.feedback(serverPlayer,
+                            com.chen1335.geneChip.network.CardFeedbackPacket.FeedbackType.NUTRIENT_EXTRACTED, 0);
+                }
             });
         }
     }

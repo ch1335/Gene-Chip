@@ -119,6 +119,9 @@ public final class CardHudRenderer {
             case ADRENAL_TRIGGERED -> ChipTypes.ADRENAL_GLAND_BURST.get();
             case GROWING_FERVOR_STAGE -> ChipTypes.GROWING_FERVOR.get();
             case LOCKSMITH_BONUS_LOOT -> ChipTypes.LOCKSMITH_INTUITION.get();
+            case SEWAGE_PURIFIED -> ChipTypes.SEWAGE_PURIFICATION_PACK.get();
+            case NUTRIENT_EXTRACTED -> ChipTypes.NUTRIENT_EXTRACTION.get();
+            case DAWN_AWAKENING -> ChipTypes.DAWN_AWAKENING.get();
             default -> null;
         };
         if (feedbackChip != null) {

@@ -36,6 +36,9 @@ public record CardFeedbackPacket(FeedbackType feedbackType, int value) implement
         ADRENAL_TRIGGERED,
         GROWING_FERVOR_STAGE,
         INFECTED_ITEM_BLOCKED,
-        LOCKSMITH_BONUS_LOOT
+        LOCKSMITH_BONUS_LOOT,
+        SEWAGE_PURIFIED,
+        NUTRIENT_EXTRACTED,
+        DAWN_AWAKENING
     }
 }

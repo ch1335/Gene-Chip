@@ -41,6 +41,14 @@ public class DawnAwakening extends Chip {
 
             // 恢复全部饱和度
             player.getFoodData().setSaturation(20);
+
+            // 黎明触发反馈：玩家附近暖色白色烟花粒子 + HUD icon（每个黎明仅触发一次）
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                serverPlayer.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.FIREWORK,
+                        player.getX(), player.getY() + 1.2, player.getZ(), 16, 0.5, 0.7, 0.5, 0.05);
+                com.chen1335.geneChip.common.CardHudSyncService.feedback(serverPlayer,
+                        com.chen1335.geneChip.network.CardFeedbackPacket.FeedbackType.DAWN_AWAKENING, 0);
+            }
         }
     }
 }
