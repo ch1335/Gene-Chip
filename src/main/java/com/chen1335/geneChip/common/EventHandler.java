@@ -1,54 +1,31 @@
 package com.chen1335.geneChip.common;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
-import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.API.object.GCAttributes;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
-import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
-import com.chen1335.geneChip.chip.Chip;
-import com.chen1335.geneChip.chip.ChipInstance;
-import com.chen1335.geneChip.client.gui.screen.ChipConfigScreen;
 import com.chen1335.geneChip.command.ChipCommand;
 import com.chen1335.geneChip.compat.coldsweat.tempModifiers.GeneChipTempModifier;
-import com.chen1335.geneChip.lootConditions.WildHunterCondition;
 import com.chen1335.geneChip.network.*;
 import com.momosoftworks.coldsweat.api.event.core.init.DefaultTempModifiersEvent;
 import com.momosoftworks.coldsweat.api.event.core.registry.TempModifierRegisterEvent;
 import com.momosoftworks.coldsweat.api.util.Temperature;
 import com.momosoftworks.coldsweat.api.util.placement.Matcher;
 import com.momosoftworks.coldsweat.api.util.placement.Placement;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @EventBusSubscriber(modid = GeneChip.MODID)
 public class EventHandler {
@@ -79,41 +56,6 @@ public class EventHandler {
                 chip.onUnEquipped(player, instance);
             });
         }
-    }
-
-
-    public static final List<Runnable> LootModifiers = new ArrayList<>();
-
-    @SubscribeEvent
-    private static void LootTableLoadEvent(LootTableLoadEvent event) {
-        LootModifiers.add(() -> {
-            List<LootPoolEntryContainer.Builder<?>> lootItems = new ArrayList<>();
-            for (LootPool pool : event.getTable().pools) {
-                for (LootPoolEntryContainer entry : pool.entries) {
-                    if (entry instanceof LootItem lootItem) {
-                        if (lootItem.item.is(ItemTags.MEAT) || lootItem.item.is(Tags.Items.LEATHERS)) {
-//                        if (event.getTable().getParamSet() == LootContextParamSets.ENTITY) {
-//                            String replace = event.getTable().getLootTableId().toString().replace("entities/", "");
-//                            BuiltInRegistries.ENTITY_TYPE.getHolder(ResourceLocation.parse( replace)).ifPresent(entityTypeReference -> {
-//
-//                            });
-//                        }
-                            lootItems.add(LootItem.lootTableItem(lootItem.item.value()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2))).when(WildHunterCondition.builder()));
-                        }
-                    }
-                }
-            }
-
-            lootItems.forEach(lootPoolEntryContainer -> {
-                event.getTable().pools.add(LootPool.lootPool().add(lootPoolEntryContainer).build());
-            });
-        });
-    }
-
-    @SubscribeEvent
-    public static void ServerStartedEvent(ServerStartedEvent event) {
-        LootModifiers.forEach(Runnable::run);
-        LootModifiers.clear();
     }
 
     @SubscribeEvent

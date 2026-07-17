@@ -1,2 +1,3 @@
-// 1.21.1	2026-03-23T18:35:21.5770633	Tags for minecraft:entity_type mod id gene_chip
-83e34cbd17e4b90546960a46e5e48ee5af034232 data/gene_chip/tags/entity_type/head_shot_hunter_target.json
+// 1.21.1	2026-07-17T16:33:02.9812728	Tags for minecraft:entity_type mod id gene_chip
+652cd116a9031221efe53b07cd32fbe76384a0ee data/c/tags/entity_type/animals.json
+83e34cbd17e4b90546960a46e5e48ee5af034232 data/c/tags/entity_type/head_shot_hunter_target.json
