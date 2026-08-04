@@ -64,6 +64,10 @@ public class ChipTypes {
 
     public static final DeferredHolder<Chip, NutrientExtraction> NUTRIENT_EXTRACTION = CHIPS.register("nutrient_extraction", NutrientExtraction::new);
 
+    public static final DeferredHolder<Chip, RottenFleshTolerance> ROTTEN_FLESH_TOLERANCE = CHIPS.register("rotten_flesh_tolerance", RottenFleshTolerance::new);
+
+    public static final DeferredHolder<Chip, TraumaFirstAid> TRAUMA_FIRST_AID = CHIPS.register("trauma_first_aid", TraumaFirstAid::new);
+
     public static final DeferredHolder<Chip, PermafrostWalkers> PERMAFROST_WALKERS = CHIPS.register("permafrost_walkers", PermafrostWalkers::new);
 
     public static final DeferredHolder<Chip, IronLung> IRON_LUNG = CHIPS.register("iron_lung", IronLung::new);

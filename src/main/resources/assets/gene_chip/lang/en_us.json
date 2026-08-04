@@ -75,6 +75,14 @@
   "gene_chip.chip.nutrient_extraction.desc": "The enhancer improves nutrient absorption efficiency, making every bite of food count",
   "gene_chip.chip.nutrient_extraction.desc.detailed": "When eating food, restore an extra +%s saturation and +%s health",
 
+  "gene_chip.chip.rotten_flesh_tolerance.name": "Rotten Food Tolerance",
+  "gene_chip.chip.rotten_flesh_tolerance.desc": "The enhancer fortifies your digestive system, making spoiled food harmless",
+  "gene_chip.chip.rotten_flesh_tolerance.desc.detailed": "When eating rotten food, negate its negative effects and have a 10%% chance to restore 1 health",
+
+  "gene_chip.chip.trauma_first_aid.name": "Trauma First Aid",
+  "gene_chip.chip.trauma_first_aid.desc": "The enhancer accelerates tissue repair, allowing healing items to restore more health",
+  "gene_chip.chip.trauma_first_aid.desc.detailed": "When using a healing item, restore additional health equal to its original healing amount",
+
   "gene_chip.chip.permafrost_walkers.name": "Permafrost Walkers",
   "gene_chip.chip.permafrost_walkers.desc": "Metabolic heat production and peripheral circulation enhanced—ignore the bitter cold",
   "gene_chip.chip.permafrost_walkers.desc.detailed": "Better survive in low temperature environments, can walk on powdered snow without sinking",

@@ -3,6 +3,8 @@ package com.chen1335.geneChip.common;
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
+import com.hexagram2021.fiahi.common.event.ApplySpecialEatEffectEvent;
+import com.wu_meng.winterscavenge.event.HealingItemUsedEvent;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.tags.EntityTypeTags;
@@ -403,7 +405,7 @@ public class GamePlayEventHandler {
         }
     }
 
-@SubscribeEvent
+    @SubscribeEvent
     public static void MobEffectEvent$Added(MobEffectEvent.Added event) {
         if (event.getEntity() instanceof Player player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.IRON_HEART).ifPresent(chipInstance -> {
@@ -427,6 +429,31 @@ public class GamePlayEventHandler {
                 });
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void ApplySpecialEatEffectEvent(ApplySpecialEatEffectEvent event) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) return;
+        if (event.getFoodData().getRottenLevel() <= 0) return;
+
+        GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.ROTTEN_FLESH_TOLERANCE).ifPresent(chipInstance -> {
+            event.setCancelled(true);
+            if (player.getRandom().nextFloat() < 0.1F) {
+                player.heal(1.0F);
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public static void HealingItemUsed(HealingItemUsedEvent event) {
+        Player player = event.getPlayer();
+        if (player.level().isClientSide) return;
+
+        float totalHealing = event.getTotalHealing();
+        if (totalHealing <= 0.0F) return;
+
+        GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TRAUMA_FIRST_AID)
+                .ifPresent(chipInstance -> player.heal(totalHealing));
     }
 
     @SubscribeEvent

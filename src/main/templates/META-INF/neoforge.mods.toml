@@ -135,6 +135,20 @@ file="META-INF/accesstransformer.cfg"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
+    modId="fiahi"
+    type="required"
+    versionRange="[4.1.1,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="winter_scavenge"
+    type="required"
+    versionRange="[1.0.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
     modId="clavis"
     type="required"
     versionRange="[0.2.11,)"

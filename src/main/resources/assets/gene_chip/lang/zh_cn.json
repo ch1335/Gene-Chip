@@ -78,6 +78,14 @@
   "gene_chip.chip.nutrient_extraction.desc": "强化剂提升营养吸收效率，让每一口食物都发挥最大价值",
   "gene_chip.chip.nutrient_extraction.desc.detailed": "食用食物时，额外恢复+%s饱和度和+%s生命值",
 
+  "gene_chip.chip.rotten_flesh_tolerance.name": "腐肉耐受",
+  "gene_chip.chip.rotten_flesh_tolerance.desc": "强化剂重塑消化系统，使腐坏食物不再威胁你的身体",
+  "gene_chip.chip.rotten_flesh_tolerance.desc.detailed": "食用腐坏食物时免疫负面效果，并有10%%概率恢复1点生命值",
+
+  "gene_chip.chip.trauma_first_aid.name": "外伤急救",
+  "gene_chip.chip.trauma_first_aid.desc": "强化剂加速受损组织修复，使治疗物品发挥更强的恢复效果",
+  "gene_chip.chip.trauma_first_aid.desc.detailed": "使用治疗类物品时，额外恢复等同于原治疗量的生命值",
+
   "gene_chip.chip.permafrost_walkers.name": "冻土行者",
   "gene_chip.chip.permafrost_walkers.desc": "代谢产热与末梢循环强化，使你无视严寒",
   "gene_chip.chip.permafrost_walkers.desc.detailed": "在低温环境中可以更好的生存，可在细雪上行走不下陷",
