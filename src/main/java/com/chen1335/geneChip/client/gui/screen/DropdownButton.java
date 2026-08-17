@@ -20,11 +20,14 @@ public class DropdownButton<T> extends AbstractWidget {
     private final Consumer<T> onSelect;
     private final int baseHeight;
     private final int optionHeight;
+    private final int textPadding;
+    private final int arrowPadding;
+    private final int borderWidth;
 
     private T value;
     private boolean expanded;
 
-    public DropdownButton(int x, int y, int width, int baseHeight, List<T> options, T initial,
+    public DropdownButton(int x, int y, int width, int baseHeight, float uiScale, List<T> options, T initial,
                           Function<T, Component> valueToText, Consumer<T> onSelect) {
         super(x, y, width, baseHeight, Component.empty());
         this.options = options;
@@ -33,6 +36,9 @@ public class DropdownButton<T> extends AbstractWidget {
         this.value = initial;
         this.baseHeight = baseHeight;
         this.optionHeight = baseHeight;
+        this.textPadding = Math.max(2, Math.round(6 * uiScale));
+        this.arrowPadding = Math.max(6, Math.round(12 * uiScale));
+        this.borderWidth = Math.max(1, Math.round(uiScale));
     }
 
     public T getValue() {
@@ -103,13 +109,13 @@ public class DropdownButton<T> extends AbstractWidget {
         boolean triggerHover = isOverTrigger(mouseX, mouseY);
         int triggerColor = triggerHover ? 0xFF595959 : 0xFF2E2E2E;
 
-        drawBox(guiGraphics, getX(), getY(), width, baseHeight, triggerColor, borderColor);
+        drawBox(guiGraphics, getX(), getY(), width, baseHeight, triggerColor, borderColor, borderWidth);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0, 0,   1);
+        guiGraphics.pose().translate(0, 0, 1);
         Component text = valueToText.apply(value);
-        guiGraphics.drawString(font, text, getX() + 6, getY() + (baseHeight - font.lineHeight) / 2 + 1, 0xFFFFFFFF, false);
+        guiGraphics.drawString(font, text, getX() + textPadding, getY() + (baseHeight - font.lineHeight) / 2 + 1, 0xFFFFFFFF, false);
         String arrow = expanded ? "▲" : "▼";
-        guiGraphics.drawString(font, arrow, getX() + width - 12, getY() + (baseHeight - font.lineHeight) / 2 + 1, 0xFFCCCCCC, false);
+        guiGraphics.drawString(font, arrow, getX() + width - arrowPadding, getY() + (baseHeight - font.lineHeight) / 2 + 1, 0xFFCCCCCC, false);
         guiGraphics.pose().popPose();
 
         if (expanded) {
@@ -117,24 +123,25 @@ public class DropdownButton<T> extends AbstractWidget {
                 int oy = getY() + baseHeight + i * optionHeight;
                 boolean hov = mouseX >= getX() && mouseX <= getX() + (double) width && mouseY >= oy && mouseY <= oy + (double) optionHeight;
                 int color = hov ? 0xFF595959 : 0xFF3A3A3A;
-                drawBox(guiGraphics, getX(), oy, width, optionHeight, color, borderColor);
+                drawBox(guiGraphics, getX(), oy, width, optionHeight, color, borderColor, borderWidth);
                 Component optText = valueToText.apply(options.get(i));
                 boolean isCurrent = options.get(i) == value || (options.get(i) != null && options.get(i).equals(value));
                 int textColor = isCurrent ? 0xFFFFFF00 : 0xFFFFFFFF;
                 guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(0, 0,   1);
-                guiGraphics.drawString(font, optText, getX() + 6, oy + (optionHeight - font.lineHeight) / 2 + 1, textColor, false);
+                guiGraphics.pose().translate(0, 0, 1);
+                guiGraphics.drawString(font, optText, getX() + textPadding, oy + (optionHeight - font.lineHeight) / 2 + 1, textColor, false);
                 guiGraphics.pose().popPose();
             }
         }
     }
 
-    private static void drawBox(GuiGraphics guiGraphics, int x, int y, int w, int h, int fillColor, int borderColor) {
+    private static void drawBox(GuiGraphics guiGraphics, int x, int y, int w, int h,
+                                int fillColor, int borderColor, int borderWidth) {
         GuiUtil.drawColorWithSize(guiGraphics, x, y, w, h, fillColor, 1);
-        GuiUtil.drawColorWithSize(guiGraphics, x, y, w, 1, borderColor,   1);
-        GuiUtil.drawColorWithSize(guiGraphics, x, y + h - 1, w, 1, borderColor,   1);
-        GuiUtil.drawColorWithSize(guiGraphics, x, y, 1, h, borderColor,   1);
-        GuiUtil.drawColorWithSize(guiGraphics, x + w - 1, y, 1, h, borderColor,   1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y, w, borderWidth, borderColor, 1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y + h - borderWidth, w, borderWidth, borderColor, 1);
+        GuiUtil.drawColorWithSize(guiGraphics, x, y, borderWidth, h, borderColor, 1);
+        GuiUtil.drawColorWithSize(guiGraphics, x + w - borderWidth, y, borderWidth, h, borderColor, 1);
     }
 
     @Override

@@ -1,32 +1,15 @@
 package com.chen1335.geneChip.client.gui;
 
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
 
 import java.math.BigDecimal;
 
 public class GuiUtil {
-    public static Vec2 getWindowScale() {
-        Window window = Minecraft.getInstance().getWindow();
-        double guiScale = window.getGuiScale();
-        GLFWVidMode glfwVidMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-        if (glfwVidMode == null) {
-            throw new IllegalStateException("Can't find a primary monitor");
-        }
-        float xScale = (float) ( ((float) window.getWidth() / glfwVidMode.width())/guiScale);
-        float yScale = (float) ( ((float) window.getHeight() / glfwVidMode.height())/guiScale);
-        return new Vec2(xScale, yScale);
-    }
-
     public static String format(float value, int i) {
         return new BigDecimal(String.format("%." + i + "f", value)).stripTrailingZeros().toPlainString();
     }

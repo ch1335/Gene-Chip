@@ -12,41 +12,36 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
-import net.minecraft.world.phys.Vec2;
 
 import java.util.Optional;
 
 public class EquippedChipWidget extends AbstractWidget {
-    private final float xScale;
-    private final float yScale;
-
     private ChipSlot chipSlot;
-    public int index = 0;
+    public final int index;
     private final ChipConfigScreen parent;
+    private final ChipConfigScreen.LayoutMetrics layout;
+    private final float scale;
 
-    private ChipWidget chipWidget = null;
+    private ChipWidget chipWidget;
 
-
-    public EquippedChipWidget(ChipSlot chipSlot, int index, ChipConfigScreen parent) {
+    public EquippedChipWidget(ChipSlot chipSlot, int index, ChipConfigScreen parent,
+                              ChipConfigScreen.LayoutMetrics layout) {
         super(0, 0, 0, 0, Component.empty());
         this.chipSlot = chipSlot;
         this.index = index;
         this.parent = parent;
-        Vec2 windowScale = GuiUtil.getWindowScale();
-        xScale = windowScale.x * 4;
-        yScale = windowScale.y * 4;
-        this.width = (int) (150 * xScale);
-        this.height = (int) (18 * yScale);
+        this.layout = layout;
+        this.scale = layout.scale();
+        resetPosition();
+        chipSlot.instance().ifPresent(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent, layout));
+    }
 
-        setX((int) (10 * xScale));
-
-        int ySize = 18;
-        int y1 = ySize + 3;
-        int y = 40;
-        setY((int) ((20 + index * y1 + y) * yScale));
-
-        Optional<ChipInstance<?>> instance = chipSlot.instance();
-        instance.ifPresent(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent));
+    private void resetPosition() {
+        ChipConfigScreen.LayoutRect rect = layout.slotRect(index);
+        setX(rect.left());
+        setY(rect.top());
+        this.width = rect.width();
+        this.height = rect.height();
     }
 
     public ChipSlot getChipSlot() {
@@ -55,9 +50,9 @@ public class EquippedChipWidget extends AbstractWidget {
 
     public void setChipSlot(ChipSlot chipSlot) {
         this.chipSlot = chipSlot;
-        chipSlot.instance().ifPresentOrElse(chipInstance -> chipWidget = new ChipWidget(chipInstance, parent), () -> {
-            chipWidget = null;
-        });
+        chipSlot.instance().ifPresentOrElse(
+                chipInstance -> chipWidget = new ChipWidget(chipInstance, parent, layout),
+                () -> chipWidget = null);
     }
 
     @Override
@@ -70,32 +65,41 @@ public class EquippedChipWidget extends AbstractWidget {
                 pose.translate(0, 0, 20);
             }
             guiGraphics.enableScissor(getX(), getY(), getX() + getWidth(), getY() + getHeight());
-            RenderSystem.enableBlend();
-            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), FastColor.ARGB32.color(150, 0, 0, 0), 1);
+            try {
+                RenderSystem.enableBlend();
+                GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(),
+                        FastColor.ARGB32.color(150, 0, 0, 0), 1);
+                GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getSmallCrystalIcon(), guiGraphics,
+                        getX() + 10 * scale, getY() + 5 * scale, 8 * scale, 8 * scale,
+                        2, 2, 4, 4, 8, 8, 2);
+                GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics,
+                        getX() + 102 * scale, getY() - 27 * scale, 48 * scale, 78 * scale,
+                        8, 1, 24, 39, 40, 40, 2);
+                GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics,
+                        getX() + 110 * scale, getY() - 9 * scale, 32 * scale, 32 * scale, 2);
 
-            GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getSmallCrystalIcon(), guiGraphics, getX() + 10 * xScale, getY() + 5 * yScale, 8 * xScale, 8 * yScale, 2, 2, 4, 4, 8, 8, 2);
-            GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics, getX() + 102 * xScale, getY() - 27 * yScale, 48 * xScale, 78 * yScale, 8, 1, 24, 39, 40, 40, 2);
-            GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics, getX() + 110 * xScale, getY() - 9 * yScale, 32 * xScale, 32 * yScale, 2);
-
-            pose.pushPose();
-            Component displayName = chipInstance.getChip().getDisplayName();
-            Font font = Minecraft.getInstance().font;
-            pose.translate(getX() + 32 * xScale, getY() + 5 * yScale, 2);
-            guiGraphics.drawString(font, displayName, 0, 0, 0xFFFFFF);
-            pose.popPose();
-
-            guiGraphics.disableScissor();
-            pose.popPose();
+                Component displayName = chipInstance.getChip().getDisplayName();
+                Font font = Minecraft.getInstance().font;
+                pose.pushPose();
+                pose.translate(getX() + 32 * scale, getY() + 5 * scale, 2);
+                pose.scale(scale, scale, 1);
+                guiGraphics.drawString(font, displayName, 0, 0, 0xFFFFFF);
+                pose.popPose();
+            } finally {
+                guiGraphics.disableScissor();
+                pose.popPose();
+            }
         });
+
         if (isHovered && !isFocused()) {
             RenderSystem.enableBlend();
-            int color = FastColor.ARGB32.color(150, 255, 255, 255);
-            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(), color, 3);
+            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(),
+                    FastColor.ARGB32.color(150, 255, 255, 255), 3);
             if (chipWidget != null && !parent.isDragging()) {
                 chipWidget.unlocked = true;
                 chipWidget.renderHoverDesc = false;
                 chipWidget.setX(mouseX);
-                chipWidget.setY((int) (mouseY - 40 * yScale));
+                chipWidget.setY((int) (mouseY - 40 * scale));
                 PoseStack pose = guiGraphics.pose();
                 pose.pushPose();
                 pose.translate(0, 0, 40);
@@ -107,14 +111,13 @@ public class EquippedChipWidget extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
     }
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         super.onDrag(mouseX, mouseY, dragX, dragY);
-        setX((int) ((int) mouseX - 100 * xScale));
-        setY((int) ((int) mouseY - 7 * yScale));
+        setX((int) Math.round(mouseX - 100 * scale));
+        setY((int) Math.round(mouseY - 7 * scale));
     }
 
     @Override
@@ -127,29 +130,16 @@ public class EquippedChipWidget extends AbstractWidget {
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
-        setX((int) (10 * xScale));
+        resetPosition();
+        int targetSlot = parent.slotAt(mouseX, mouseY);
+        if (targetSlot != -1 && targetSlot != index) {
+            EquippedChipWidget target = parent.equippedChipWidgets.get(targetSlot);
+            Optional<ChipInstance<?>> targetInstance = target.getChipSlot().instance();
+            Optional<ChipInstance<?>> sourceInstance = this.getChipSlot().instance();
 
-        int ySize = 18;
-        int y1 = ySize + 3;
-        int y = 40;
-        setY((int) ((20 + index * y1 + y) * yScale));
-
-        if (parent.hoveredSlot != -1) {
-            EquippedChipWidget old = parent.equippedChipWidgets.get(parent.hoveredSlot);
-            Optional<ChipInstance<?>> oldInstance = old.getChipSlot().instance();
-            Optional<ChipInstance<?>> newInstance = this.getChipSlot().instance();
-            if (oldInstance.isEmpty()) {
-                parent.setSlotChip(null, getChipSlot().index());
-            } else {
-                parent.setSlotChip(oldInstance.get(), getChipSlot().index());
-            }
-
-
-            newInstance.ifPresent(chipInstance -> {
-                parent.setSlotChip(chipInstance, parent.hoveredSlot);
-            });
+            parent.setSlotChip(targetInstance.orElse(null), index);
+            sourceInstance.ifPresent(chipInstance -> parent.setSlotChip(chipInstance, targetSlot));
         }
-
         setFocused(false);
     }
 }
