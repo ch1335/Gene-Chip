@@ -49,6 +49,8 @@ public class ChipConfigScreen extends Screen {
 
     private LayoutMetrics layout;
     private double scrollDesignY;
+    private boolean draggingScrollBar;
+    private double scrollBarGrabOffset;
 
     public final Map<ChipType, Map<Chip, ChipInstance<?>>> availableChips = new HashMap<>();
     public final ChipFilter chipFilter = new ChipFilter();
@@ -199,12 +201,54 @@ public class ChipConfigScreen extends Screen {
                 renderChipWidget(guiGraphics, chipWidget, mouseX, mouseY, partialTick);
             }
         }
+        renderScrollBar(guiGraphics, mouseX, mouseY);
         renderSelectedChipDetails(guiGraphics);
         if (viewport.contains(mouseX, mouseY)) {
             for (ChipWidget chipWidget : chipWidgets) {
                 chipWidget.renderHoverTooltip(guiGraphics, mouseX, mouseY);
             }
         }
+    }
+
+    private void renderScrollBar(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        LayoutRect track = layout.scrollBarTrackRect();
+        drawRect(guiGraphics, track, FastColor.ARGB32.color(180, 25, 25, 25), 5);
+        LayoutRect thumb = getScrollBarThumbRect();
+        int color = draggingScrollBar || thumb.contains(mouseX, mouseY)
+                ? FastColor.ARGB32.color(255, 215, 215, 215)
+                : FastColor.ARGB32.color(255, 150, 150, 150);
+        drawRect(guiGraphics, thumb, color, 6);
+    }
+
+    private LayoutRect getScrollBarThumbRect() {
+        LayoutRect track = layout.scrollBarTrackRect();
+        double minScroll = computeMinScrollY();
+        int minimumThumb = layout.length(18);
+        if (minScroll >= 0) {
+            return new LayoutRect(track.left(), track.top(), track.right(), track.bottom());
+        }
+
+        double contentHeight = getContentHeight();
+        double viewportHeight = 248;
+        int thumbHeight = Math.max(minimumThumb,
+                (int) Math.round(track.height() * Math.min(1.0D, viewportHeight / contentHeight)));
+        double progress = Math.max(0.0D, Math.min(1.0D, scrollDesignY / minScroll));
+        int thumbTop = track.top() + (int) Math.round((track.height() - thumbHeight) * progress);
+        return new LayoutRect(track.left(), thumbTop, track.right(), thumbTop + thumbHeight);
+    }
+
+    private void updateScrollFromThumb(double mouseY) {
+        LayoutRect track = layout.scrollBarTrackRect();
+        LayoutRect thumb = getScrollBarThumbRect();
+        int travel = track.height() - thumb.height();
+        if (travel <= 0) {
+            scrollDesignY = 0;
+            return;
+        }
+        double thumbTop = Math.max(track.top(), Math.min(mouseY - scrollBarGrabOffset, track.bottom() - thumb.height()));
+        double progress = (thumbTop - track.top()) / travel;
+        scrollDesignY = computeMinScrollY() * progress;
+        clampScrollY();
     }
 
     private static void renderChipWidget(GuiGraphics guiGraphics, ChipWidget chipWidget,
@@ -342,6 +386,21 @@ public class ChipConfigScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            LayoutRect track = layout.scrollBarTrackRect();
+            if (track.contains(mouseX, mouseY) && computeMinScrollY() < 0) {
+                LayoutRect thumb = getScrollBarThumbRect();
+                draggingScrollBar = true;
+                if (thumb.contains(mouseX, mouseY)) {
+                    scrollBarGrabOffset = mouseY - thumb.top();
+                } else {
+                    scrollBarGrabOffset = thumb.height() / 2.0D;
+                    updateScrollFromThumb(mouseY);
+                }
+                return true;
+            }
+        }
+
         boolean collapsed = false;
         if (unlockedDropdown != null && unlockedDropdown.isExpanded() && !unlockedDropdown.isMouseOver(mouseX, mouseY)) {
             unlockedDropdown.setExpanded(false);
@@ -363,6 +422,24 @@ public class ChipConfigScreen extends Screen {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (button == 0 && draggingScrollBar) {
+            updateScrollFromThumb(mouseY);
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0 && draggingScrollBar) {
+            draggingScrollBar = false;
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
@@ -391,12 +468,20 @@ public class ChipConfigScreen extends Screen {
         return oldScroll != scrollDesignY || super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
-    private double computeMinScrollY() {
+    private double getContentHeight() {
         int rows = (chipWidgets.size() + CHIP_COLUMNS - 1) / CHIP_COLUMNS;
         if (rows == 0) return 0;
-        double contentBottom = CHIP_GRID_Y + (rows - 1) * CHIP_ROW_PITCH + CARD_HEIGHT * CARD_SCALE;
-        double viewportBottom = 270;
-        return Math.min(0, viewportBottom - 10 - contentBottom);
+        return (rows - 1) * CHIP_ROW_PITCH + CARD_HEIGHT * CARD_SCALE;
+    }
+
+    private double computeMinScrollY() {
+        double viewportBottom = 269;
+        double firstCardTop = CHIP_GRID_Y;
+        double contentHeight = getContentHeight();
+        if (contentHeight <= 0) return 0;
+
+        double bottomLimitedScroll = viewportBottom - (firstCardTop + contentHeight);
+        return Math.min(0, bottomLimitedScroll);
     }
 
     private void clampScrollY() {
@@ -518,6 +603,10 @@ public class ChipConfigScreen extends Screen {
 
         LayoutRect cardViewportRect() {
             return rect(106, 21, 238, 248);
+        }
+
+        LayoutRect scrollBarTrackRect() {
+            return rect(345, 21, 6, 248);
         }
 
         LayoutRect detailPanelRect() {
