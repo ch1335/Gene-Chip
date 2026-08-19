@@ -184,22 +184,34 @@ public class ChipConfigScreen extends Screen {
         try {
             for (int index = 0; index < chipWidgets.size(); index++) {
                 ChipWidget chipWidget = chipWidgets.get(index);
-                if (!chipWidget.isFocused()) {
-                    LayoutRect cardRect = layout.cardRect(index, scrollDesignY);
-                    chipWidget.setPosition(cardRect.left(), cardRect.top());
-                }
-                PoseStack pose = guiGraphics.pose();
-                pose.pushPose();
-                pose.translate(0, 0, -30);
-                chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
-                pose.popPose();
+                if (chipWidget.isFocused()) continue;
+
+                LayoutRect cardRect = layout.cardRect(index, scrollDesignY);
+                chipWidget.setPosition(cardRect.left(), cardRect.top());
+                renderChipWidget(guiGraphics, chipWidget, mouseX, mouseY, partialTick);
             }
         } finally {
             guiGraphics.disableScissor();
         }
         for (ChipWidget chipWidget : chipWidgets) {
-            chipWidget.renderHoverTooltip(guiGraphics, mouseX, mouseY);
+            if (chipWidget.isFocused()) {
+                renderChipWidget(guiGraphics, chipWidget, mouseX, mouseY, partialTick);
+            }
         }
+        if (viewport.contains(mouseX, mouseY)) {
+            for (ChipWidget chipWidget : chipWidgets) {
+                chipWidget.renderHoverTooltip(guiGraphics, mouseX, mouseY);
+            }
+        }
+    }
+
+    private static void renderChipWidget(GuiGraphics guiGraphics, ChipWidget chipWidget,
+                                         int mouseX, int mouseY, float partialTick) {
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(0, 0, -30);
+        chipWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+        pose.popPose();
     }
 
     @Override
