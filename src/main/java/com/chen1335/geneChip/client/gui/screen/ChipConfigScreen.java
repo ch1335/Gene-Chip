@@ -39,7 +39,7 @@ public class ChipConfigScreen extends Screen {
     private static final int FILTER_Y = 4;
     private static final int FILTER_HEIGHT = 16;
     private static final int CHIP_GRID_X = 115;
-    private static final int CHIP_GRID_Y = 47;
+    private static final int CHIP_GRID_Y = 24;
     private static final int CHIP_COLUMNS = 4;
     private static final int CHIP_COLUMN_PITCH = 58;
     private static final int CHIP_ROW_PITCH = 96;
@@ -281,9 +281,12 @@ public class ChipConfigScreen extends Screen {
     private void renderCardPanel(GuiGraphics guiGraphics) {
         LayoutRect cardPanel = layout.cardPanelRect();
         LayoutRect detailPanel = layout.detailPanelRect();
+        int borderColor = FastColor.ARGB32.color(180, 200, 200, 200);
         drawBorderedRect(guiGraphics, cardPanel,
-                FastColor.ARGB32.color(180, 200, 200, 200),
+                borderColor,
                 FastColor.ARGB32.color(110, 30, 30, 30), -42);
+        drawRect(guiGraphics, layout.scrollBarTopBorderRect(), borderColor, -42);
+        drawRect(guiGraphics, layout.scrollBarBottomBorderRect(), borderColor, -42);
         drawBorderedRect(guiGraphics, detailPanel,
                 FastColor.ARGB32.color(180, 200, 200, 200),
                 FastColor.ARGB32.color(150, 18, 18, 18), -40);
@@ -607,6 +610,14 @@ public class ChipConfigScreen extends Screen {
 
         LayoutRect scrollBarTrackRect() {
             return rect(345, 21, 6, 248);
+        }
+
+        LayoutRect scrollBarTopBorderRect() {
+            return rect(345, 20, 6, 1);
+        }
+
+        LayoutRect scrollBarBottomBorderRect() {
+            return rect(345, 269, 6, 1);
         }
 
         LayoutRect detailPanelRect() {
