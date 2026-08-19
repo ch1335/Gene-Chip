@@ -180,7 +180,7 @@ public class ChipConfigScreen extends Screen {
             typeDropdown.render(guiGraphics, mouseX, mouseY, partialTick);
         }
 
-        LayoutRect viewport = layout.cardPanelRect();
+        LayoutRect viewport = layout.cardViewportRect();
         guiGraphics.enableScissor(viewport.left(), viewport.top(), viewport.right(), viewport.bottom());
         try {
             for (int index = 0; index < chipWidgets.size(); index++) {
@@ -222,7 +222,7 @@ public class ChipConfigScreen extends Screen {
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
 
-        drawRect(guiGraphics, layout.rect(0, 20, 105, 242),
+        drawRect(guiGraphics, layout.rect(0, 20, 105, 250),
                 FastColor.ARGB32.color(100, 160, 160, 160), 1);
         drawRect(guiGraphics, layout.rect(0, 0, 480, 20),
                 FastColor.ARGB32.color(100, 160, 160, 160), 0);
@@ -235,10 +235,23 @@ public class ChipConfigScreen extends Screen {
     }
 
     private void renderCardPanel(GuiGraphics guiGraphics) {
-        LayoutRect borderRect = layout.rect(105, 20, 375, 242);
-        drawRect(guiGraphics, borderRect, FastColor.ARGB32.color(180, 200, 200, 200), -42);
-        drawRect(guiGraphics, layout.cardPanelRect(), FastColor.ARGB32.color(110, 30, 30, 30), -41);
-        drawRect(guiGraphics, layout.detailPanelRect(), FastColor.ARGB32.color(150, 18, 18, 18), -40);
+        LayoutRect cardPanel = layout.cardPanelRect();
+        LayoutRect detailPanel = layout.detailPanelRect();
+        drawBorderedRect(guiGraphics, cardPanel,
+                FastColor.ARGB32.color(180, 200, 200, 200),
+                FastColor.ARGB32.color(110, 30, 30, 30), -42);
+        drawBorderedRect(guiGraphics, detailPanel,
+                FastColor.ARGB32.color(180, 200, 200, 200),
+                FastColor.ARGB32.color(150, 18, 18, 18), -40);
+    }
+
+    private void drawBorderedRect(GuiGraphics guiGraphics, LayoutRect outer, int borderColor, int fillColor, int z) {
+        drawRect(guiGraphics, outer, borderColor, z);
+        int border = layout.length(1);
+        LayoutRect inner = new LayoutRect(
+                outer.left() + border, outer.top() + border,
+                outer.right() - border, outer.bottom() - border);
+        drawRect(guiGraphics, inner, fillColor, z + 1);
     }
 
     private static void drawRect(GuiGraphics guiGraphics, LayoutRect rect, int color, int z) {
@@ -246,7 +259,11 @@ public class ChipConfigScreen extends Screen {
     }
 
     private void renderSelectedChipDetails(GuiGraphics guiGraphics) {
-        LayoutRect panel = layout.detailPanelRect();
+        LayoutRect borderPanel = layout.detailPanelRect();
+        int inset = layout.length(2);
+        LayoutRect panel = new LayoutRect(
+                borderPanel.left() + inset, borderPanel.top() + inset,
+                borderPanel.right() - inset, borderPanel.bottom() - inset);
         float scale = layout.scale();
         Minecraft minecraft = Minecraft.getInstance();
         PoseStack pose = guiGraphics.pose();
@@ -365,7 +382,7 @@ public class ChipConfigScreen extends Screen {
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (unlockedDropdown != null && unlockedDropdown.isExpanded()) return false;
         if (typeDropdown != null && typeDropdown.isExpanded()) return false;
-        if (!layout.cardPanelRect().contains(mouseX, mouseY)) {
+        if (!layout.cardViewportRect().contains(mouseX, mouseY)) {
             return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
         }
 
@@ -378,7 +395,7 @@ public class ChipConfigScreen extends Screen {
         int rows = (chipWidgets.size() + CHIP_COLUMNS - 1) / CHIP_COLUMNS;
         if (rows == 0) return 0;
         double contentBottom = CHIP_GRID_Y + (rows - 1) * CHIP_ROW_PITCH + CARD_HEIGHT * CARD_SCALE;
-        double viewportBottom = 260;
+        double viewportBottom = 270;
         return Math.min(0, viewportBottom - 10 - contentBottom);
     }
 
@@ -496,11 +513,15 @@ public class ChipConfigScreen extends Screen {
         }
 
         LayoutRect cardPanelRect() {
-            return rect(108, 22, 237, 238);
+            return rect(105, 20, 240, 250);
+        }
+
+        LayoutRect cardViewportRect() {
+            return rect(106, 21, 238, 248);
         }
 
         LayoutRect detailPanelRect() {
-            return rect(351, 22, 116, 238);
+            return rect(351, 20, 129, 250);
         }
     }
 
