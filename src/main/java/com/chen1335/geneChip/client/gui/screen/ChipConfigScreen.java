@@ -34,15 +34,15 @@ public class ChipConfigScreen extends Screen {
     private static final int DESIGN_WIDTH = 480;
     private static final int DESIGN_HEIGHT = 270;
     private static final float MIN_SCALE = 0.625F;
-    private static final float CARD_SCALE = 1.25F;
+    private static final float CARD_SCALE = 1.15F;
 
     private static final int FILTER_Y = 4;
     private static final int FILTER_HEIGHT = 16;
-    private static final int CHIP_GRID_X = 105;
+    private static final int CHIP_GRID_X = 115;
     private static final int CHIP_GRID_Y = 47;
     private static final int CHIP_COLUMNS = 4;
-    private static final int CHIP_COLUMN_PITCH = 62;
-    private static final int CHIP_ROW_PITCH = 105;
+    private static final int CHIP_COLUMN_PITCH = 58;
+    private static final int CHIP_ROW_PITCH = 96;
     private static final int CARD_WIDTH = 48;
     private static final int CARD_HEIGHT = 78;
     private static final double SCROLL_STEP = 50.0D;
@@ -89,7 +89,7 @@ public class ChipConfigScreen extends Screen {
     }
 
     private void setupFilterBar() {
-        LayoutRect searchRect = layout.rect(105, FILTER_Y, 80, FILTER_HEIGHT);
+        LayoutRect searchRect = layout.rect(115, FILTER_Y, 80, FILTER_HEIGHT);
         searchBox = new EditBox(Minecraft.getInstance().font,
                 searchRect.left(), searchRect.top(), searchRect.width(), searchRect.height(),
                 Component.translatable("gene_chip.filter.search_hint"));
@@ -101,7 +101,7 @@ public class ChipConfigScreen extends Screen {
         });
         addRenderableWidget(searchBox);
 
-        LayoutRect unlockedRect = layout.rect(189, FILTER_Y, 56, FILTER_HEIGHT);
+        LayoutRect unlockedRect = layout.rect(199, FILTER_Y, 54, FILTER_HEIGHT);
         unlockedDropdown = new DropdownButton<>(
                 unlockedRect.left(), unlockedRect.top(), unlockedRect.width(), unlockedRect.height(), layout.scale(),
                 List.of(Boolean.FALSE, Boolean.TRUE),
@@ -117,7 +117,7 @@ public class ChipConfigScreen extends Screen {
         List<ChipType> typeOptions = new ArrayList<>();
         typeOptions.add(null);
         typeOptions.addAll(Arrays.asList(ChipType.values()));
-        LayoutRect typeRect = layout.rect(249, FILTER_Y, 56, FILTER_HEIGHT);
+        LayoutRect typeRect = layout.rect(257, FILTER_Y, 54, FILTER_HEIGHT);
         typeDropdown = new DropdownButton<>(
                 typeRect.left(), typeRect.top(), typeRect.width(), typeRect.height(), layout.scale(),
                 typeOptions,
@@ -222,9 +222,9 @@ public class ChipConfigScreen extends Screen {
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
 
-        drawRect(guiGraphics, layout.rect(10, 20, 85, 242),
+        drawRect(guiGraphics, layout.rect(0, 20, 105, 242),
                 FastColor.ARGB32.color(100, 160, 160, 160), 1);
-        drawRect(guiGraphics, layout.rect(10, 0, 460, 20),
+        drawRect(guiGraphics, layout.rect(0, 0, 480, 20),
                 FastColor.ARGB32.color(100, 160, 160, 160), 0);
         renderCardPanel(guiGraphics);
 
@@ -235,7 +235,7 @@ public class ChipConfigScreen extends Screen {
     }
 
     private void renderCardPanel(GuiGraphics guiGraphics) {
-        LayoutRect borderRect = layout.rect(95, 20, 375, 242);
+        LayoutRect borderRect = layout.rect(105, 20, 375, 242);
         drawRect(guiGraphics, borderRect, FastColor.ARGB32.color(180, 200, 200, 200), -42);
         drawRect(guiGraphics, layout.cardPanelRect(), FastColor.ARGB32.color(110, 30, 30, 30), -41);
         drawRect(guiGraphics, layout.detailPanelRect(), FastColor.ARGB32.color(150, 18, 18, 18), -40);
@@ -412,7 +412,7 @@ public class ChipConfigScreen extends Screen {
             int count = counts.getOrDefault(type, 0);
             if (count <= 0) continue;
 
-            float iconX = layout.designX(10 + visibleIndex * 16);
+            float iconX = layout.designX(2 + visibleIndex * 20);
             float iconY = layout.designY(summaryY);
             float scale = layout.scale();
             GuiUtil.drawTextureWithSize(type.getSmallCrystalIcon(), guiGraphics,
@@ -421,7 +421,7 @@ public class ChipConfigScreen extends Screen {
 
             PoseStack pose = guiGraphics.pose();
             pose.pushPose();
-            pose.translate(layout.designX(19 + visibleIndex * 16), layout.designY(summaryY + 1), 1);
+            pose.translate(layout.designX(11 + visibleIndex * 20), layout.designY(summaryY + 1), 1);
             pose.scale(scale, scale, 1);
             guiGraphics.drawString(minecraft.font, Component.literal(Integer.toString(count)), 0, 0, 0xFFFFFFFF, false);
             pose.popPose();
@@ -486,7 +486,7 @@ public class ChipConfigScreen extends Screen {
         }
 
         LayoutRect slotRect(int index) {
-            return rect(10, 60 + index * 21, 85, 18);
+            return rect(0, 60 + index * 21, 105, 18);
         }
 
         LayoutRect cardRect(int index, double scrollY) {
@@ -496,11 +496,11 @@ public class ChipConfigScreen extends Screen {
         }
 
         LayoutRect cardPanelRect() {
-            return rect(98, 22, 253, 238);
+            return rect(108, 22, 237, 238);
         }
 
         LayoutRect detailPanelRect() {
-            return rect(359, 22, 108, 238);
+            return rect(351, 22, 116, 238);
         }
     }
 

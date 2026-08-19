@@ -73,20 +73,23 @@ public class EquippedChipWidget extends AbstractWidget {
                 GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), getWidth(), getHeight(),
                         FastColor.ARGB32.color(150, 0, 0, 0), 1);
                 GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getSmallCrystalIcon(), guiGraphics,
-                        getX() + 10 * scale, getY() + 5 * scale, 8 * scale, 8 * scale,
+                        getX() + 4 * scale, getY() + 5 * scale, 8 * scale, 8 * scale,
                         2, 2, 4, 4, 8, 8, 2);
                 GuiUtil.drawTextureWithSize(chipInstance.getChip().getType().getCardFace(), guiGraphics,
-                        getX() + 37 * scale, getY() - 27 * scale, 48 * scale, 78 * scale,
+                        getX() + 57 * scale, getY() - 27 * scale, 48 * scale, 78 * scale,
                         8, 1, 24, 39, 40, 40, 2);
                 GuiUtil.drawTextureWithSize(chipInstance.getChip().getTexture(), guiGraphics,
-                        getX() + 45 * scale, getY() - 9 * scale, 32 * scale, 32 * scale, 2);
+                        getX() + 65 * scale, getY() - 9 * scale, 32 * scale, 32 * scale, 2);
 
                 Component displayName = chipInstance.getChip().getDisplayName();
                 Font font = Minecraft.getInstance().font;
+                float nameScale = scale * 0.68F;
+                int maxNameWidth = Math.max(1, (int) (41 * scale / nameScale));
+                String fittedName = font.plainSubstrByWidth(displayName.getString(), maxNameWidth);
                 pose.pushPose();
-                pose.translate(getX() + 22 * scale, getY() + 5 * scale, 2);
-                pose.scale(scale * 0.72F, scale * 0.72F, 1);
-                guiGraphics.drawString(font, displayName, 0, 0, 0xFFFFFF);
+                pose.translate(getX() + 14 * scale, getY() + 5 * scale, 2);
+                pose.scale(nameScale, nameScale, 1);
+                guiGraphics.drawString(font, fittedName, 0, 0, 0xFFFFFF);
                 pose.popPose();
             } finally {
                 guiGraphics.disableScissor();
@@ -126,7 +129,7 @@ public class EquippedChipWidget extends AbstractWidget {
             return;
         }
         draggingSlot = true;
-        setX((int) Math.round(mouseX - 42 * scale));
+        setX((int) Math.round(mouseX - 52 * scale));
         setY((int) Math.round(mouseY - 7 * scale));
     }
 

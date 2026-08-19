@@ -79,7 +79,7 @@ public class ChipWidget extends AbstractWidget {
         Component displayName = chipInstance.getChip().getDisplayName();
         int stringWidth = minecraft.font.width(displayName);
         float nameScale = scale * 0.8F;
-        pose.translate(getX() + 32 * scale - stringWidth * nameScale / 2, getY() + 2 * scale + 2, 0);
+        pose.translate(getX() + 20 * scale - stringWidth * nameScale / 2, getY() + 2 * scale + 2, 0);
         pose.scale(nameScale, nameScale, 1);
         guiGraphics.drawString(minecraft.font, displayName, 0, 0, nameColor);
         pose.popPose();
