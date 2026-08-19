@@ -28,6 +28,10 @@ public class ChipWidget extends AbstractWidget {
     public boolean unlocked;
     public boolean renderHoverDesc = true;
 
+    private double pressX;
+    private double pressY;
+    private boolean draggingCard;
+
     public ChipWidget(ChipInstance<?> chipInstance, ChipConfigScreen parent, ChipConfigScreen.LayoutMetrics layout) {
         super(0, 0, Math.round(48 * layout.cardScale()), Math.round(78 * layout.cardScale()), Component.empty());
         this.chipInstance = chipInstance;
@@ -42,7 +46,7 @@ public class ChipWidget extends AbstractWidget {
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
         RenderSystem.enableDepthTest();
-        if (isFocused()) {
+        if (draggingCard) {
             pose.translate(0, 0, 60);
         }
 
@@ -96,7 +100,7 @@ public class ChipWidget extends AbstractWidget {
     }
 
     public void renderHoverTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!renderHoverDesc || !isHovered || parent.isDragging()) return;
+        if (!renderHoverDesc || !isHovered || parent.isDragging() || parent.isSelected(chipInstance)) return;
 
         Minecraft minecraft = Minecraft.getInstance();
         if (!unlocked) {
@@ -121,23 +125,40 @@ public class ChipWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!unlocked) {
+        if (!unlocked || button != 0 || !isMouseOver(mouseX, mouseY)) {
             return false;
         }
+        pressX = mouseX;
+        pressY = mouseY;
+        draggingCard = false;
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         super.onDrag(mouseX, mouseY, dragX, dragY);
+        double threshold = Math.max(3, Math.round(4 * layout.scale()));
+        double deltaX = mouseX - pressX;
+        double deltaY = mouseY - pressY;
+        if (!draggingCard && deltaX * deltaX + deltaY * deltaY < threshold * threshold) {
+            return;
+        }
+        draggingCard = true;
         setX((int) Math.round(mouseX - 24 * scale));
         setY((int) Math.round(mouseY - 41 * scale));
     }
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
-        setFocused(false);
+        if (!draggingCard) {
+            parent.selectChip(chipInstance);
+            setFocused(false);
+            return;
+        }
+
         int targetSlot = parent.slotAt(mouseX, mouseY);
+        draggingCard = false;
+        setFocused(false);
         if (targetSlot == -1) return;
 
         for (EquippedChipWidget equippedChipWidget : parent.equippedChipWidgets) {
@@ -147,5 +168,13 @@ public class ChipWidget extends AbstractWidget {
             }
         }
         parent.setSlotChip(chipInstance, targetSlot);
+    }
+
+    public boolean isDraggingCard() {
+        return draggingCard;
+    }
+
+    public ChipInstance<?> getChipInstance() {
+        return chipInstance;
     }
 }

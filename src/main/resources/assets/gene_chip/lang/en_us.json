@@ -203,6 +203,9 @@
   "gene_chip.filter.all": "All",
   "gene_chip.filter.unlocked": "Unlocked",
   "gene_chip.filter.type.all": "All Types",
+  "gene_chip.details.hint": "Click an unlocked chip to view its effects",
+  "gene_chip.details.level": "Level: %s",
+  "gene_chip.details.exp": "EXP: %s",
 
   "gene_chip.chip_type.combat": "Combat",
   "gene_chip.chip_type.mutation": "Mutation",

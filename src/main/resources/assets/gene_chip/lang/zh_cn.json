@@ -203,6 +203,9 @@
   "gene_chip.filter.all": "全部",
   "gene_chip.filter.unlocked": "已解锁",
   "gene_chip.filter.type.all": "全类型",
+  "gene_chip.details.hint": "点击一张已解锁卡牌查看效果",
+  "gene_chip.details.level": "等级：%s",
+  "gene_chip.details.exp": "经验：%s",
 
   "gene_chip.chip_type.combat": "战斗",
   "gene_chip.chip_type.mutation": "变异",
