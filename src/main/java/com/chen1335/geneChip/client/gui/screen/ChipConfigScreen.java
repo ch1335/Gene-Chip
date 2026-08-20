@@ -13,8 +13,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.netty.util.collection.IntObjectMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -62,6 +65,7 @@ public class ChipConfigScreen extends Screen {
     private EditBox searchBox;
     private DropdownButton<Boolean> unlockedDropdown;
     private DropdownButton<ChipType> typeDropdown;
+    private DetailActionButton equipButton;
     private ChipInstance<?> selectedChip;
 
     public ChipConfigScreen() {
@@ -78,13 +82,17 @@ public class ChipConfigScreen extends Screen {
         hoveredSlot = -1;
 
         setupFilterBar();
+        setupEquipButton();
         rebuildChipWidgets();
 
-        getSlots().values().forEach(chipSlot -> {
-            EquippedChipWidget equippedChipWidget = new EquippedChipWidget(chipSlot, chipSlot.index(), this, layout);
+        IntObjectMap<ChipSlot> slots = getSlots();
+        for (int index = 0; index < slots.size(); index++) {
+            ChipSlot chipSlot = slots.get(index);
+            if (chipSlot == null) continue;
+            EquippedChipWidget equippedChipWidget = new EquippedChipWidget(chipSlot, index, this, layout);
             addWidget(equippedChipWidget);
             equippedChipWidgets.add(equippedChipWidget);
-        });
+        }
         availableChips.clear();
         availableChips.putAll(GeneChipClient.getPlayerChipData().getChipInfos().getChips());
         clampScrollY();
@@ -93,7 +101,7 @@ public class ChipConfigScreen extends Screen {
     private void setupFilterBar() {
         LayoutRect searchRect = layout.rect(115, FILTER_Y, 80, FILTER_HEIGHT);
         searchBox = new EditBox(Minecraft.getInstance().font,
-                searchRect.left(), searchRect.top(), searchRect.width(), searchRect.height(),
+                searchRect.left(    ), searchRect.top(), searchRect.width(), searchRect.height(),
                 Component.translatable("gene_chip.filter.search_hint"));
         searchBox.setHint(Component.translatable("gene_chip.filter.search_hint"));
         searchBox.setValue(chipFilter.getSearchText());
@@ -132,6 +140,15 @@ public class ChipConfigScreen extends Screen {
                     rebuildChipWidgets();
                 });
         addWidget(typeDropdown);
+    }
+
+    private void setupEquipButton() {
+        LayoutRect rect = layout.equipButtonRect();
+        equipButton = new DetailActionButton(rect, layout.scale(), this::equipSelectedChip,
+                Component.translatable("gene_chip.details.equip"));
+        equipButton.visible = selectedChip != null;
+        equipButton.active = selectedChip != null;
+        addWidget(equipButton);
     }
 
     public void rebuildChipWidgets() {
@@ -203,6 +220,10 @@ public class ChipConfigScreen extends Screen {
         }
         renderScrollBar(guiGraphics, mouseX, mouseY);
         renderSelectedChipDetails(guiGraphics);
+        if (equipButton != null) {
+            updateEquipButtonState();
+            equipButton.render(guiGraphics, mouseX, mouseY, partialTick);
+        }
         if (viewport.contains(mouseX, mouseY)) {
             for (ChipWidget chipWidget : chipWidgets) {
                 chipWidget.renderHoverTooltip(guiGraphics, mouseX, mouseY);
@@ -355,7 +376,7 @@ public class ChipConfigScreen extends Screen {
         Component levelText = Component.translatable("gene_chip.details.level", selectedChip.getLvl());
         Component expText = Component.translatable("gene_chip.details.exp", selectedChip.getExp());
         pose.pushPose();
-        pose.translate(contentLeft, panel.bottom() - 23 * scale, 8);
+        pose.translate(contentLeft, layout.equipButtonRect().top() - 23 * scale, 8);
         pose.scale(scale * 0.72F, scale * 0.72F, 1);
         guiGraphics.drawString(minecraft.font, levelText, 0, 0, 0xFFFFFF55, false);
         guiGraphics.drawString(minecraft.font, expText, 0, 11, 0xFFAAAAAA, false);
@@ -381,6 +402,54 @@ public class ChipConfigScreen extends Screen {
 
     public void selectChip(ChipInstance<?> chipInstance) {
         this.selectedChip = chipInstance;
+        updateEquipButtonState();
+    }
+
+    private void updateEquipButtonState() {
+        if (equipButton == null) return;
+        equipButton.visible = selectedChip != null;
+        if (selectedChip == null) {
+            equipButton.active = false;
+            return;
+        }
+
+        boolean equipped = false;
+        boolean hasEmptySlot = false;
+        IntObjectMap<ChipSlot> slots = getSlots();
+        for (int index = 0; index < slots.size(); index++) {
+            ChipSlot slot = slots.get(index);
+            if (slot == null) continue;
+            Optional<ChipInstance<?>> instance = slot.instance();
+            if (instance.isPresent() && instance.get().getChip() == selectedChip.getChip()) {
+                equipped = true;
+                break;
+            }
+            hasEmptySlot |= slot.isEmpty();
+        }
+
+        if (equipped) {
+            equipButton.setMessage(Component.translatable("gene_chip.details.equipped"));
+            equipButton.active = false;
+        } else if (!hasEmptySlot) {
+            equipButton.setMessage(Component.translatable("gene_chip.details.no_slot"));
+            equipButton.active = false;
+        } else {
+            equipButton.setMessage(Component.translatable("gene_chip.details.equip"));
+            equipButton.active = true;
+        }
+    }
+
+    private void equipSelectedChip() {
+        if (selectedChip == null) return;
+        IntObjectMap<ChipSlot> slots = getSlots();
+        for (int index = 0; index < slots.size(); index++) {
+            ChipSlot slot = slots.get(index);
+            if (slot != null && slot.isEmpty()) {
+                setSlotChip(selectedChip, index);
+                updateEquipButtonState();
+                return;
+            }
+        }
     }
 
     public boolean isSelected(ChipInstance<?> chipInstance) {
@@ -622,6 +691,57 @@ public class ChipConfigScreen extends Screen {
 
         LayoutRect detailPanelRect() {
             return rect(351, 20, 129, 250);
+        }
+
+        LayoutRect equipButtonRect() {
+            return rect(358, 248, 115, 16);
+        }
+    }
+
+    private static final class DetailActionButton extends AbstractWidget {
+        private final Runnable onPress;
+        private final int borderWidth;
+
+        DetailActionButton(LayoutRect rect, float uiScale, Runnable onPress, Component message) {
+            super(rect.left(), rect.top(), rect.width(), rect.height(), message);
+            this.onPress = onPress;
+            this.borderWidth = Math.max(1, Math.round(uiScale));
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (button != 0 || !this.active || !this.visible || !this.isMouseOver(mouseX, mouseY)) {
+                return false;
+            }
+            playDownSound(Minecraft.getInstance().getSoundManager());
+            onPress.run();
+            return true;
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            int borderColor = active ? 0xFFA0A0A0 : 0xFF707070;
+            int fillColor = !active ? 0xFF353535 : isHovered ? 0xFF595959 : 0xFF2E2E2E;
+            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), width, height, fillColor, 9);
+            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), width, borderWidth, borderColor, 10);
+            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY() + height - borderWidth,
+                    width, borderWidth, borderColor, 10);
+            GuiUtil.drawColorWithSize(guiGraphics, getX(), getY(), borderWidth, height, borderColor, 10);
+            GuiUtil.drawColorWithSize(guiGraphics, getX() + width - borderWidth, getY(),
+                    borderWidth, height, borderColor, 10);
+
+            Font font = Minecraft.getInstance().font;
+            int textX = getX() + (width - font.width(getMessage())) / 2;
+            int textY = getY() + (height - font.lineHeight) / 2 + 1;
+            PoseStack pose = guiGraphics.pose();
+            pose.pushPose();
+            pose.translate(0,0,10);
+            guiGraphics.drawString(font, getMessage(), textX, textY, active ? 0xFFFFFFFF : 0xFF999999, false);
+            pose.popPose();
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         }
     }
 

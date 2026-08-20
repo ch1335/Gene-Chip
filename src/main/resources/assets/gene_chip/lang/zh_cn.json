@@ -206,6 +206,9 @@
   "gene_chip.details.hint": "点击一张已解锁卡牌查看效果",
   "gene_chip.details.level": "等级：%s",
   "gene_chip.details.exp": "经验：%s",
+  "gene_chip.details.equip": "装备",
+  "gene_chip.details.equipped": "已装备",
+  "gene_chip.details.no_slot": "槽位不足",
 
   "gene_chip.chip_type.combat": "战斗",
   "gene_chip.chip_type.mutation": "变异",

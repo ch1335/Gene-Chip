@@ -206,6 +206,9 @@
   "gene_chip.details.hint": "Click an unlocked chip to view its effects",
   "gene_chip.details.level": "Level: %s",
   "gene_chip.details.exp": "EXP: %s",
+  "gene_chip.details.equip": "Equip",
+  "gene_chip.details.equipped": "Equipped",
+  "gene_chip.details.no_slot": "Slots Full",
 
   "gene_chip.chip_type.combat": "Combat",
   "gene_chip.chip_type.mutation": "Mutation",
