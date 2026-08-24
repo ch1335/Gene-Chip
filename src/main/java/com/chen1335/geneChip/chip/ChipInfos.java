@@ -60,6 +60,7 @@ public class ChipInfos implements INBTSerializable<CompoundTag> {
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        this.chips.clear();
         ListTag chips = tag.getList("chips", Tag.TAG_COMPOUND);
         for (Tag chip : chips) {
             CompoundTag compoundTag = (CompoundTag) chip;

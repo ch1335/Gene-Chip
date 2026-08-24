@@ -148,7 +148,10 @@
   "gene_chip.chip.hunter_instinct.desc.detailed": "When marking an entity, consume %s hunger to make it glow and take +%s increased damage for %s seconds. Cooldown %s seconds",
 
   "gene_chip.config": "Gene Chip Config",
-  "gene_chip.config.card": "Card Config",
+  "gene_chip.config.gameplay": "Global Gameplay",
+  "gene_chip.config.card": "Chip Parameters",
+  "gene_chip.config.max_level": "Maximum Chip Level",
+  "gene_chip.config.required_experience": "Experience Requirement Formula",
 
   "gene_chip.config_value.burn_duration": "Burn Duration",
   "gene_chip.config_value.climb_speed": "Climb Speed",
@@ -206,6 +209,8 @@
   "gene_chip.details.hint": "Click an unlocked chip to view its effects",
   "gene_chip.details.level": "Level: %s",
   "gene_chip.details.exp": "EXP: %s",
+  "gene_chip.details.exp_progress": "EXP: %s / %s",
+  "gene_chip.details.max": "MAX",
   "gene_chip.details.equip": "Equip",
   "gene_chip.details.equipped": "Equipped",
   "gene_chip.details.no_slot": "Slots Full",
@@ -221,6 +226,8 @@
   "gene_chip.command.remove.success": "Removed chip %s from %s",
   "gene_chip.command.remove.not_owned": "%s does not own the chip %s",
   "gene_chip.command.chip_not_found": "Chip %s not found",
+  "gene_chip.command.add_exp.not_owned": "Does not own chip %s",
+  "gene_chip.command.add_exp.success": "Added %s experience to %s's chip %s (level %s, experience %s)",
   "gene_chip.command.remove_all.success": "Removed %s chips from %s",
 
   "gene_chip.chip.locked": "Locked",

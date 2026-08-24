@@ -3,10 +3,12 @@ package com.chen1335.geneChip.client.gui.screen;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
+import com.chen1335.geneChip.chip.ChipProgression;
 import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.client.gui.GuiUtil;
+import com.chen1335.geneChip.config.GameplayConfig;
 import com.chen1335.geneChip.network.SetSlotChipPacket;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -395,13 +397,38 @@ public class ChipConfigScreen extends Screen {
         drawWrappedText(guiGraphics, chip.detailDesc(selectedChip.getLvl()),
                 contentLeft, y, contentWidth, textScale, 0xFFFFFFFF);
 
-        Component levelText = Component.translatable("gene_chip.details.level", selectedChip.getLvl());
-        Component expText = Component.translatable("gene_chip.details.exp", selectedChip.getExp());
+        renderExperienceFooter(guiGraphics, panel, selectedChip);
+    }
+
+    private void renderExperienceFooter(GuiGraphics guiGraphics, LayoutRect panel, ChipInstance<?> instance) {
+        float scale = layout.scale();
+        LayoutRect bar = layout.experienceBarRect();
+        int required = instance.getLvl() >= GameplayConfig.getMaxLevel() ? 0 : ChipProgression.requiredExperience(instance.getLvl());
+        float progress = required == 0 ? 1.0F : Math.min(1.0F, instance.getExp() / (float) required);
+
+        GuiUtil.drawColorWithSize(guiGraphics, bar.left(), bar.top(), bar.width(), bar.height(), 0xFFA0A0A0, 8);
+        GuiUtil.drawColorWithSize(guiGraphics, bar.left() + 1, bar.top() + 1,
+                bar.width() - 2, bar.height() - 2, 0xFF242424, 9);
+        int fillWidth = Math.round((bar.width() - 2) * progress);
+        if (fillWidth > 0) {
+            GuiUtil.drawColorWithSize(guiGraphics, bar.left() + 1, bar.top() + 1,
+                    fillWidth, bar.height() - 2, 0xFF4D9CFF, 10);
+        }
+
+        Component levelText = Component.translatable("gene_chip.details.level", instance.getLvl());
+        Component expText = required == 0
+                ? Component.translatable("gene_chip.details.max")
+                : Component.translatable("gene_chip.details.exp_progress", instance.getExp(), required);
+        PoseStack pose = guiGraphics.pose();
         pose.pushPose();
-        pose.translate(contentLeft, layout.equipButtonRect().top() - 23 * scale, 8);
+        pose.translate(panel.left() + 5 * scale, bar.top() - 12 * scale, 11);
         pose.scale(scale * 0.72F, scale * 0.72F, 1);
-        guiGraphics.drawString(minecraft.font, levelText, 0, 0, 0xFFFFFF55, false);
-        guiGraphics.drawString(minecraft.font, expText, 0, 11, 0xFFAAAAAA, false);
+        guiGraphics.drawString(Minecraft.getInstance().font, levelText, 0, 0, 0xFFFFFF55, false);
+        pose.popPose();
+        pose.pushPose();
+        pose.translate(bar.left(), bar.bottom() + 2 * scale, 11);
+        pose.scale(scale * 0.65F, scale * 0.65F, 1);
+        guiGraphics.drawString(Minecraft.getInstance().font, expText, 0, 0, 0xFFCCCCCC, false);
         pose.popPose();
     }
 
@@ -717,6 +744,10 @@ public class ChipConfigScreen extends Screen {
 
         LayoutRect detailPanelRect() {
             return rect(351, 20, 129, 250);
+        }
+
+        LayoutRect experienceBarRect() {
+            return rect(358, 226, 115, 8);
         }
 
         LayoutRect equipButtonRect() {

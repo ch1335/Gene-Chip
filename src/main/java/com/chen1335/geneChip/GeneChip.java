@@ -4,6 +4,7 @@ import com.chen1335.geneChip.API.object.*;
 import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
 import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.config.ClothConfig;
+import com.chen1335.geneChip.config.GameplayConfig;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -26,6 +27,7 @@ public class GeneChip {
     public static final ScriptEngine JS_ENGINE = new ScriptEngineManager().getEngineByName("javascript");
 
     public static final Path CHIP_CONFIG = FMLPaths.CONFIGDIR.get().resolve("gene_chip").resolve("chip_config.json");
+    public static final Path GAMEPLAY_CONFIG = FMLPaths.CONFIGDIR.get().resolve("gene_chip").resolve("gameplay_config.json");
 
     public GeneChip(IEventBus modEventBus, ModContainer modContainer) throws NoSuchFieldException, IllegalAccessException {
         GCAttachmentTypes.ATTACHMENT_TYPES.register(modEventBus);
@@ -40,6 +42,7 @@ public class GeneChip {
     }
 
     public void FMLCommonSetupEvent(FMLCommonSetupEvent setupEvent) {
+        GameplayConfig.load();
         ChipConfig.load();
     }
 

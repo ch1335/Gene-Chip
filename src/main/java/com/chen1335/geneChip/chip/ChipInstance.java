@@ -17,7 +17,7 @@ public class ChipInstance<T extends Chip> implements INBTSerializable<CompoundTa
     public static final StreamCodec<RegistryFriendlyByteBuf, ChipInstance<?>> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.registry(RegisterTypes.CHIP_KEY),
             ChipInstance::getChip,
-            ByteBufCodecs.FLOAT,
+            ByteBufCodecs.INT,
             ChipInstance::getExp,
             ByteBufCodecs.INT,
             ChipInstance::getLvl,
@@ -26,17 +26,17 @@ public class ChipInstance<T extends Chip> implements INBTSerializable<CompoundTa
 
     private T chip;
 
-    private float exp;
+    private int exp;
 
     private int lvl;
 
-    public ChipInstance(T chip, float exp, int lvl) {
+    public ChipInstance(T chip, int exp, int lvl) {
         this.chip = chip;
-        this.exp = exp;
-        this.lvl = lvl;
+        this.exp = Math.max(0, exp);
+        this.lvl = Math.max(1, lvl);
     }
 
-    public ChipInstance(T chip, float exp) {
+    public ChipInstance(T chip, int exp) {
         this(chip, exp, 1);
     }
 
@@ -48,8 +48,13 @@ public class ChipInstance<T extends Chip> implements INBTSerializable<CompoundTa
         return chip;
     }
 
-    public float getExp() {
+    public int getExp() {
         return exp;
+    }
+
+    void setProgress(int lvl, int exp) {
+        this.lvl = Math.max(1, lvl);
+        this.exp = Math.max(0, exp);
     }
 
     @Nullable
@@ -61,15 +66,20 @@ public class ChipInstance<T extends Chip> implements INBTSerializable<CompoundTa
         if (chip == null) {
             return null;
         }
-        float exp = tag.getFloat("exp");
-        return new ChipInstance<>(chip, exp);
+        int exp = tag.contains("exp") ? (int) Math.max(0, tag.getDouble("exp")) : 0;
+        int lvl = tag.contains("lvl") ? Math.max(1, tag.getInt("lvl")) : 1;
+        ChipInstance<?> instance = new ChipInstance<>(chip, exp, lvl);
+        ChipProgression.normalize(instance);
+        return instance;
     }
 
     @Override
     public @UnknownNullability CompoundTag serializeNBT(HolderLookup.@NotNull Provider provider) {
         CompoundTag tag = new CompoundTag();
         RegisterTypes.CHIP.getResourceKey(chip).ifPresent(resourceKey -> tag.putString("chip", resourceKey.location().toString()));
-        tag.putFloat("exp", exp);
+        tag.putInt("data_version", 1);
+        tag.putInt("exp", exp);
+        tag.putInt("lvl", lvl);
         return tag;
     }
 
@@ -78,6 +88,8 @@ public class ChipInstance<T extends Chip> implements INBTSerializable<CompoundTa
         if (tag.contains("chip")) {
             chip = Cast.cast(RegisterTypes.CHIP.get(ResourceLocation.tryParse(tag.getString("chip"))));
         }
-        exp = tag.getFloat("exp");
+        exp = tag.contains("exp") ? (int) Math.max(0, tag.getDouble("exp")) : 0;
+        lvl = tag.contains("lvl") ? Math.max(1, tag.getInt("lvl")) : 1;
+        ChipProgression.normalize(this);
     }
 }

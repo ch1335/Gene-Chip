@@ -68,6 +68,14 @@ public class PlayerChipData implements INBTSerializable<CompoundTag> {
         }
     }
 
+    public boolean addChipExperience(ServerPlayer player, Chip chip, int amount) {
+        ChipInstance<?> instance = chipInfos.getChips().getOrDefault(chip.getType(), Map.of()).get(chip);
+        if (instance == null || amount <= 0) return false;
+        ChipProgression.addExperience(instance, amount);
+        syncToClient(player);
+        return true;
+    }
+
     public void syncToClient(ServerPlayer serverPlayer) {
         Map<String, List<ChipTypeSlot>> map = new HashMap<>();
         slotInfos.slotsByName.forEach((name, slots) -> {

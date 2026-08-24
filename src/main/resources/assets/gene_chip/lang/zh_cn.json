@@ -1,6 +1,9 @@
 {
   "gene_chip.config": "基因芯片配置",
-  "gene_chip.config.card": "卡牌配置",
+  "gene_chip.config.gameplay": "游戏全局配置",
+  "gene_chip.config.card": "芯片参数配置",
+  "gene_chip.config.max_level": "最高芯片等级",
+  "gene_chip.config.required_experience": "每级升级所需经验公式",
 
   "gene_chip.chip.head_shot_hunter.name": "爆头猎手",
   "gene_chip.chip.head_shot_hunter.desc": "强化剂精准作用于视觉神经与反射弧，使你更擅长捕捉敌人弱点",
@@ -204,8 +207,10 @@
   "gene_chip.filter.unlocked": "已解锁",
   "gene_chip.filter.type.all": "全类型",
   "gene_chip.details.hint": "点击一张已解锁卡牌查看效果",
-  "gene_chip.details.level": "等级：%s",
-  "gene_chip.details.exp": "经验：%s",
+  "gene_chip.details.level": "等级: %s",
+  "gene_chip.details.exp": "经验: %s",
+  "gene_chip.details.exp_progress": "经验: %s / %s",
+  "gene_chip.details.max": "MAX",
   "gene_chip.details.equip": "装备",
   "gene_chip.details.equipped": "已装备",
   "gene_chip.details.no_slot": "槽位不足",
@@ -221,6 +226,8 @@
   "gene_chip.command.remove.success": "已移除 %s 的卡牌 %s",
   "gene_chip.command.remove.not_owned": "%s 未拥有卡牌 %s",
   "gene_chip.command.chip_not_found": "未找到卡牌 %s",
+  "gene_chip.command.add_exp.not_owned": "目标玩家未拥有卡牌 %s",
+  "gene_chip.command.add_exp.success": "已为 %s 的卡牌 %s 增加 %s 点经验（当前等级: %s，当前经验: %s）",
   "gene_chip.command.remove_all.success": "已移除 %s 的 %s 张卡牌",
 
   "gene_chip.chip.locked": "未解锁",

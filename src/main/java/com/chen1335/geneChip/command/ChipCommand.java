@@ -5,6 +5,7 @@ import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
+import com.chen1335.geneChip.config.GameplayConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -27,9 +28,18 @@ public class ChipCommand {
                         .then(Commands.literal("give")
                                 .then(Commands.argument("target", EntityArgument.player())
                                         .then(Commands.argument("chip", ResourceKeyArgument.key(RegisterTypes.CHIP_KEY))
-                                                .executes(ctx -> give(ctx, 0))
-                                                .then(Commands.argument("level", IntegerArgumentType.integer(0))
+                                                .executes(ctx -> give(ctx, 1))
+                                                .then(Commands.argument("level", IntegerArgumentType.integer(1))
                                                         .executes(ctx -> give(ctx, IntegerArgumentType.getInteger(ctx, "level")))
+                                                )
+                                        )
+                                )
+                        )
+                        .then(Commands.literal("add_exp")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .then(Commands.argument("chip", ResourceKeyArgument.key(RegisterTypes.CHIP_KEY))
+                                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                                        .executes(ChipCommand::addExperience)
                                                 )
                                         )
                                 )
@@ -64,12 +74,32 @@ public class ChipCommand {
         ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
         Chip chip = resolveChip(ctx);
         if (chip == null) return 0;
+        if (level > GameplayConfig.getMaxLevel()) {
+            ctx.getSource().sendFailure(Component.translatable("gene_chip.command.level_too_high", GameplayConfig.getMaxLevel()));
+            return 0;
+        }
         PlayerChipData data = target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-        data.addNewChip(target, new ChipInstance<>(chip, level));
+        data.addNewChip(target, new ChipInstance<>(chip, 0, level));
 
         Component name = chip.getDisplayName();
         ctx.getSource().sendSuccess(() ->
                 Component.translatable("gene_chip.command.give.success", target.getDisplayName(), name, level), true);
+        return 1;
+    }
+
+    private static int addExperience(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+        Chip chip = resolveChip(ctx);
+        if (chip == null) return 0;
+        int amount = IntegerArgumentType.getInteger(ctx, "amount");
+        if (!target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA).addChipExperience(target, chip, amount)) {
+            ctx.getSource().sendFailure(Component.translatable("gene_chip.command.add_exp.not_owned", chip.getDisplayName()));
+            return 0;
+        }
+        ChipInstance<?> instance = target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA)
+                .getChipInfos().getChips().get(chip.getType()).get(chip);
+        ctx.getSource().sendSuccess(() -> Component.translatable("gene_chip.command.add_exp.success",
+                target.getDisplayName(), chip.getDisplayName(), amount, instance.getLvl(), instance.getExp()), true);
         return 1;
     }
 

@@ -90,6 +90,10 @@ public class GeneChipAPI {
         return data.getCoolDownInfos().isCoolDown(chip);
     }
 
+    public static boolean addChipExperience(ServerPlayer player, Chip chip, int amount) {
+        return player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA).addChipExperience(player, chip, amount);
+    }
+
     /**
      * 设置指定槽位的芯片，自动处理旧芯片卸下和新芯片装备回调，重新烘焙 currentSlots
      */

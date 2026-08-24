@@ -4,6 +4,7 @@ import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -19,13 +20,29 @@ public class ClothConfig {
 
             configBuilder.setTitle(Component.translatable("gene_chip.config"));
             configBuilder.setParentScreen(parent);
+            ConfigCategory gameplayConfig = configBuilder.getOrCreateCategory(Component.translatable("gene_chip.config.gameplay"));
             ConfigCategory cardConfig = configBuilder.getOrCreateCategory(Component.translatable("gene_chip.config.card"));
+            ConfigEntryBuilder entryBuilder = configBuilder.entryBuilder();
+
+            gameplayConfig.addEntry(entryBuilder.startIntField(Component.translatable("gene_chip.config.max_level"), GameplayConfig.getMaxLevel())
+                    .setDefaultValue(10)
+                    .setMin(1)
+                    .setMax(1000)
+                    .setSaveConsumer(value -> GameplayConfig.setMaxLevel(value))
+                    .build());
+            gameplayConfig.addEntry(entryBuilder.startStrField(Component.translatable("gene_chip.config.required_experience"), GameplayConfig.getRequiredExperienceFormula())
+                    .setDefaultValue("100 * lvl")
+                    .setSaveConsumer(GameplayConfig::setRequiredExperienceFormula)
+                    .build());
 
             for (Map.Entry<ResourceKey<Chip>, Chip> entry : RegisterTypes.CHIP.entrySet()) {
                 entry.getValue().buildClothConfig(entry.getKey().location(), configBuilder, cardConfig);
             }
 
-            configBuilder.setSavingRunnable(ChipConfig::save);
+            configBuilder.setSavingRunnable(() -> {
+                GameplayConfig.save();
+                ChipConfig.save();
+            });
             return configBuilder.build();
         });
 
