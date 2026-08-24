@@ -209,6 +209,7 @@
   "gene_chip.details.equip": "Equip",
   "gene_chip.details.equipped": "Equipped",
   "gene_chip.details.no_slot": "Slots Full",
+  "gene_chip.details.equipped_cards": "Equipped Chips",
 
   "gene_chip.chip_type.combat": "Combat",
   "gene_chip.chip_type.mutation": "Mutation",

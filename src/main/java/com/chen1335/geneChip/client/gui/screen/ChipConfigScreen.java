@@ -293,10 +293,32 @@ public class ChipConfigScreen extends Screen {
                 FastColor.ARGB32.color(100, 160, 160, 160), 0);
         renderCardPanel(guiGraphics);
 
+        renderEquippedCardsTitle(guiGraphics);
         hoveredSlot = slotAt(mouseX, mouseY);
         for (int index = 0; index < getSlots().size(); index++) {
             drawRect(guiGraphics, layout.slotRect(index), FastColor.ARGB32.color(150, 0, 0, 0), 1);
         }
+    }
+
+    private void renderEquippedCardsTitle(GuiGraphics guiGraphics) {
+        LayoutRect titleRect = layout.equippedCardsTitleRect();
+        drawBorderedRect(guiGraphics, titleRect,
+                FastColor.ARGB32.color(180, 200, 200, 200),
+                FastColor.ARGB32.color(100, 0, 0, 0), 1);
+
+        Font font = Minecraft.getInstance().font;
+        float textScale = layout.scale() * 0.65F;
+        String title = Component.translatable("gene_chip.details.equipped_cards").getString();
+        int textWidth = font.width(title);
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(
+                titleRect.left() + (titleRect.width() - textWidth * textScale) / 2.0F,
+                titleRect.top() + (titleRect.height() - font.lineHeight * textScale) / 2.0F,
+                2);
+        pose.scale(textScale, textScale, 1);
+        guiGraphics.drawString(font, title, 0, 0, 0xFFFFFFFF, false);
+        pose.popPose();
     }
 
     private void renderCardPanel(GuiGraphics guiGraphics) {
@@ -657,6 +679,10 @@ public class ChipConfigScreen extends Screen {
             int right = originX + Math.round((float) (x + width) * scale);
             int bottom = originY + Math.round((float) (y + height) * scale);
             return new LayoutRect(left, top, right, bottom);
+        }
+
+        LayoutRect equippedCardsTitleRect() {
+            return rect(0, 39, 105, 18);
         }
 
         LayoutRect slotRect(int index) {

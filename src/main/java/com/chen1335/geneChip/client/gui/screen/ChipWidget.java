@@ -87,14 +87,14 @@ public class ChipWidget extends AbstractWidget {
         Component desc = chipInstance.getChip().detailDesc(chipInstance.getLvl());
         List<FormattedCharSequence> split = minecraft.font.split(desc, 100);
         float descScale = scale / 2.5F;
-        for (int i = 0; i < split.size(); i++) {
-            pose.pushPose();
-            pose.translate(getX() + 4.5F * scale,
-                    getY() + (67 + 5.5F * i) * scale - split.size() * 2.5F * scale, 0);
-            pose.scale(descScale, descScale, 1);
-            guiGraphics.drawString(minecraft.font, split.get(i), 0, 0, descColor);
-            pose.popPose();
-        }
+//        for (int i = 0; i < split.size(); i++) {
+//            pose.pushPose();
+//            pose.translate(getX() + 4.5F * scale,
+//                    getY() + (67 + 5.5F * i) * scale - split.size() * 2.5F * scale, 0);
+//            pose.scale(descScale, descScale, 1);
+//            guiGraphics.drawString(minecraft.font, split.get(i), 0, 0, descColor);
+//            pose.popPose();
+//        }
 
         pose.popPose();
     }

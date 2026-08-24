@@ -209,6 +209,7 @@
   "gene_chip.details.equip": "装备",
   "gene_chip.details.equipped": "已装备",
   "gene_chip.details.no_slot": "槽位不足",
+  "gene_chip.details.equipped_cards": "已装备的卡牌",
 
   "gene_chip.chip_type.combat": "战斗",
   "gene_chip.chip_type.mutation": "变异",
