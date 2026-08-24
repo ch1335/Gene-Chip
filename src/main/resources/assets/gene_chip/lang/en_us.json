@@ -228,5 +228,6 @@
 
   "gene_chip.chip_select.title": "Chip Draw",
   "gene_chip.chip_select.hint": "Choose a chip",
+  "gene_chip.chip_select.effect_hint": "Hover over a candidate chip to view its effect",
   "item.gene_chip.gene_enhancer": "Gene Enhancer"
 }

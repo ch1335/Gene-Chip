@@ -228,5 +228,6 @@
 
   "gene_chip.chip_select.title": "抽卡",
   "gene_chip.chip_select.hint": "选择一张卡牌",
+  "gene_chip.chip_select.effect_hint": "将鼠标移到待选择卡牌上查看效果",
   "item.gene_chip.gene_enhancer": "基因强化剂"
 }

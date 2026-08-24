@@ -28,6 +28,9 @@ public class ChipSelectScreen extends Screen {
     private static final int CARD_W = (int) (48 * CARD_SCALE);
     private static final int CARD_H = (int) (78 * CARD_SCALE);
     private static final int SPREAD = CARD_W + 20;
+    private static final int EFFECT_PANEL_WIDTH = CARD_W + SPREAD * 2;
+    private static final int EFFECT_PANEL_HEIGHT = 53;
+    private static final int EFFECT_PANEL_GAP = 12;
 
     private static final ResourceLocation CARD_BACK =
             ResourceLocation.fromNamespaceAndPath("gene_chip", "textures/chip/card_back.png");
@@ -145,9 +148,46 @@ public class ChipSelectScreen extends Screen {
         pose.popPose();
 
         if (animationFinished() && !selected) {
-            Component hint = Component.translatable("gene_chip.chip_select.hint");
-            guiGraphics.drawCenteredString(mc.font, hint, this.width / 2, this.height - 20, 0xFFFFFFFF);
+            renderEffectPanel(guiGraphics);
         }
+    }
+
+    private void renderEffectPanel(GuiGraphics guiGraphics) {
+        Minecraft mc = Minecraft.getInstance();
+        int panelWidth = Math.min(EFFECT_PANEL_WIDTH, this.width - 16);
+        int panelX = (this.width - panelWidth) / 2;
+        int cardBottom = this.height / 2 + CARD_H / 2;
+        int panelY = Math.min(cardBottom + EFFECT_PANEL_GAP, this.height - EFFECT_PANEL_HEIGHT - 8);
+
+        GuiUtil.drawColorWithSize(guiGraphics, panelX, panelY, panelWidth, EFFECT_PANEL_HEIGHT,
+                0xFFD0D0D0, 40);
+        GuiUtil.drawColorWithSize(guiGraphics, panelX + 1, panelY + 1,
+                panelWidth - 2, EFFECT_PANEL_HEIGHT - 2, 0xE0282828, 41);
+
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(0, 0, 50);
+        if (hoveredIndex < 0) {
+            Component hint = Component.translatable("gene_chip.chip_select.effect_hint");
+            guiGraphics.drawCenteredString(mc.font, hint, this.width / 2,
+                    panelY + (EFFECT_PANEL_HEIGHT - mc.font.lineHeight) / 2, 0xFFB0B0B0);
+            pose.popPose();
+            return;
+        }
+
+        ChipInstance<?> hovered = candidates.get(hoveredIndex);
+        Component name = hovered.getChip().getDisplayName();
+        guiGraphics.drawCenteredString(mc.font, name, this.width / 2, panelY + 6, 0xFFFFFFFF);
+
+        Component effect = hovered.getChip().detailDesc(hovered.getLvl());
+        List<FormattedCharSequence> lines = mc.font.split(effect, panelWidth - 16);
+        int maxLines = Math.min(lines.size(), 3);
+        int textY = panelY + 20;
+        for (int index = 0; index < maxLines; index++) {
+            guiGraphics.drawCenteredString(mc.font, lines.get(index), this.width / 2,
+                    textY + index * (mc.font.lineHeight + 1), 0xFFDDDDDD);
+        }
+        pose.popPose();
     }
 
     private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, float scale, boolean hovered) {
@@ -190,16 +230,6 @@ public class ChipSelectScreen extends Screen {
             guiGraphics.drawString(mc.font, displayName, 0, 0, 0xFFFFFFFF, false);
             pose.popPose();
 
-            Component desc = instance.getChip().detailDesc(instance.getLvl());
-            List<FormattedCharSequence> split = mc.font.split(desc, (int) (60 * scale));
-            for (int i = 0; i < split.size(); i++) {
-                FormattedCharSequence line = split.get(i);
-                pose.pushPose();
-                pose.translate(x + 4.5 * scale, y + (67 + 5.5 * i) * scale - split.size() * 2.5 * scale, 0);
-                pose.scale(scale / 2.5F, scale / 2.5F, 1);
-                guiGraphics.drawString(mc.font, line, 0, 0, 0xFFFFFFFF, false);
-                pose.popPose();
-            }
         } else {
             GuiUtil.drawTextureWithSize(CARD_BACK, guiGraphics,
                     x, y, 48 * scale, 78 * scale, 0);
