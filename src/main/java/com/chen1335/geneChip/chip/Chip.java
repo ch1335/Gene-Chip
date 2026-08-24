@@ -96,6 +96,7 @@ public abstract class Chip {
                     .setDefaultValue(calculator.getDefaultCalculator())
                     .setSaveConsumer(strings -> {
                         calculator.restCalculator();
+                        calculator.cleanCapturedValue();
                         calculator.setCalculator(strings);
                     })
                     .build();
@@ -145,6 +146,9 @@ public abstract class Chip {
         return result;
     }
 
+    public Map<String, JsValueCalculator> getConfigs() {
+        return configValue;
+    }
     public ChipInstance<?> createInstance() {
         return new ChipInstance<>(this, 0, 1);
     }

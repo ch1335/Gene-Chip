@@ -225,7 +225,7 @@ public class ChipSelectScreen extends Screen {
             pose.pushPose();
             Component displayName = instance.getChip().getDisplayName();
             int stringWidth = mc.font.width(displayName);
-            pose.translate(x + 32 * scale - stringWidth * scale * 0.8F / 2, y + 2 * scale + 2, 0);
+            pose.translate(x + 24 * scale - stringWidth * scale * 0.8F / 2, y + 2 * scale + 2, 0);
             pose.scale(scale * 0.8F, scale * 0.8F, 1);
             guiGraphics.drawString(mc.font, displayName, 0, 0, 0xFFFFFFFF, false);
             pose.popPose();
