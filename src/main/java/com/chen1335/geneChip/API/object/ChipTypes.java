@@ -10,6 +10,7 @@ import com.chen1335.geneChip.chip.chips.mutation.PainBlockade;
 import com.chen1335.geneChip.chip.chips.survival.Photosynthesis;
 import com.chen1335.geneChip.chip.chips.survival.*;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
+import com.chen1335.geneChip.chip.chips.tactics.FlyingKick;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
 import com.chen1335.geneChip.chip.chips.tactics.SlidingTackle;
 import com.chen1335.geneChip.chip.chips.tactics.SpiderClimb;
@@ -85,6 +86,8 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, SpiderClimb> SPIDER_CLIMB = CHIPS.register("spider_climb", SpiderClimb::new);
 
     public static final DeferredHolder<Chip, TacticalRoll> TACTICAL_ROLL = CHIPS.register("tactical_roll", TacticalRoll::new);
+
+    public static final DeferredHolder<Chip, FlyingKick> FLYING_KICK = CHIPS.register("flying_kick", FlyingKick::new);
 
     public static final DeferredHolder<Chip, VengefulFlame> VENGEFUL_FLAME = CHIPS.register("vengeful_flame", VengefulFlame::new);
 

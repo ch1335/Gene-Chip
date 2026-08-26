@@ -125,6 +125,10 @@
   "gene_chip.chip.tactical_roll.desc": "肾上腺素短暂激发，让你能在危急时刻向后规避",
   "gene_chip.chip.tactical_roll.desc.detailed": "双击后退键执行后向翻滚%s格，翻滚期间无敌并免疫击退（持续%s秒），之后获得%s秒失衡，移动速度降低%s%%。冷却%s秒",
 
+  "gene_chip.chip.flying_kick.name": "飞身踢",
+  "gene_chip.chip.flying_kick.desc": "强化剂大幅重构股四头肌与骨盆韧带的爆发力，使你能够利用奔跑的惯性，将整个身体化为最狂暴的动力撞槌",
+  "gene_chip.chip.flying_kick.desc.detailed": "冲刺跳跃在空中按下攻击键，消耗%s点饱和度向前飞踢。对命中目标造成%s倍近战伤害与%s格强力击退；目标撞击方块表面时追加%s倍二次撞击伤害并眩晕%s秒。滑空期间免疫摔落伤害。冷却%s秒",
+
   "gene_chip.chip.vengeful_flame.name": "复仇火焰",
   "gene_chip.chip.vengeful_flame.desc": "死亡瞬间，强化剂失控引发体内能量暴走，化为焚尽一切的烈焰",
   "gene_chip.chip.vengeful_flame.desc.detailed": "死亡时在原地引发爆炸（不破坏地形），点燃半径%s格内的敌人，持续%s秒",
@@ -159,6 +163,10 @@
   "gene_chip.config_value.cooldown": "冷却时间",
   "gene_chip.config_value.damage_boost": "伤害加成",
   "gene_chip.config_value.damage_mul": "伤害倍率",
+  "gene_chip.config_value.damage_multiplier": "伤害倍率",
+  "gene_chip.config_value.impact_damage": "冲击伤害",
+  "gene_chip.config_value.knockback_distance": "击退距离",
+  "gene_chip.config_value.stun_duration": "眩晕时间",
   "gene_chip.config_value.damage_reduction": "伤害减免",
   "gene_chip.config_value.damage_reflect_ratio": "伤害反射比例",
   "gene_chip.config_value.decrease_air_supply_mul": "氧气消耗倍率",

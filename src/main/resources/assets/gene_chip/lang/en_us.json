@@ -119,6 +119,10 @@
   "gene_chip.chip.tactical_roll.desc": "Adrenaline briefly surges, allowing you to dodge backward in critical moments",
   "gene_chip.chip.tactical_roll.desc.detailed": "Double-tap the back key to roll backward %s blocks, invincible and knockback immune during roll (%s seconds). Afterward, %s seconds of imbalance with %s%% speed reduction. Cooldown %s seconds",
 
+  "gene_chip.chip.flying_kick.name": "Flying Kick",
+  "gene_chip.chip.flying_kick.desc": "The enhancer radically rebuilds the explosive power of the quadriceps and pelvic ligaments, letting you turn your running momentum into the most savage kinetic battering ram",
+  "gene_chip.chip.flying_kick.desc.detailed": "While sprint-jumping in the air, press attack to launch a flying kick forward, costing %s saturation. Hit targets take %sx melee damage and are knocked back %s blocks; hitting a block surface deals an additional %sx impact damage and stuns for %s seconds. Immune to fall damage while gliding. Cooldown %s seconds",
+
   "gene_chip.chip.vengeful_flame.name": "Vengeful Flame",
   "gene_chip.chip.vengeful_flame.desc": "At the moment of death, the enhancer spirals out of control, triggering an internal energy rampage that becomes a scorching blaze",
   "gene_chip.chip.vengeful_flame.desc.detailed": "On death, cause an explosion at your location (no terrain damage), igniting enemies within %s blocks for %s seconds",
@@ -159,6 +163,10 @@
   "gene_chip.config_value.cooldown": "Cooldown",
   "gene_chip.config_value.damage_boost": "Damage Boost",
   "gene_chip.config_value.damage_mul": "Damage Multiplier",
+  "gene_chip.config_value.damage_multiplier": "Damage Multiplier",
+  "gene_chip.config_value.impact_damage_multiplier": "Impact Damage Multiplier",
+  "gene_chip.config_value.knockback_distance": "Knockback Distance",
+  "gene_chip.config_value.stun_duration": "Stun Duration",
   "gene_chip.config_value.damage_reduction": "Damage Reduction",
   "gene_chip.config_value.damage_reflect_ratio": "Damage Reflect Ratio",
   "gene_chip.config_value.decrease_air_supply_mul": "Air Supply Decrease Multiplier",

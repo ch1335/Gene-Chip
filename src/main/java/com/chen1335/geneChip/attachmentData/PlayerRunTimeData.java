@@ -3,11 +3,15 @@ package com.chen1335.geneChip.attachmentData;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.GeneChip;
+import com.chen1335.geneChip.chip.chips.tactics.FlyingKick;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 
@@ -43,6 +47,14 @@ public class PlayerRunTimeData {
 
     // 战术滑铲芯片 - 是否正在滑铲
     public boolean slidingTackleActive = false;
+
+    // 飞身踢芯片 - 服务端权威的飞踢状态
+    public boolean flyingKickActive = false;
+    public int flyingKickTimer = 0;
+    public int flyingKickHitEntityId = -1;
+    public LivingEntity flyingKickKnockbackTarget;
+    public int flyingKickImpactTimer = 0;
+    public boolean flyingKickImpactHandled = false;
 
     // 战术滑铲芯片 - 滑铲持续时间计时器
     public int slidingTackleTimer = 0;
@@ -130,6 +142,10 @@ public class PlayerRunTimeData {
             }
         }
 
+        if (!entity.level().isClientSide) {
+            tickFlyingKick(entity);
+        }
+
         // 战术翻滚计时
         if (tacticalRolling) {
             tacticalRollTimer--;
@@ -178,6 +194,148 @@ public class PlayerRunTimeData {
         if (isOnGround && !wasOnGround) {
             canDoubleJump = true;
         }
+    }
+
+    public void startFlyingKick(Player player) {
+        flyingKickActive = true;
+        flyingKickTimer = 12;
+        flyingKickHitEntityId = -1;
+        flyingKickKnockbackTarget = null;
+        flyingKickImpactTimer = 0;
+        flyingKickImpactHandled = false;
+        player.fallDistance = 0;
+
+        Vec3 direction = player.getLookAngle();
+        Vec3 horizontal = new Vec3(direction.x, 0, direction.z);
+        if (horizontal.lengthSqr() < 1.0E-6) {
+            horizontal = new Vec3(0, 0, 1);
+        }
+        horizontal = horizontal.normalize();
+        player.setDeltaMovement(horizontal.scale(1.25).add(0, Math.max(0, player.getDeltaMovement().y) * 0.25, 0));
+        player.hurtMarked = true;
+    }
+
+    private void tickFlyingKick(Player player) {
+        if (flyingKickActive) {
+            player.fallDistance = 0;
+            if (!player.isAlive() || player.isPassenger() || player.isInWater() || player.isInLava()) {
+                stopFlyingKick(player);
+            } else {
+                Vec3 direction = player.getLookAngle();
+                Vec3 horizontal = new Vec3(direction.x, 0, direction.z);
+                if (horizontal.lengthSqr() >= 1.0E-6) {
+                    Vec3 velocity = horizontal.normalize().scale(1.25);
+                    player.setDeltaMovement(velocity.x, Math.max(-0.08, player.getDeltaMovement().y), velocity.z);
+                    player.hurtMarked = true;
+                }
+
+                if (flyingKickHitEntityId < 0) {
+                    AABB hitBox = player.getBoundingBox().expandTowards(player.getDeltaMovement()).inflate(0.45);
+                    LivingEntity target = player.level().getEntitiesOfClass(
+                                    LivingEntity.class,
+                                    hitBox,
+                                    candidate -> candidate != player && candidate.isAlive() && !candidate.isSpectator())
+                            .stream()
+                            .min((left, right) -> Double.compare(player.distanceToSqr(left), player.distanceToSqr(right)))
+                            .orElse(null);
+                    if (target != null) {
+                        hitFlyingKickTarget(player, target);
+                    }
+                }
+
+                flyingKickTimer--;
+                if (flyingKickTimer <= 0 || player.horizontalCollision || player.onGround()) {
+                    stopFlyingKick(player);
+                }
+            }
+        }
+
+        tickFlyingKickImpact(player);
+    }
+
+    private void hitFlyingKickTarget(Player player, LivingEntity target) {
+        GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.FLYING_KICK).ifPresent(chipInstance -> {
+            FlyingKick chip = chipInstance.getChip();
+            float attackDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+            float damage = attackDamage * chip.damageMultiplier.getValue(chipInstance.getLvl());
+            if (!target.hurt(target.level().damageSources().playerAttack(player), damage)) {
+                return;
+            }
+
+            flyingKickHitEntityId = target.getId();
+            flyingKickKnockbackTarget = target;
+            flyingKickImpactTimer = 20;
+            flyingKickImpactHandled = false;
+
+            Vec3 direction = target.position().subtract(player.position());
+            Vec3 horizontal = new Vec3(direction.x, 0, direction.z);
+            if (horizontal.lengthSqr() < 1.0E-6) {
+                Vec3 look = player.getLookAngle();
+                horizontal = new Vec3(look.x, 0, look.z);
+            }
+            horizontal = horizontal.normalize();
+            double distance = chip.knockbackDistance.getValue(chipInstance.getLvl());
+            double speed = Math.min(2.0, Math.max(0.4, distance / 6.0));
+            Vec3 add = horizontal.scale(speed).add(0, 0.35, 0);
+            player.addDeltaMovement(add.multiply(-1,0,-1));
+            target.setDeltaMovement(add);
+            target.hurtMarked = true;
+            stopFlyingKick(player);
+        });
+    }
+
+    private void tickFlyingKickImpact(Player player) {
+        if (flyingKickKnockbackTarget == null) {
+            return;
+        }
+        if (flyingKickImpactHandled || flyingKickImpactTimer-- <= 0 || !flyingKickKnockbackTarget.isAlive()) {
+            clearFlyingKickTarget();
+            return;
+        }
+
+        LivingEntity target = flyingKickKnockbackTarget;
+        if (target.horizontalCollision) {
+            GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.FLYING_KICK).ifPresent(chipInstance -> {
+                FlyingKick chip = chipInstance.getChip();
+                float attackDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                float impactDamage = attackDamage * chip.impactDamageMultiplier.getValue(chipInstance.getLvl());
+                target.invulnerableTime = 0;
+                target.hurt(target.level().damageSources().playerAttack(player), impactDamage);
+                int stunTicks = (int) (chip.stunDuration.getValue(chipInstance.getLvl()) * 20);
+                target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,
+                        stunTicks,
+                        9,
+                        false,
+                        false,
+                        true
+                ));
+                target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        net.minecraft.world.effect.MobEffects.WEAKNESS,
+                        stunTicks,
+                        9,
+                        false,
+                        false,
+                        true
+                ));
+                target.setDeltaMovement(Vec3.ZERO);
+                target.hurtMarked = true;
+            });
+            flyingKickImpactHandled = true;
+            clearFlyingKickTarget();
+        }
+    }
+
+    private void stopFlyingKick(Player player) {
+        flyingKickActive = false;
+        flyingKickTimer = 0;
+        player.fallDistance = 0;
+    }
+
+    private void clearFlyingKickTarget() {
+        flyingKickKnockbackTarget = null;
+        flyingKickImpactTimer = 0;
+        flyingKickImpactHandled = false;
     }
 
 }

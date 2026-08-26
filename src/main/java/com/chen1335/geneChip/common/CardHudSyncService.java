@@ -21,7 +21,7 @@ import java.util.Set;
 public final class CardHudSyncService {
     private static final Set<Chip> HUD_COOLDOWNS = Set.of(
             ChipTypes.SLIDING_TACKLE.get(), ChipTypes.DOUBLE_JUMP.get(), ChipTypes.TACTICAL_ROLL.get(),
-            ChipTypes.ADRENAL_GLAND_BURST.get()
+            ChipTypes.FLYING_KICK.get(), ChipTypes.ADRENAL_GLAND_BURST.get()
     );
 
     private CardHudSyncService() {

@@ -67,6 +67,35 @@ public class ClientEventHandler {
 
     // 战术翻滚芯片逻辑 - 双击后退键
     @SubscribeEvent
+    public static void MouseInputEvent(InputEvent.MouseButton.Pre event) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null || event.getAction() != InputConstants.PRESS) return;
+
+        KeyMapping attackKey = Minecraft.getInstance().options.keyAttack;
+        if (attackKey.getKey().getType() != InputConstants.Type.MOUSE
+                || event.getButton() != attackKey.getKey().getValue()) {
+            return;
+        }
+
+        GeneChipClient.getPlayerEquippedChip(ChipTypes.FLYING_KICK).ifPresent(chipInstance -> {
+            if (!player.isSprinting() || player.onGround()
+                    || GeneChipAPI.isChipCooldown(player, ChipTypes.FLYING_KICK.get())) {
+                return;
+            }
+
+            float saturationCost = chipInstance.getChip().saturationCost.getValue(chipInstance.getLvl());
+            if (player.getFoodData().getSaturationLevel() < saturationCost) return;
+
+            PacketDistributor.sendToServer(new PlayerActionPacket(
+                    PlayerActionPacket.ActionType.FLYING_KICK, new CompoundTag()));
+            // 仅作输入侧节流，最终资源消耗与动作状态仍由服务端决定。
+            GeneChipAPI.addChipCooldown(player, ChipTypes.FLYING_KICK.get(),
+                    (int) (chipInstance.getChip().cooldown.getValue(chipInstance.getLvl()) * 20));
+        });
+    }
+
+    // 战术翻滚芯片逻辑 - 双击后退键
+    @SubscribeEvent
     public static void KeyInputEvent(InputEvent.Key event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;

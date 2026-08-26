@@ -7,6 +7,7 @@ import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
+import com.chen1335.geneChip.chip.chips.tactics.FlyingKick;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
 import com.chen1335.geneChip.common.CardHudSyncService;
 import net.minecraft.nbt.CompoundTag;
@@ -111,6 +112,29 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     GeneChipAPI.addChipCooldown(player, ChipTypes.TACTICAL_ROLL.get(), cooldown);
                     accepted[0] = true;
                 });
+            } else if (action == ActionType.FLYING_KICK) {
+                GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.FLYING_KICK).ifPresent(chipInstance -> {
+                    PlayerChipData playerChipData = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+                    PlayerRunTimeData runtimeData = GeneChipAPI.getPlayerRunTimeData(player);
+                    FlyingKick chip = chipInstance.getChip();
+                    float saturationCost = chip.saturationCost.getValue(chipInstance.getLvl());
+
+                    // 客户端只负责请求；服务端重新确认动作条件、资源和冷却。
+                    if (playerChipData.getCoolDownInfos().isCoolDown(chip)
+                            || runtimeData.flyingKickActive
+                            || !player.isSprinting()
+                            || player.onGround()
+                            || player.isSpectator()
+                            || player.isPassenger()
+                            || player.getFoodData().getSaturationLevel() < saturationCost) {
+                        return;
+                    }
+
+                    player.getFoodData().setSaturation(player.getFoodData().getSaturationLevel() - saturationCost);
+                    runtimeData.startFlyingKick(player);
+                    GeneChipAPI.addChipCooldown(player, chip, (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20));
+                    accepted[0] = true;
+                });
             }
             CardHudSyncService.feedback(player, accepted[0] ? CardFeedbackPacket.FeedbackType.ACTION_ACCEPTED : CardFeedbackPacket.FeedbackType.ACTION_REJECTED, action.ordinal());
             CardHudSyncService.sync(player);
@@ -121,6 +145,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
     public enum ActionType {
         SLIDING_TACKLE,//滑铲
         DOUBLE_JUMP,//二段跳
-        TACTICAL_ROLL//战术翻滚
+        TACTICAL_ROLL,//战术翻滚
+        FLYING_KICK//飞身踢
     }
 }
