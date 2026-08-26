@@ -128,12 +128,18 @@ public final class CardHudRenderer {
             drawIcon(graphics, feedbackChip.getTexture(), width - 69, height - 85);
         }
         String text = switch (ClientCardHudState.feedbackType) {
-            case AMMO_RECYCLED -> "+" + ClientCardHudState.feedbackValue;
-            case COUNTER_RELEASED -> "COUNTER +" + ClientCardHudState.feedbackValue;
-            case COMBO_PROGRESS -> ClientCardHudState.feedbackValue + "/3";
-            case COMBO_TRIGGERED -> "COMBO FEVER";
-            case HEADSHOT -> "HEADSHOT";
-            case ACTION_REJECTED -> "ACTION BLOCKED";
+            case AMMO_RECYCLED -> net.minecraft.network.chat.Component.translatable(
+                    "gene_chip.feedback.ammo_recycled", ClientCardHudState.feedbackValue).getString();
+            case COUNTER_RELEASED -> net.minecraft.network.chat.Component.translatable(
+                    "gene_chip.feedback.counter_released", ClientCardHudState.feedbackValue).getString();
+            case COMBO_PROGRESS -> net.minecraft.network.chat.Component.translatable(
+                    "gene_chip.feedback.combo_progress", ClientCardHudState.feedbackValue).getString();
+            case COMBO_TRIGGERED -> net.minecraft.network.chat.Component.translatable(
+                    "gene_chip.feedback.combo_triggered").getString();
+            case HEADSHOT -> net.minecraft.network.chat.Component.translatable(
+                    "gene_chip.feedback.headshot").getString();
+            case ACTION_REJECTED -> net.minecraft.network.chat.Component.translatable(
+                    "gene_chip.feedback.action_rejected").getString();
             case INFECTED_ITEM_BLOCKED ->
                     net.minecraft.network.chat.Component.translatable("gene_chip.feedback.infected_item_blocked").getString();
             default -> "";

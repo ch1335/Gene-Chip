@@ -91,6 +91,8 @@ public class ClientEventHandler {
             // 仅作输入侧节流，最终资源消耗与动作状态仍由服务端决定。
             GeneChipAPI.addChipCooldown(player, ChipTypes.FLYING_KICK.get(),
                     (int) (chipInstance.getChip().cooldown.getValue(chipInstance.getLvl()) * 20));
+            AnimationHandler.playAnimationAndDistribute(
+                    player, ResourceLocation.fromNamespaceAndPath(GeneChip.MODID, "flying_kick"));
         });
     }
 

@@ -2050,7 +2050,7 @@
 			}
 		},
 		"flying_kick": {
-			"animation_length": 1.25,
+			"animation_length": 1.125,
 			"bones": {
 				"body": {
 					"rotation": {

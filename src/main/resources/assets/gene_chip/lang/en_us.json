@@ -243,6 +243,12 @@
 
   "gene_chip.chip.locked": "Locked",
   "gene_chip.feedback.infected_item_blocked": "Infection symbiosis blocked this item",
+  "gene_chip.feedback.ammo_recycled": "+%s",
+  "gene_chip.feedback.counter_released": "COUNTER +%s",
+  "gene_chip.feedback.combo_progress": "%s/3",
+  "gene_chip.feedback.combo_triggered": "COMBO FEVER",
+  "gene_chip.feedback.headshot": "HEADSHOT",
+  "gene_chip.feedback.action_rejected": "ACTION BLOCKED",
 
   "gene_chip.chip_select.title": "Chip Draw",
   "gene_chip.chip_select.hint": "Choose a chip",

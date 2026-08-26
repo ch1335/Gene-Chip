@@ -164,7 +164,7 @@
   "gene_chip.config_value.damage_boost": "伤害加成",
   "gene_chip.config_value.damage_mul": "伤害倍率",
   "gene_chip.config_value.damage_multiplier": "伤害倍率",
-  "gene_chip.config_value.impact_damage": "冲击伤害",
+  "gene_chip.config_value.impact_damage_multiplier": "冲击伤害",
   "gene_chip.config_value.knockback_distance": "击退距离",
   "gene_chip.config_value.stun_duration": "眩晕时间",
   "gene_chip.config_value.damage_reduction": "伤害减免",
@@ -243,6 +243,12 @@
 
   "gene_chip.chip.locked": "未解锁",
   "gene_chip.feedback.infected_item_blocked": "感染共生阻止了该物品",
+  "gene_chip.feedback.ammo_recycled": "+%s",
+  "gene_chip.feedback.counter_released": "反击 +%s",
+  "gene_chip.feedback.combo_progress": "%s/3",
+  "gene_chip.feedback.combo_triggered": "连击热潮",
+  "gene_chip.feedback.headshot": "爆头",
+  "gene_chip.feedback.action_rejected": "动作被阻止",
 
   "gene_chip.chip_select.title": "抽卡",
   "gene_chip.chip_select.hint": "选择一张卡牌",
