@@ -43,7 +43,7 @@ public class ChipConfigScreen extends Screen {
 
     private static final int FILTER_Y = 4;
     private static final int FILTER_HEIGHT = 16;
-    private static final int CHIP_GRID_X = 115;
+    private static final int CHIP_GRID_X = 111;
     private static final int CHIP_GRID_Y = 24;
     private static final int CHIP_COLUMNS = 4;
     private static final int CHIP_COLUMN_PITCH = 58;
@@ -394,10 +394,40 @@ public class ChipConfigScreen extends Screen {
         int y = panel.top() + layout.length(36);
         y = drawWrappedText(guiGraphics, chip.getDesc(), contentLeft, y, contentWidth, textScale, 0xFFCCCCCC);
         y += layout.length(5);
-        drawWrappedText(guiGraphics, chip.detailDesc(selectedChip.getLvl()),
+        y = drawWrappedText(guiGraphics, chip.detailDesc(selectedChip.getLvl()),
                 contentLeft, y, contentWidth, textScale, 0xFFFFFFFF);
+        renderUpgradeEffects(guiGraphics, chip, selectedChip.getLvl(), contentLeft, contentWidth, textScale, y);
 
         renderExperienceFooter(guiGraphics, panel, selectedChip);
+    }
+
+    private void renderUpgradeEffects(GuiGraphics guiGraphics, Chip chip, int level,
+                                      int contentLeft, int contentWidth, float textScale, int startY) {
+        List<Chip.UpgradeEffect> effects = chip.getUpgradeEffects(level, GameplayConfig.getMaxLevel());
+        if (effects.isEmpty()) return;
+
+        LayoutRect bar = layout.experienceBarRect();
+        int bottom = bar.top() - layout.length(14);
+        int titleY = startY + layout.length(5);
+        if (titleY >= bottom) return;
+
+        guiGraphics.enableScissor(contentLeft, 0, contentLeft + contentWidth, bottom);
+        try {
+            int y = drawWrappedText(guiGraphics,
+                    Component.translatable("gene_chip.details.upgrade_effects"),
+                    contentLeft, titleY, contentWidth, textScale, 0xFF72D6FF);
+            for (Chip.UpgradeEffect effect : effects) {
+                Component attribute = Component.translatable("gene_chip.config_value." + effect.configId());
+                String key = effect.direction() == Chip.UpgradeDirection.INCREASE
+                        ? "gene_chip.details.upgrade_increase"
+                        : "gene_chip.details.upgrade_decrease";
+                y += layout.length(2);
+                y = drawWrappedText(guiGraphics, Component.translatable(key, attribute),
+                        contentLeft, y, contentWidth, textScale, 0xFFB8E8FF);
+            }
+        } finally {
+            guiGraphics.disableScissor();
+        }
     }
 
     private void renderExperienceFooter(GuiGraphics guiGraphics, LayoutRect panel, ChipInstance<?> instance) {

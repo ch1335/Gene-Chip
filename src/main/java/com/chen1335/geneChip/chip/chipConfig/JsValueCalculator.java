@@ -55,6 +55,14 @@ public class JsValueCalculator {
         });
     }
 
+    public boolean changesBetweenLevels(int firstLevel, int secondLevel) {
+        float firstValue = getValue(firstLevel);
+        float secondValue = getValue(secondLevel);
+        return Float.isFinite(firstValue)
+                && Float.isFinite(secondValue)
+                && Math.abs(secondValue - firstValue) > 1.0E-6F;
+    }
+
     public String getArgValue(int lvl) {
         float value = getValue(lvl);
         if (isPercentage) {

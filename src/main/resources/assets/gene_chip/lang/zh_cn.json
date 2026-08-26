@@ -215,6 +215,9 @@
   "gene_chip.details.equipped": "已装备",
   "gene_chip.details.no_slot": "槽位不足",
   "gene_chip.details.equipped_cards": "已装备的卡牌",
+  "gene_chip.details.upgrade_effects": "升级效果",
+  "gene_chip.details.upgrade_increase": "升级增加%s",
+  "gene_chip.details.upgrade_decrease": "升级降低%s",
 
   "gene_chip.chip_type.combat": "战斗",
   "gene_chip.chip_type.mutation": "变异",

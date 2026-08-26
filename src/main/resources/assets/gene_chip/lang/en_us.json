@@ -215,6 +215,9 @@
   "gene_chip.details.equipped": "Equipped",
   "gene_chip.details.no_slot": "Slots Full",
   "gene_chip.details.equipped_cards": "Equipped Chips",
+  "gene_chip.details.upgrade_effects": "Upgrade Effects",
+  "gene_chip.details.upgrade_increase": "Upgrade increases %s",
+  "gene_chip.details.upgrade_decrease": "Upgrade decreases %s",
 
   "gene_chip.chip_type.combat": "Combat",
   "gene_chip.chip_type.mutation": "Mutation",
