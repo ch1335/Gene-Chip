@@ -77,12 +77,16 @@ public class GamePlayEventHandler {
         if (event.getOwner() instanceof ServerPlayer player) {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.MAKE_LIVING).ifPresent(chipInstance -> {
                 MakeLiving chip = chipInstance.getChip();
+                GunData data = GunData.from(player.getMainHandItem());
                 float value = chip.recyclingChance.getValue(chipInstance.getLvl());
+                int projectileAmount = Math.max(1, data.compute().projectileAmount);
+                if (projectileAmount > 1) {
+                    value /= projectileAmount;
+                }
                 int recycled = 0;
                 if (player.getRandom().nextFloat() < value) recycled++;
                 if (WorldFactorSynergy.isZombieRiot() && player.getRandom().nextFloat() < 0.05F) recycled++;
                 if (recycled > 0) {
-                    GunData data = GunData.from(player.getMainHandItem());
                     data.ammo.set(data.ammo.get() + recycled);
                     CardHudSyncService.feedback(player, CardFeedbackPacket.FeedbackType.AMMO_RECYCLED, recycled);
                 }
