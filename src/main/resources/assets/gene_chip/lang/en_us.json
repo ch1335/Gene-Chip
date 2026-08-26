@@ -121,7 +121,7 @@
 
   "gene_chip.chip.flying_kick.name": "Flying Kick",
   "gene_chip.chip.flying_kick.desc": "The enhancer radically rebuilds the explosive power of the quadriceps and pelvic ligaments, letting you turn your running momentum into the most savage kinetic battering ram",
-  "gene_chip.chip.flying_kick.desc.detailed": "While sprint-jumping in the air, press attack to launch a flying kick forward, costing %s saturation. Hit targets take %sx melee damage and are knocked back %s blocks; hitting a block surface deals an additional %sx impact damage and stuns for %s seconds. Immune to fall damage while gliding. Cooldown %s seconds",
+  "gene_chip.chip.flying_kick.desc.detailed": "While sprint-jumping in the air, press attack to launch a flying kick forward, costing %s hunger. Hit targets take %sx melee damage and are knocked back %s blocks; hitting a block surface deals an additional %sx impact damage and stuns for %s seconds. Immune to fall damage while gliding. Cooldown %s seconds",
 
   "gene_chip.chip.vengeful_flame.name": "Vengeful Flame",
   "gene_chip.chip.vengeful_flame.desc": "At the moment of death, the enhancer spirals out of control, triggering an internal energy rampage that becomes a scorching blaze",
@@ -204,6 +204,7 @@
   "gene_chip.config_value.reflect_window": "Reflect Window",
   "gene_chip.config_value.roll_distance": "Roll Distance",
   "gene_chip.config_value.saturation_cost": "Saturation Cost",
+  "gene_chip.config_value.food_cost": "Food Cost",
   "gene_chip.config_value.slide_distance": "Slide Distance",
   "gene_chip.config_value.slide_time": "Slide Duration",
   "gene_chip.config_value.stomach_bonus": "Stomach Bonus",

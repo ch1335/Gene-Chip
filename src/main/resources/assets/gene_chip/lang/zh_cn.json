@@ -127,7 +127,7 @@
 
   "gene_chip.chip.flying_kick.name": "飞身踢",
   "gene_chip.chip.flying_kick.desc": "强化剂大幅重构股四头肌与骨盆韧带的爆发力，使你能够利用奔跑的惯性，将整个身体化为最狂暴的动力撞槌",
-  "gene_chip.chip.flying_kick.desc.detailed": "冲刺跳跃在空中按下攻击键，消耗%s点饱和度向前飞踢。对命中目标造成%s倍近战伤害与%s格强力击退；目标撞击方块表面时追加%s倍二次撞击伤害并眩晕%s秒。滑空期间免疫摔落伤害。冷却%s秒",
+  "gene_chip.chip.flying_kick.desc.detailed": "冲刺跳跃在空中按下攻击键，消耗%s点饱食度向前飞踢。对命中目标造成%s倍近战伤害与%s格强力击退；目标撞击方块表面时追加%s倍二次撞击伤害并眩晕%s秒。滑空期间免疫摔落伤害。冷却%s秒",
 
   "gene_chip.chip.vengeful_flame.name": "复仇火焰",
   "gene_chip.chip.vengeful_flame.desc": "死亡瞬间，强化剂失控引发体内能量暴走，化为焚尽一切的烈焰",
@@ -204,6 +204,7 @@
   "gene_chip.config_value.reflect_window": "反射窗口",
   "gene_chip.config_value.roll_distance": "翻滚距离",
   "gene_chip.config_value.saturation_cost": "饱和度消耗",
+  "gene_chip.config_value.food_cost": "饱食度消耗",
   "gene_chip.config_value.slide_distance": "滑铲距离",
   "gene_chip.config_value.slide_time": "滑铲持续时间",
   "gene_chip.config_value.stomach_bonus": "胃容量加成",

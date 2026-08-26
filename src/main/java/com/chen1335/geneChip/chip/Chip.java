@@ -138,7 +138,7 @@ public abstract class Chip {
 
     private static UpgradeSemantic defaultUpgradeSemantic(String id) {
         return switch (id) {
-            case "cooldown", "saturation_cost", "hunger_cost", "immunity_cost",
+            case "cooldown", "saturation_cost", "food_cost", "hunger_cost", "immunity_cost",
                  "exhaustion_duration", "off_balance_time", "off_balance_slow",
                  "quality_threshold" -> UpgradeSemantic.LOWER_IS_BETTER;
             case "threshold", "decrease_air_supply_mul" -> UpgradeSemantic.HIGHER_IS_BETTER;

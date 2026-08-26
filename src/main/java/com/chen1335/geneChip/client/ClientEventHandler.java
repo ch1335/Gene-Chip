@@ -83,8 +83,8 @@ public class ClientEventHandler {
                 return;
             }
 
-            float saturationCost = chipInstance.getChip().saturationCost.getValue(chipInstance.getLvl());
-            if (player.getFoodData().getSaturationLevel() < saturationCost) return;
+            float foodCost = chipInstance.getChip().foodCost.getValue(chipInstance.getLvl());
+            if (player.getFoodData().getFoodLevel() < foodCost) return;
 
             PacketDistributor.sendToServer(new PlayerActionPacket(
                     PlayerActionPacket.ActionType.FLYING_KICK, new CompoundTag()));

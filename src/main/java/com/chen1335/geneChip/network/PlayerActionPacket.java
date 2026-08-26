@@ -117,7 +117,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     PlayerChipData playerChipData = player.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
                     PlayerRunTimeData runtimeData = GeneChipAPI.getPlayerRunTimeData(player);
                     FlyingKick chip = chipInstance.getChip();
-                    float saturationCost = chip.saturationCost.getValue(chipInstance.getLvl());
+                    float foodCost = chip.foodCost.getValue(chipInstance.getLvl());
 
                     // 客户端只负责请求；服务端重新确认动作条件、资源和冷却。
                     if (playerChipData.getCoolDownInfos().isCoolDown(chip)
@@ -126,11 +126,11 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                             || player.onGround()
                             || player.isSpectator()
                             || player.isPassenger()
-                            || player.getFoodData().getSaturationLevel() < saturationCost) {
+                            || player.getFoodData().getFoodLevel() < foodCost) {
                         return;
                     }
 
-                    player.getFoodData().setSaturation(player.getFoodData().getSaturationLevel() - saturationCost);
+                    player.getFoodData().eat(-Math.max(1, (int) Math.ceil(foodCost)), 0);
                     runtimeData.startFlyingKick(player);
                     GeneChipAPI.addChipCooldown(player, chip, (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20));
                     accepted[0] = true;
