@@ -51,7 +51,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                         return;
                     }
 
-                    player.getFoodData().eat(-2, 0);
+                    GeneChipAPI.consumeFood(player, 2, chipInstance);
 
                     PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
                     playerRunTimeData.slidingTackleActive = true;
@@ -71,15 +71,14 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     }
 
                     DoubleJump chip = chipInstance.getChip();
-                    float saturationCost = chip.saturationCost.getValue(chipInstance.getLvl());
+                    float foodCost = chip.saturationCost.getValue(chipInstance.getLvl());
 
-                    if (player.getFoodData().getFoodLevel() < saturationCost) {
+                    if (player.getFoodData().getFoodLevel() < foodCost) {
                         return;
                     }
 
                     // 消耗饱和度
-                    player.getFoodData().eat((int) -saturationCost, 0);
-
+                    GeneChipAPI.consumeFood(player, (int) foodCost, chipInstance);
                     // 添加“体力透支”效果：缓慢I，持续2秒
                     float duration = chip.exhaustionDuration.getValue(chipInstance.getLvl());
                     player.addEffect(new MobEffectInstance(
@@ -130,7 +129,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                         return;
                     }
 
-                    player.getFoodData().eat(-Math.max(1, (int) Math.ceil(foodCost)), 0);
+                    GeneChipAPI.consumeFood(player,Math.max(1, (int) Math.ceil(foodCost)),chipInstance);
                     runtimeData.startFlyingKick(player);
                     GeneChipAPI.addChipCooldown(player, chip, (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20));
                     accepted[0] = true;

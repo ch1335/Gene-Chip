@@ -1,5 +1,6 @@
 package com.chen1335.geneChip.API;
 
+import com.chen1335.geneChip.API.events.ConsumeFoodEvent;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
@@ -13,6 +14,7 @@ import com.immunity.util.ImmunityServerUtil;
 import io.netty.util.collection.IntObjectMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.util.Cast;
 
@@ -126,5 +128,12 @@ public class GeneChipAPI {
     //开始一次卡牌选择
     public static void StartCardSelect(ServerPlayer serverPlayer,List<ChipInstance<?>> candidates){
             PacketDistributor.sendToPlayer(serverPlayer,new ChipSelectPacket(candidates));
+    }
+
+    public static void consumeFood(Player player, int food, ChipInstance<?> instance){
+        ConsumeFoodEvent post = NeoForge.EVENT_BUS.post(new ConsumeFoodEvent(player, food, instance));
+        if (!post.isCanceled()) {
+            player.getFoodData().eat(-food,0);
+        }
     }
 }

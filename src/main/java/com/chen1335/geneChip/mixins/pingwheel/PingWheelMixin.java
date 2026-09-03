@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import nx.pingwheel.common.core.PingType;
 import nx.pingwheel.common.core.ServerCore;
 import nx.pingwheel.common.network.PingLocationC2SPacket;
@@ -35,7 +36,7 @@ public abstract class PingWheelMixin {
                 return;
             }
 
-            player.getFoodData().eat((int) -hungerCost, 0);
+            GeneChipAPI.consumeFood( player, (int) hungerCost,chipInstance);
 
             float duration = chip.markDuration.getValue(chipInstance.getLvl());
             float damageBoost = chip.damageBoost.getValue(chipInstance.getLvl());

@@ -65,7 +65,7 @@ public class Photosynthesis extends Chip {
             }
 
             if (playerRunTimeData.photosynthesisStacks > 0) {
-                player.getFoodData().eat(2, 0);
+                GeneChipAPI.consumeFood(player,2,instance);
             }
         }
     }

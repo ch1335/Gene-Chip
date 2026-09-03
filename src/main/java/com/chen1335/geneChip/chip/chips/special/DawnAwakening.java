@@ -40,6 +40,7 @@ public class DawnAwakening extends Chip {
             player.heal(healthAmount);
 
             // 恢复全部饱和度
+            player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(20);
 
             // 黎明触发反馈：玩家附近暖色白色烟花粒子 + HUD icon（每个黎明仅触发一次）
