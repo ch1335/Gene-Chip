@@ -31,7 +31,11 @@ public record ChipSelectPacket(List<ChipInstance<?>> candidates, int refreshMask
     public void handler(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player().isLocalPlayer()) {
-                Minecraft.getInstance().setScreen(new ChipSelectScreen(candidates, refreshMask));
+                if (Minecraft.getInstance().screen instanceof ChipSelectScreen screen) {
+                    screen.updateCandidates(candidates, refreshMask);
+                } else {
+                    Minecraft.getInstance().setScreen(new ChipSelectScreen(candidates, refreshMask));
+                }
             }
         });
     }

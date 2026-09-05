@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChipSelectScreen extends Screen {
@@ -40,7 +41,7 @@ public class ChipSelectScreen extends Screen {
             ResourceLocation.fromNamespaceAndPath("gene_chip", "textures/chip/card_back.png");
 
     private final List<ChipInstance<?>> candidates;
-    private final int refreshMask;
+    private int refreshMask;
 
     private long startTimeMs = -1;
     private boolean selected = false;
@@ -49,8 +50,17 @@ public class ChipSelectScreen extends Screen {
 
     public ChipSelectScreen(List<ChipInstance<?>> candidates, int refreshMask) {
         super(Component.translatable("gene_chip.chip_select.title"));
-        this.candidates = candidates;
+        this.candidates = new ArrayList<>(candidates);
         this.refreshMask = refreshMask;
+    }
+
+    /** 更新服务端返回的候选，不重置当前界面的动画进度。 */
+    public void updateCandidates(List<ChipInstance<?>> newCandidates, int newRefreshMask) {
+        candidates.clear();
+        candidates.addAll(newCandidates);
+        refreshMask = newRefreshMask;
+        refreshRequestedIndex = -1;
+        hoveredIndex = -1;
     }
 
     @Override
