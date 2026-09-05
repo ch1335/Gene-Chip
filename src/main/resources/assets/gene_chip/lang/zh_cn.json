@@ -241,6 +241,7 @@
   "gene_chip.command.add_exp.not_owned": "目标玩家未拥有卡牌 %s",
   "gene_chip.command.add_exp.success": "已为 %s 的卡牌 %s 增加 %s 点经验（当前等级: %s，当前经验: %s）",
   "gene_chip.command.remove_all.success": "已移除 %s 的 %s 张卡牌",
+  "gene_chip.command.set_next_draw_refresh.success": "已设置 %s 下一次抽卡可刷新：%s",
 
   "gene_chip.chip.locked": "未解锁",
   "gene_chip.feedback.infected_item_blocked": "感染共生阻止了该物品",
@@ -254,5 +255,6 @@
   "gene_chip.chip_select.title": "抽卡",
   "gene_chip.chip_select.hint": "选择一张卡牌",
   "gene_chip.chip_select.effect_hint": "将鼠标移到待选择卡牌上查看效果",
+  "gene_chip.chip_select.refresh": "刷新",
   "item.gene_chip.gene_enhancer": "基因强化剂"
 }

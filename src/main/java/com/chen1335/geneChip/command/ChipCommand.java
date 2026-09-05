@@ -7,6 +7,7 @@ import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.config.GameplayConfig;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -54,6 +55,13 @@ public class ChipCommand {
                         .then(Commands.literal("remove_all")
                                 .then(Commands.argument("target", EntityArgument.player())
                                         .executes(ChipCommand::removeAll)
+                                )
+                        )
+                        .then(Commands.literal("set_next_draw_refresh")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .then(Commands.argument("can_refresh", BoolArgumentType.bool())
+                                                .executes(ChipCommand::setNextDrawRefresh)
+                                        )
                                 )
                         )
         );
@@ -123,6 +131,15 @@ public class ChipCommand {
                     Component.translatable("gene_chip.command.remove.not_owned", target.getDisplayName(), name), false);
         }
         return had ? 1 : 0;
+    }
+
+    private static int setNextDrawRefresh(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
+        boolean canRefresh = BoolArgumentType.getBool(ctx, "can_refresh");
+        target.getData(GCAttachmentTypes.PLAYER_CHIP_DATA).setNextChipDrawCanRefresh(canRefresh);
+        ctx.getSource().sendSuccess(() -> Component.translatable(
+                "gene_chip.command.set_next_draw_refresh.success", target.getDisplayName(), canRefresh), true);
+        return 1;
     }
 
     private static int removeAll(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

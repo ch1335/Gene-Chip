@@ -22,6 +22,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -48,47 +49,67 @@ public class GeneEnhancer extends Item {
         }
     }
 
+    /**
+     * 在服务端按照芯片权重生成候选卡牌。excludedChips 用于刷新时排除当前候选，
+     * 避免刷新后再次出现相同卡牌。
+     */
+    public static List<ChipInstance<?>> createChipDrawCandidates(ServerPlayer serverPlayer) {
+        return createChipDrawCandidates(serverPlayer, Set.of(), 3);
+    }
+
+    public static List<ChipInstance<?>> createChipDrawCandidates(ServerPlayer serverPlayer, Set<Chip> excludedChips,
+                                                                  int maximumCandidateCount) {
+        Level level = serverPlayer.level();
+        PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        List<Chip> pool = new ArrayList<>();
+
+        for (Chip chip : RegisterTypes.CHIP) {
+            Map<Chip, ChipInstance<?>> chips = data.getChipInfos().getChips().get(chip.getType());
+            if ((chips == null || !chips.containsKey(chip)) && !excludedChips.contains(chip)) {
+                pool.add(chip);
+            }
+        }
+
+        int candidateCount = Math.min(maximumCandidateCount, pool.size());
+        List<ChipInstance<?>> candidates = new ArrayList<>();
+        List<Chip> remaining = new ArrayList<>(pool);
+
+        for (int c = 0; c < candidateCount; c++) {
+            double totalWeight = 0;
+            for (Chip chip : remaining) {
+                totalWeight += chip.getWeight(level);
+            }
+            if (totalWeight <= 0) {
+                candidates.add(remaining.getFirst().createInstance());
+                remaining.removeFirst();
+                continue;
+            }
+
+            double randomWeight = level.random.nextDouble() * totalWeight;
+            double cumulative = 0;
+            Chip selected = remaining.getLast();
+            for (Chip chip : remaining) {
+                cumulative += chip.getWeight(level);
+                if (randomWeight < cumulative) {
+                    selected = chip;
+                    break;
+                }
+            }
+            candidates.add(selected.createInstance());
+            remaining.remove(selected);
+        }
+        return candidates;
+    }
+
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         if (!level.isClientSide && livingEntity instanceof ServerPlayer serverPlayer) {
             PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
-            List<Chip> pool = new ArrayList<>();
-
-            for (Chip chip : RegisterTypes.CHIP) {
-                Map<Chip, ChipInstance<?>> chips = data.getChipInfos().getChips().get(chip.getType());
-                if (chips == null || !chips.containsKey(chip)) {
-                    pool.add(chip);
-                }
+            if (data.hasPendingChipDraw()) {
+                return stack;
             }
 
-            int candidateCount = Math.min(3, pool.size());
-            List<ChipInstance<?>> candidates = new ArrayList<>();
-            List<Chip> remaining = new ArrayList<>(pool);
-
-            for (int c = 0; c < candidateCount; c++) {
-                double totalWeight = 0;
-                for (Chip chip : remaining) {
-                    totalWeight += chip.getWeight(level);
-                }
-                if (totalWeight <= 0) {
-                    candidates.add(remaining.getFirst().createInstance());
-                    remaining.removeFirst();
-                    continue;
-                }
-
-                double r = level.random.nextDouble() * totalWeight;
-                double cumulative = 0;
-                Chip selected = remaining.getLast();
-                for (Chip chip : remaining) {
-                    cumulative += chip.getWeight(level);
-                    if (r < cumulative) {
-                        selected = chip;
-                        break;
-                    }
-                }
-                candidates.add(selected.createInstance());
-                remaining.remove(selected);
-            }
+            List<ChipInstance<?>> candidates = createChipDrawCandidates(serverPlayer);
             if (!candidates.isEmpty()) {
                 GeneChipAPI.StartCardSelect(serverPlayer, candidates);
                 stack.shrink(1);

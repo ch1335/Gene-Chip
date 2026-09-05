@@ -12,12 +12,14 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
-public record ChipSelectPacket(List<ChipInstance<?>> candidates) implements CustomPacketPayload {
+public record ChipSelectPacket(List<ChipInstance<?>> candidates, int refreshMask) implements CustomPacketPayload {
     public static final Type<ChipSelectPacket> TYPE = new Type<>(GeneChip.id("chip_select"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ChipSelectPacket> STREAM_CODEC = StreamCodec.composite(
             ChipInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),
             ChipSelectPacket::candidates,
+            ByteBufCodecs.INT,
+            ChipSelectPacket::refreshMask,
             ChipSelectPacket::new
     );
 
@@ -29,7 +31,7 @@ public record ChipSelectPacket(List<ChipInstance<?>> candidates) implements Cust
     public void handler(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player().isLocalPlayer()) {
-                Minecraft.getInstance().setScreen(new ChipSelectScreen(candidates));
+                Minecraft.getInstance().setScreen(new ChipSelectScreen(candidates, refreshMask));
             }
         });
     }

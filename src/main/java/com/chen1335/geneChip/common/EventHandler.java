@@ -40,6 +40,7 @@ public class EventHandler {
         if (player instanceof ServerPlayer serverPlayer) {
             PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
             data.syncToClient(serverPlayer);
+            data.sendPendingChipDraw(serverPlayer);
             CardHudSyncService.sync(serverPlayer);
             data.getSlotInfos().currentSlots.forEach((chip, instance) -> {
                 chip.onEquipped(player, instance);
@@ -76,6 +77,7 @@ public class EventHandler {
         registrar.playBidirectional(SetSlotChipPacket.TYPE, SetSlotChipPacket.STREAM_CODEC, SetSlotChipPacket::handler);
         registrar.playToClient(ChipSelectPacket.TYPE, ChipSelectPacket.STREAM_CODEC, ChipSelectPacket::handler);
         registrar.playToServer(ChipSelectedPacket.TYPE, ChipSelectedPacket.STREAM_CODEC, ChipSelectedPacket::handler);
+        registrar.playToServer(ChipRefreshPacket.TYPE, ChipRefreshPacket.STREAM_CODEC, ChipRefreshPacket::handler);
 
         registrar.playBidirectional(AnimationPack.TYPE, AnimationPack.STREAM_CODEC, AnimationPack::handler);
 

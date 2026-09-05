@@ -9,13 +9,11 @@ import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipSlot;
 import com.chen1335.geneChip.client.GeneChipClient;
-import com.chen1335.geneChip.network.ChipSelectPacket;
 import com.immunity.util.ImmunityServerUtil;
 import io.netty.util.collection.IntObjectMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.util.Cast;
 
 import java.util.List;
@@ -125,9 +123,11 @@ public class GeneChipAPI {
         }
     }
 
-    //开始一次卡牌选择
-    public static void StartCardSelect(ServerPlayer serverPlayer,List<ChipInstance<?>> candidates){
-            PacketDistributor.sendToPlayer(serverPlayer,new ChipSelectPacket(candidates));
+    // 开始一次卡牌选择，并将候选保存为服务端待选择状态。
+    public static void StartCardSelect(ServerPlayer serverPlayer, List<ChipInstance<?>> candidates) {
+        PlayerChipData data = serverPlayer.getData(GCAttachmentTypes.PLAYER_CHIP_DATA);
+        data.startChipDraw(candidates);
+        data.sendPendingChipDraw(serverPlayer);
     }
 
     public static void consumeFood(Player player, int food, ChipInstance<?> instance){

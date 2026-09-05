@@ -241,6 +241,7 @@
   "gene_chip.command.add_exp.not_owned": "Does not own chip %s",
   "gene_chip.command.add_exp.success": "Added %s experience to %s's chip %s (level %s, experience %s)",
   "gene_chip.command.remove_all.success": "Removed %s chips from %s",
+  "gene_chip.command.set_next_draw_refresh.success": "Set whether %s's next chip draw can refresh: %s",
 
   "gene_chip.chip.locked": "Locked",
   "gene_chip.feedback.infected_item_blocked": "Infection symbiosis blocked this item",
@@ -254,5 +255,6 @@
   "gene_chip.chip_select.title": "Chip Draw",
   "gene_chip.chip_select.hint": "Choose a chip",
   "gene_chip.chip_select.effect_hint": "Hover over a candidate chip to view its effect",
+  "gene_chip.chip_select.refresh": "Refresh",
   "item.gene_chip.gene_enhancer": "Gene Enhancer"
 }

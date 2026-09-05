@@ -2,6 +2,7 @@ package com.chen1335.geneChip.client.gui.screen;
 
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.client.gui.GuiUtil;
+import com.chen1335.geneChip.network.ChipRefreshPacket;
 import com.chen1335.geneChip.network.ChipSelectedPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -31,19 +32,25 @@ public class ChipSelectScreen extends Screen {
     private static final int EFFECT_PANEL_WIDTH = CARD_W + SPREAD * 2;
     private static final int EFFECT_PANEL_HEIGHT = 53;
     private static final int EFFECT_PANEL_GAP = 12;
+    private static final int REFRESH_BUTTON_WIDTH = CARD_W;
+    private static final int REFRESH_BUTTON_HEIGHT = 20;
+    private static final int REFRESH_BUTTON_GAP = 16;
 
     private static final ResourceLocation CARD_BACK =
             ResourceLocation.fromNamespaceAndPath("gene_chip", "textures/chip/card_back.png");
 
     private final List<ChipInstance<?>> candidates;
+    private final int refreshMask;
 
     private long startTimeMs = -1;
     private boolean selected = false;
+    private int refreshRequestedIndex = -1;
     private int hoveredIndex = -1;
 
-    public ChipSelectScreen(List<ChipInstance<?>> candidates) {
+    public ChipSelectScreen(List<ChipInstance<?>> candidates, int refreshMask) {
         super(Component.translatable("gene_chip.chip_select.title"));
         this.candidates = candidates;
+        this.refreshMask = refreshMask;
     }
 
     @Override
@@ -133,7 +140,6 @@ public class ChipSelectScreen extends Screen {
         }
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
-        Minecraft mc = Minecraft.getInstance();
         for (int i = 0; i < candidates.size(); i++) {
             float[] center = cardCenter(i);
             float x = center[0] - (float) CARD_W / 2;
@@ -142,22 +148,70 @@ public class ChipSelectScreen extends Screen {
                 y -= 10;
             }
             pose.translate(0,0,30);
-            renderCard(guiGraphics, candidates.get(i), x, y, CARD_SCALE, hoveredIndex == i);
+            renderCard(guiGraphics, candidates.get(i), x, y, hoveredIndex == i);
 
         }
         pose.popPose();
 
         if (animationFinished() && !selected) {
             renderEffectPanel(guiGraphics);
+            for (int index = 0; index < candidates.size(); index++) {
+                if (canRefreshCandidate(index)) {
+                    renderRefreshButton(guiGraphics, index, mouseX, mouseY);
+                }
+            }
         }
+    }
+
+    private int effectPanelY() {
+        int cardBottom = this.height / 2 + CARD_H / 2;
+        return Math.min(cardBottom + EFFECT_PANEL_GAP, this.height - EFFECT_PANEL_HEIGHT - 8);
+    }
+
+    private boolean canRefreshCandidate(int candidateIndex) {
+        return (refreshMask & 1 << candidateIndex) != 0;
+    }
+
+    private int refreshButtonX(int candidateIndex) {
+        return Math.round(cardCenter(candidateIndex)[0] - (float) REFRESH_BUTTON_WIDTH / 2);
+    }
+
+    private int refreshButtonY(int candidateIndex) {
+        return Math.round(cardCenter(candidateIndex)[1] - (float) CARD_H / 2
+                - REFRESH_BUTTON_HEIGHT - REFRESH_BUTTON_GAP - 10);
+    }
+
+    private boolean isRefreshButton(int candidateIndex, double mouseX, double mouseY) {
+        int x = refreshButtonX(candidateIndex);
+        int y = refreshButtonY(candidateIndex);
+        return mouseX >= x && mouseX <= x + REFRESH_BUTTON_WIDTH
+                && mouseY >= y && mouseY <= y + REFRESH_BUTTON_HEIGHT;
+    }
+
+    private void renderRefreshButton(GuiGraphics guiGraphics, int candidateIndex, int mouseX, int mouseY) {
+        int x = refreshButtonX(candidateIndex);
+        int y = refreshButtonY(candidateIndex);
+        boolean requesting = refreshRequestedIndex == candidateIndex;
+        boolean hovered = refreshRequestedIndex < 0 && isRefreshButton(candidateIndex, mouseX, mouseY);
+        int borderColor = requesting ? 0xFF707070 : 0xFFD0D0D0;
+        int backgroundColor = requesting ? 0xFF454545 : (hovered ? 0xFF575757 : 0xFF383838);
+
+        GuiUtil.drawColorWithSize(guiGraphics, x, y, REFRESH_BUTTON_WIDTH, REFRESH_BUTTON_HEIGHT, borderColor, 200);
+        GuiUtil.drawColorWithSize(guiGraphics, x + 1, y + 1,
+                REFRESH_BUTTON_WIDTH - 2, REFRESH_BUTTON_HEIGHT - 2, backgroundColor, 201);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0, 0, 202);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font,
+                Component.translatable("gene_chip.chip_select.refresh"), x + REFRESH_BUTTON_WIDTH / 2,
+                y + (REFRESH_BUTTON_HEIGHT - Minecraft.getInstance().font.lineHeight) / 2, 0xFFFFFFFF);
+        guiGraphics.pose().popPose();
     }
 
     private void renderEffectPanel(GuiGraphics guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
         int panelWidth = Math.min(EFFECT_PANEL_WIDTH, this.width - 16);
         int panelX = (this.width - panelWidth) / 2;
-        int cardBottom = this.height / 2 + CARD_H / 2;
-        int panelY = Math.min(cardBottom + EFFECT_PANEL_GAP, this.height - EFFECT_PANEL_HEIGHT - 8);
+        int panelY = effectPanelY();
 
         GuiUtil.drawColorWithSize(guiGraphics, panelX, panelY, panelWidth, EFFECT_PANEL_HEIGHT,
                 0xFFD0D0D0, 40);
@@ -190,8 +244,9 @@ public class ChipSelectScreen extends Screen {
         pose.popPose();
     }
 
-    private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, float scale, boolean hovered) {
+    private void renderCard(GuiGraphics guiGraphics, ChipInstance<?> instance, float x, float y, boolean hovered) {
         Minecraft mc = Minecraft.getInstance();
+        float scale = CARD_SCALE;
         PoseStack pose = guiGraphics.pose();
         pose.pushPose();
         pose.translate(0, 0, hovered ? 50 : 10);
@@ -241,8 +296,16 @@ public class ChipSelectScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != 0) return false;
-        if (selected) return false;
+        if (selected || refreshRequestedIndex >= 0) return false;
         if (!animationFinished()) return false;
+
+        for (int index = 0; index < candidates.size(); index++) {
+            if (canRefreshCandidate(index) && isRefreshButton(index, mouseX, mouseY)) {
+                refreshRequestedIndex = index;
+                PacketDistributor.sendToServer(new ChipRefreshPacket(index));
+                return true;
+            }
+        }
 
         for (int i = 0; i < candidates.size(); i++) {
             float[] center = cardCenter(i);
@@ -250,7 +313,7 @@ public class ChipSelectScreen extends Screen {
             float y = center[1] - (float) CARD_H / 2;
             if (mouseX >= x && mouseX <= x + CARD_W && mouseY >= y && mouseY <= y + CARD_H) {
                 selected = true;
-                PacketDistributor.sendToServer(new ChipSelectedPacket(candidates.get(i)));
+                PacketDistributor.sendToServer(new ChipSelectedPacket(i));
                 Minecraft.getInstance().setScreen(null);
                 return true;
             }
