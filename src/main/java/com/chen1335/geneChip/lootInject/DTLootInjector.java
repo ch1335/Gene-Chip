@@ -34,15 +34,21 @@ public class DTLootInjector {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void TagsUpdatedEvent(TagsUpdatedEvent event) {
-        if (event.shouldUpdateStaticData()) {
-            onAddModifiers();
-            RegistryAccess registryAccess = event.getRegistryAccess();
-            for (LootModifier lootModifier : LOOT_MODIFIERS) {
-                lootModifier.modify(registryAccess, LOOT_TABLES_BY_RL);
-            }
-            LOOT_MODIFIERS.clear();
-            LOOT_TABLES_BY_RL.clear();
+        // 只在服务端数据包加载时注入。
+        // 客户端连接非集成服务器时也会收到该事件（UpdateCause.CLIENT_PACKET_RECEIVED 且 integratedServer == false，
+        // 此时 shouldUpdateStaticData() 同样返回 true），但客户端从不加载战利品表，
+        // LOOT_TABLES_BY_RL 恒为空，注入逻辑在客户端没有任何意义。
+        if (event.getUpdateCause() != TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
+            return;
         }
+
+        onAddModifiers();
+        RegistryAccess registryAccess = event.getRegistryAccess();
+        for (LootModifier lootModifier : LOOT_MODIFIERS) {
+            lootModifier.modify(registryAccess, LOOT_TABLES_BY_RL);
+        }
+        LOOT_MODIFIERS.clear();
+        LOOT_TABLES_BY_RL.clear();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -59,24 +65,25 @@ public class DTLootInjector {
             BuiltInRegistries.ENTITY_TYPE.forEach(entityType -> {
                 if (entityType.is(EntityTypeTags.ANIMALS)) {
                     LootTable lootTable = lootTableMap.get(entityType.getDefaultLootTable().location());
-
-                    List<LootPoolEntryContainer.Builder<?>> lootItems = new ArrayList<>();
-                    for (LootPool pool : lootTable.pools) {
-                        for (LootPoolEntryContainer entry : pool.entries) {
-                            if (entry instanceof LootItem lootItem) {
-                                if (lootItem.item.is(ItemTags.MEAT) || lootItem.item.is(Tags.Items.LEATHERS)) {
-                                    lootItems.add(LootItem.lootTableItem(lootItem.item.value())
-                                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2)))
-                                            .apply(FeedbackFunction.builder())
-                                            .when(WildHunterCondition.builder()));
+                    if (lootTable != null) {
+                        List<LootPoolEntryContainer.Builder<?>> lootItems = new ArrayList<>();
+                        for (LootPool pool : lootTable.pools) {
+                            for (LootPoolEntryContainer entry : pool.entries) {
+                                if (entry instanceof LootItem lootItem) {
+                                    if (lootItem.item.is(ItemTags.MEAT) || lootItem.item.is(Tags.Items.LEATHERS)) {
+                                        lootItems.add(LootItem.lootTableItem(lootItem.item.value())
+                                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2)))
+                                                .apply(FeedbackFunction.builder())
+                                                .when(WildHunterCondition.builder()));
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    lootItems.forEach(lootPoolEntryContainer -> {
-                        lootTable.pools.add(LootPool.lootPool().add(lootPoolEntryContainer).build());
-                    });
+                        lootItems.forEach(lootPoolEntryContainer -> {
+                            lootTable.pools.add(LootPool.lootPool().add(lootPoolEntryContainer).build());
+                        });
+                    }
                 }
             });
 
