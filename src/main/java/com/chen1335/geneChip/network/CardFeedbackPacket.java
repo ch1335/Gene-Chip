@@ -1,6 +1,7 @@
 package com.chen1335.geneChip.network;
 
 import com.chen1335.geneChip.GeneChip;
+import com.chen1335.geneChip.client.AmmoRecycleFeedback;
 import com.chen1335.geneChip.client.ClientCardHudState;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -22,7 +23,12 @@ public record CardFeedbackPacket(FeedbackType feedbackType, int value) implement
     }
 
     public void handler(IPayloadContext context) {
-        context.enqueueWork(() -> ClientCardHudState.onFeedback(feedbackType, value));
+        context.enqueueWork(() -> {
+            ClientCardHudState.onFeedback(feedbackType, value);
+            if (feedbackType == FeedbackType.AMMO_RECYCLED) {
+                AmmoRecycleFeedback.push(value);
+            }
+        });
     }
 
     public enum FeedbackType {

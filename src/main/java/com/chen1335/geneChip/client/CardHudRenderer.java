@@ -69,6 +69,7 @@ public final class CardHudRenderer {
         }
 
         renderFeedback(graphics, minecraft, screenWidth, screenHeight);
+        AmmoRecycleFeedback.render(graphics, minecraft, screenWidth, screenHeight);
         renderFeverOverlay(graphics, screenWidth, screenHeight);
     }
 
@@ -128,8 +129,7 @@ public final class CardHudRenderer {
             drawIcon(graphics, feedbackChip.getTexture(), width - 69, height - 85);
         }
         String text = switch (ClientCardHudState.feedbackType) {
-            case AMMO_RECYCLED -> net.minecraft.network.chat.Component.translatable(
-                    "gene_chip.feedback.ammo_recycled", ClientCardHudState.feedbackValue).getString();
+            // AMMO_RECYCLED 不在这里画：它由 AmmoRecycleFeedback 画在弹药数字上方并上浮淡出。
             case COUNTER_RELEASED -> net.minecraft.network.chat.Component.translatable(
                     "gene_chip.feedback.counter_released", ClientCardHudState.feedbackValue).getString();
             case COMBO_PROGRESS -> net.minecraft.network.chat.Component.translatable(

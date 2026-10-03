@@ -130,7 +130,7 @@ file="META-INF/accesstransformer.cfg"
 [[dependencies.${mod_id}]]
     modId="hunger_reworked_reforged"
     type="required"
-    versionRange="[1.0.3,)"
+    versionRange="[1.0.2,)"
     ordering="NONE"
     side="BOTH"
 
