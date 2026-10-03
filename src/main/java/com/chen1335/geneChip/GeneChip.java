@@ -13,6 +13,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.slf4j.Logger;
 
 import javax.script.ScriptEngine;
@@ -24,7 +25,7 @@ public class GeneChip {
     public static final String MODID = "gene_chip";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final ScriptEngine JS_ENGINE = new ScriptEngineManager().getEngineByName("javascript");
+    public static final ScriptEngine JS_ENGINE = new NashornScriptEngineFactory().getScriptEngine("--global-per-engine");
 
     public static final Path CHIP_CONFIG = FMLPaths.CONFIGDIR.get().resolve("gene_chip").resolve("chip_config.json");
     public static final Path GAMEPLAY_CONFIG = FMLPaths.CONFIGDIR.get().resolve("gene_chip").resolve("gameplay_config.json");
