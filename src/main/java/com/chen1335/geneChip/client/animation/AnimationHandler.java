@@ -62,8 +62,12 @@ public class AnimationHandler {
     }
 
     private static GCModifierLayer getController(Player player) {
-        IAnimation animation = PlayerAnimationAccess.getPlayerAnimationLayer(
-                (AbstractClientPlayer) player, AnimationHandler.ANIMATION_RESOURCE);
+        // 服务端实体没有动画层，而且 AbstractClientPlayer 是客户端专属类（专用服务端会被剥掉），
+        // 所以先用 isLocalPlayer() 短路，再 instanceof，绝不硬转。
+        if (!player.isLocalPlayer() || !(player instanceof AbstractClientPlayer clientPlayer)) {
+            return null;
+        }
+        IAnimation animation = PlayerAnimationAccess.getPlayerAnimationLayer(clientPlayer, AnimationHandler.ANIMATION_RESOURCE);
         return animation instanceof GCModifierLayer controller ? controller : null;
     }
 }

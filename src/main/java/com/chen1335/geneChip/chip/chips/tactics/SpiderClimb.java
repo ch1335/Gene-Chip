@@ -1,16 +1,12 @@
 package com.chen1335.geneChip.chip.chips.tactics;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
-import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
-import com.chen1335.geneChip.client.animation.AnimationHandler;
-import com.zigythebird.playeranim.api.PlayerAnimationAccess;
-import com.zigythebird.playeranimcore.animation.layered.IAnimation;
-import net.minecraft.client.player.AbstractClientPlayer;
+import com.chen1335.geneChip.client.animation.SpiderClimbAnimation;
 import net.minecraft.world.entity.player.Player;
 
 public class SpiderClimb extends Chip {
@@ -28,26 +24,29 @@ public class SpiderClimb extends Chip {
         return ChipType.TACTICS;
     }
 
+    /**
+     * 爬墙主逻辑，客户端与服务端都会执行（{@code LivingEntity.travel} 的 mixin 是双端的）。
+     * <p>
+     * 服务端负责物理：垂直速度、坠落距离归零、{@code spiderClimbing} 状态；
+     * 动画只能作用于客户端本地玩家，全部转交 {@link SpiderClimbAnimation}，并且这里也先判一次
+     * {@code isLocalPlayer()} —— 服务端实体是 {@code ServerPlayer}，直接碰客户端动画 API 会崩。
+     */
     public void handleClimb(ChipInstance<SpiderClimb> chipInstance, Player player) {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+
         if (player.horizontalCollision) {
-            IAnimation animation = PlayerAnimationAccess.getPlayerAnimationLayer((AbstractClientPlayer) player, AnimationHandler.ANIMATION_RESOURCE);
-            if (animation != null && !animation.isActive() && !player.onGround() && player.isLocalPlayer()) {
-                AnimationHandler.playAnimationAndDistribute(player, GeneChip.id("climb"));
-            }
-            SpiderClimb chip = chipInstance.getChip();
-            float climbSpeed = chip.climbSpeed.getValue(chipInstance.getLvl());
             boolean isMovingUp = player.zza > 0;
 
+            if (player.isLocalPlayer()) {
+                SpiderClimbAnimation.onClimbing(player, isMovingUp);
+            }
+
             if (isMovingUp) {
-                if (player.isLocalPlayer()) {
-                    AnimationHandler.getSpeedModifier(player).speed = 1;
-                }
+                float climbSpeed = chipInstance.getChip().climbSpeed.getValue(chipInstance.getLvl());
                 player.setDeltaMovement(player.getDeltaMovement().x, climbSpeed, player.getDeltaMovement().z);
             }
             playerRunTimeData.spiderClimbing = true;
             player.fallDistance = 0;
-
         }
 
         boolean noCollision = player.level().noCollision(player, player.getBoundingBox().inflate(0.1, 0, 0.1));
@@ -57,12 +56,12 @@ public class SpiderClimb extends Chip {
                     player.setDeltaMovement(player.getDeltaMovement().x, 0, player.getDeltaMovement().z);
 
                     if (player.isLocalPlayer()) {
-                        AnimationHandler.getSpeedModifier(player).speed = 0;
+                        SpiderClimbAnimation.setSpeed(player, 0.0F);
                     }
-                } else if (player.zza == 0 && !player.onGround()) {
+                } else if (player.zza == 0) {
                     player.setDeltaMovement(player.getDeltaMovement().x, -0.5, player.getDeltaMovement().z);
                     if (player.isLocalPlayer()) {
-                        AnimationHandler.getSpeedModifier(player).speed = 1;
+                        SpiderClimbAnimation.setSpeed(player, 1.0F);
                     }
                 }
             }
@@ -70,8 +69,7 @@ public class SpiderClimb extends Chip {
         } else if (playerRunTimeData.spiderClimbing) {
             playerRunTimeData.spiderClimbing = false;
             if (player.isLocalPlayer()) {
-                AnimationHandler.getSpeedModifier(player).speed = 1;
-                AnimationHandler.playAnimationAndDistribute(player, null);
+                SpiderClimbAnimation.stopClimbing(player);
             }
         }
 
