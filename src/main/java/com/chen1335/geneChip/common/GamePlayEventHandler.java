@@ -2,8 +2,10 @@ package com.chen1335.geneChip.common;
 
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
 import com.hexagram2021.fiahi.common.event.ApplySpecialEatEffectEvent;
+import com.immunity.ImmunityTags;
 import com.wu_meng.winterscavenge.event.HealingItemUsedEvent;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -79,7 +82,8 @@ public class GamePlayEventHandler {
                 MakeLiving chip = chipInstance.getChip();
                 GunData data = GunData.from(player.getMainHandItem());
                 float value = chip.recyclingChance.getValue(chipInstance.getLvl());
-                int projectileAmount = Math.max(1, data.compute().projectileAmount);
+                // SW 0.8.9 起 GunData#compute() 已弃用（@ApiStatus.ScheduledForRemoval），改用 GunProp 取值
+                int projectileAmount = Math.max(1, data.get(GunProp.PROJECTILE_AMOUNT));
                 if (projectileAmount > 1) {
                     value /= projectileAmount;
                 }
@@ -438,7 +442,12 @@ public class GamePlayEventHandler {
     @SubscribeEvent
     public static void ApplySpecialEatEffectEvent(ApplySpecialEatEffectEvent event) {
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) return;
-        if (event.getFoodData().getRottenLevel() <= 0) return;
+        ItemStack stack = event.getItemStack();
+        // 触发条件是「物品本身属于腐坏食物」，而不是 fiahi 的腐烂等级：
+        // 原版腐肉在 fiahi 里温度恒为 0、腐烂等级也恒为 0（>50 才算 1 级），只看等级的话对腐肉永远不触发。
+        // 腐坏食物统一用 Immunity 的 immunity:spoiled_food 标签判定（整合包把 rotten_flesh 加进去了），
+        // 同时保留「腐烂等级 > 0」这条，兼容在背包/地上被 fiahi 捂到腐烂的食物。
+        if (!stack.is(ImmunityTags.SPOILED_FOOD) && event.getFoodData().getRottenLevel() <= 0) return;
 
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.ROTTEN_FLESH_TOLERANCE).ifPresent(chipInstance -> {
             event.setCancelled(true);

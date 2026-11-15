@@ -154,7 +154,9 @@ dependencies {
     implementation fileTree("libs")
     implementation "curse.maven:ldlib-626676:8046986"
     implementation "curse.maven:cloth-config-348521:5729127"
-    implementation "curse.maven:superb-warfare-1218165:7292699"
+    implementation "curse.maven:superb-warfare-1218165:9470559"
+    // Superb Warfare 0.8.9.x 起用 Kotlin 实现（modLoader = "kotlinforforge"），dev 环境需要它才能加载
+    implementation "curse.maven:kotlin-for-forge-351264:8335665"
     implementation "curse.maven:curios-309927:6529130"
     implementation "curse.maven:geckolib-388172:7707149"
     implementation "curse.maven:clavis-1296431:7473490"
