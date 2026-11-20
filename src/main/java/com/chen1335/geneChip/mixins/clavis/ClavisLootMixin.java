@@ -3,6 +3,7 @@ package com.chen1335.geneChip.mixins.clavis;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.GeneChip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.chips.special.LocksmithIntuition;
 import com.chen1335.geneChip.common.CardHudSyncService;
 import com.chen1335.geneChip.network.CardFeedbackPacket;
@@ -42,8 +43,12 @@ public abstract class ClavisLootMixin {
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.LOCKSMITH_INTUITION).ifPresent(chipInstance -> {
             LocksmithIntuition chip = chipInstance.getChip();
             float threshold = chip.qualityThreshold.getValue(chipInstance.getLvl());
+            // 锁匠直觉经验：开锁成功 +10
+            ChipExperience.grant(player, ChipTypes.LOCKSMITH_INTUITION.get(), 10);
 
             if (quality >= threshold) {
+                // 锁匠直觉经验：完美开锁 +20
+                ChipExperience.grant(player, ChipTypes.LOCKSMITH_INTUITION.get(), 20);
                 ResourceKey<LootTable> lootTableKey = ResourceKey.create(
                         Registries.LOOT_TABLE,
                         GENE_CHIP$BONUS_LOOT_TABLE

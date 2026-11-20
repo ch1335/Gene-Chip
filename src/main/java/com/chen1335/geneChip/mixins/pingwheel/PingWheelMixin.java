@@ -2,6 +2,7 @@ package com.chen1335.geneChip.mixins.pingwheel;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.chips.special.HunterInstinct;
 import com.chen1335.geneChip.common.GamePlayEventHandler;
 import net.minecraft.server.MinecraftServer;
@@ -52,6 +53,8 @@ public abstract class PingWheelMixin {
 
             int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
             GeneChipAPI.addChipCooldown(player, chipInstance.getChip(), cooldown);
+            // 猎手本能经验：标记实体 +5
+            ChipExperience.grant(player, ChipTypes.HUNTER_INSTINCT.get(), 5);
         });
     }
 }

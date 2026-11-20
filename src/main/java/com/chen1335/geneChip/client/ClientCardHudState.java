@@ -4,6 +4,7 @@ import com.chen1335.geneChip.network.CardFeedbackPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public final class ClientCardHudState {
     public static int feedbackTicks;
     public static int feedbackValue;
     public static CardFeedbackPacket.FeedbackType feedbackType;
+
+    /** 芯片升级提示（HUD 中央一行文字）。 */
+    public static Component levelUpMessage;
+    public static int levelUpTicks;
 
     private ClientCardHudState() {
     }
@@ -75,6 +80,7 @@ public final class ClientCardHudState {
         if (comboFeverTicks > 0) comboFeverTicks--;
         if (statusPulseTicks > 0) statusPulseTicks--;
         if (feedbackTicks > 0) feedbackTicks--;
+        if (levelUpTicks > 0) levelUpTicks--;
     }
 
     public static void onFeedback(CardFeedbackPacket.FeedbackType type, int value) {
@@ -87,10 +93,15 @@ public final class ClientCardHudState {
         }
     }
 
+    /** 芯片升级：HUD 中央显示一行提示，60 tick 后消失。 */
+    public static void onChipLevelUp(com.chen1335.geneChip.chip.Chip chip, int level) {
+        levelUpMessage = Component.translatable("gene_chip.level_up", chip.getDisplayName(), level);
+        levelUpTicks = 60;
+    }
+
     public static void markLocksmithScreen() {
         locksmithScreenActive = true;
     }
-
     public static boolean shouldRenderLocksmithScreenIcon() {
         return locksmithScreenActive;
     }

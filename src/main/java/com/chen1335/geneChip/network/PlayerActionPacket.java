@@ -6,6 +6,7 @@ import com.chen1335.geneChip.API.object.GCAttachmentTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerChipData;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.chips.tactics.DoubleJump;
 import com.chen1335.geneChip.chip.chips.tactics.FlyingKick;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
@@ -58,6 +59,8 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     playerRunTimeData.slidingTackleTimer = (int) (chipInstance.getChip().slideTime.getValue(chipInstance.getLvl()));
 
                     playerChipData.addCoolDown(chipInstance.getChip(), (int) (chipInstance.getChip().cooldown.getValue(chipInstance.getLvl()) * 20));
+                    // 战术滑铲经验：成功滑铲 +6
+                    ChipExperience.grant(player, ChipTypes.SLIDING_TACKLE.get(), 6);
                     accepted[0] = true;
                 });
             } else if (action == ActionType.DOUBLE_JUMP) {
@@ -91,6 +94,8 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     runtimeData.canDoubleJump = false;
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.DOUBLE_JUMP.get(), cooldown);
+                    // 二段跳经验：成功二段跳 +3
+                    ChipExperience.grant(player, ChipTypes.DOUBLE_JUMP.get(), 3);
                     accepted[0] = true;
                 });
             } else if (action == ActionType.TACTICAL_ROLL) {
@@ -109,6 +114,8 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
 
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.TACTICAL_ROLL.get(), cooldown);
+                    // 战术翻滚经验：成功翻滚 +6
+                    ChipExperience.grant(player, ChipTypes.TACTICAL_ROLL.get(), 6);
                     accepted[0] = true;
                 });
             } else if (action == ActionType.FLYING_KICK) {

@@ -3,6 +3,7 @@ package com.chen1335.geneChip.chip.chips.survival;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
@@ -42,6 +43,8 @@ public class Infected extends Chip {
         }
 
         if (inZone) {
+            // 感染者经验：处于感染区每分钟 +12
+            ChipExperience.grantPassive(serverPlayer, this, 12);
             int strengthLevel = 1; // 力量 II (amplifier=1)
 
             // 血月联动：力量提升至III，但每分钟损失10点免疫力

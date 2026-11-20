@@ -1,6 +1,7 @@
 package com.chen1335.geneChip.chip.chips.mutation;
 
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
@@ -31,6 +32,8 @@ public class MutationAdaptation extends Chip {
         float reduction = drainReduction.getValue(instance.getLvl());
 
         if (inZone) {
+            // 突变适应经验：处于感染区每分钟 +15
+            ChipExperience.grantPassive(serverPlayer, this, 15);
             float drainMult = 1 - reduction;
 
             // 感染溢出/免疫激增联动：减缓提升至50%

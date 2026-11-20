@@ -251,6 +251,7 @@
   "gene_chip.feedback.combo_triggered": "连击热潮",
   "gene_chip.feedback.headshot": "爆头",
   "gene_chip.feedback.action_rejected": "动作被阻止",
+  "gene_chip.level_up": "芯片 %s 提升至 Lv.%s",
 
   "gene_chip.chip_select.title": "抽卡",
   "gene_chip.chip_select.hint": "选择一张卡牌",

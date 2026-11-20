@@ -4,6 +4,7 @@ import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.common.CardHudSyncService;
 import com.chen1335.geneChip.network.CardFeedbackPacket;
 import net.minecraft.core.particles.ParticleTypes;
@@ -92,5 +93,19 @@ public class GrowingFervor extends Chip {
         if (immunityValue >= 50) return 1;
         if (immunityValue >= 25) return 2;
         return 3;
+    }
+
+    @Override
+    public void tick(Player player, ChipInstance<?> instance) {
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        // 愈发狂热经验：按免疫档位每分钟结算（免疫越低给得越多）
+        int stage = stageForImmunity(GeneChipAPI.getImmunityValue(player));
+        int rate = switch (stage) {
+            case 0 -> 6;
+            case 1 -> 10;
+            case 2 -> 14;
+            default -> 18;
+        };
+        ChipExperience.grantPassive(serverPlayer, this, rate);
     }
 }

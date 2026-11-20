@@ -4,6 +4,7 @@ import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
@@ -30,6 +31,7 @@ public class Photosynthesis extends Chip {
     @Override
     public void tick(Player player, ChipInstance<?> instance) {
         if (player.level().isClientSide) return;
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) return;
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
 
         int interval = BASE_INTERVAL;
@@ -56,6 +58,8 @@ public class Photosynthesis extends Chip {
                 if (playerRunTimeData.photosynthesisStacks < maxStacks) {
                     playerRunTimeData.photosynthesisStacks++;
                     updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks);
+                    // 光合作用经验：获得光照充能层 +3
+                    ChipExperience.grant(serverPlayer, this, 3);
                 }
             } else {
                 if (playerRunTimeData.photosynthesisStacks > 0) {
@@ -67,6 +71,11 @@ public class Photosynthesis extends Chip {
             if (playerRunTimeData.photosynthesisStacks > 0) {
                 GeneChipAPI.consumeFood(player,2,instance);
             }
+        }
+
+        // 光合作用经验：白天户外持续充能每分钟 +4
+        if (playerRunTimeData.photosynthesisCharging) {
+            ChipExperience.grantPassive(serverPlayer, this, 4);
         }
     }
 

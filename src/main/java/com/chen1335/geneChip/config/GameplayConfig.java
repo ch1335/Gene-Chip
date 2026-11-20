@@ -18,6 +18,10 @@ public final class GameplayConfig {
 
     private static int maxLevel = DEFAULT_MAX_LEVEL;
     private static String requiredExperienceFormula = DEFAULT_FORMULA;
+    /** 芯片升级时是否发 HUD 提示。 */
+    private static boolean chipExpLevelUpNotify = true;
+    /** 芯片经验全局倍率（平衡旋钮，默认 1.0）。 */
+    private static double chipExpMultiplier = 1.0D;
 
     private GameplayConfig() {
     }
@@ -37,20 +41,35 @@ public final class GameplayConfig {
                 GeneChip.LOGGER.warn("Invalid chip experience formula, using default: {}", requiredExperienceFormula);
                 requiredExperienceFormula = DEFAULT_FORMULA;
             }
+            chipExpLevelUpNotify = data == null || data.chipExpLevelUpNotify == null
+                    || data.chipExpLevelUpNotify;
+            chipExpMultiplier = data == null || data.chipExpMultiplier == null
+                    ? 1.0D : Mth.clamp(data.chipExpMultiplier, 0.0D, 100.0D);
         } catch (Exception e) {
             GeneChip.LOGGER.error("Failed to read gameplay config", e);
             maxLevel = DEFAULT_MAX_LEVEL;
             requiredExperienceFormula = DEFAULT_FORMULA;
+            chipExpLevelUpNotify = true;
+            chipExpMultiplier = 1.0D;
         }
     }
 
     public static void save() {
         try {
             Files.createDirectories(PATH.getParent());
-            Files.writeString(PATH, GSON.toJson(new Data(maxLevel, requiredExperienceFormula)));
+            Files.writeString(PATH, GSON.toJson(new Data(maxLevel, requiredExperienceFormula,
+                    chipExpLevelUpNotify, chipExpMultiplier)));
         } catch (IOException e) {
             GeneChip.LOGGER.error("Failed to save gameplay config", e);
         }
+    }
+
+    public static boolean isChipExpLevelUpNotify() {
+        return chipExpLevelUpNotify;
+    }
+
+    public static double getChipExpMultiplier() {
+        return chipExpMultiplier;
     }
 
     public static int getMaxLevel() {
@@ -103,6 +122,7 @@ public final class GameplayConfig {
         return Math.min(Integer.MAX_VALUE, Math.max(1, level * 100));
     }
 
-    private record Data(Integer maxLevel, String requiredExperience) {
+    private record Data(Integer maxLevel, String requiredExperience,
+                        Boolean chipExpLevelUpNotify, Double chipExpMultiplier) {
     }
 }

@@ -85,6 +85,7 @@ public class EventHandler {
         registrar.playToClient(CardHudStatePacket.TYPE, CardHudStatePacket.STREAM_CODEC, CardHudStatePacket::handler);
         registrar.playToClient(CardFeedbackPacket.TYPE, CardFeedbackPacket.STREAM_CODEC, CardFeedbackPacket::handler);
         registrar.playToClient(WorldItemFeedbackPacket.TYPE, WorldItemFeedbackPacket.STREAM_CODEC, WorldItemFeedbackPacket::handler);
+        registrar.playToClient(ChipLevelUpPacket.TYPE, ChipLevelUpPacket.STREAM_CODEC, ChipLevelUpPacket::handler);
     }
 
     @SubscribeEvent

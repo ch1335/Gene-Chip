@@ -70,7 +70,17 @@ public final class CardHudRenderer {
 
         renderFeedback(graphics, minecraft, screenWidth, screenHeight);
         AmmoRecycleFeedback.render(graphics, minecraft, screenWidth, screenHeight);
+        renderLevelUp(graphics, minecraft, screenWidth, screenHeight);
         renderFeverOverlay(graphics, screenWidth, screenHeight);
+    }
+
+    /** 芯片升级提示：屏幕中下方一行文字，60 tick 内线性淡出。 */
+    private static void renderLevelUp(GuiGraphics graphics, Minecraft minecraft, int width, int height) {
+        if (ClientCardHudState.levelUpTicks <= 0 || ClientCardHudState.levelUpMessage == null) return;
+        int alpha = Math.min(255, ClientCardHudState.levelUpTicks * 8);
+        int color = (alpha << 24) | 0xFFE37A;
+        graphics.drawCenteredString(minecraft.font, ClientCardHudState.levelUpMessage,
+                width / 2, height - 78, color);
     }
 
     private static List<StatusEntry> collectStatuses() {

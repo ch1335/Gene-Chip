@@ -1,9 +1,11 @@
 package com.chen1335.geneChip.chip.chips.special;
 
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +22,11 @@ public class NightHunter extends Chip {
 
     @Override
     public void tick(Player player, ChipInstance<?> instance) {
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        if (isNight(player)) {
+            // 暗夜猎手经验：夜间每分钟 +10
+            ChipExperience.grantPassive(serverPlayer, this, 10);
+        }
         if (player.level().getGameTime() % 20 == 0) {
             if (isNight(player)) {
                 int strengthAmp = 0; // 力量 I

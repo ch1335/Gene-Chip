@@ -2,6 +2,7 @@ package com.chen1335.geneChip.mixins.lootr;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.chips.survival.ScrapCollector;
 import com.chen1335.geneChip.compat.worldfactor.WorldFactorSynergy;
 import com.chen1335.geneChip.network.WorldItemFeedbackPacket;
@@ -32,6 +33,11 @@ public class DefaultLootFillerMixin {
     @Inject(method = "unpackLootTable", at = @At("TAIL"))
     public void onUnpackLootTable(ILootrInfoProvider provider, Player player, Container inventory, CallbackInfo ci) {
         if (player == null || !(inventory instanceof net.minecraft.world.Container container)) return;
+
+        // 废品收集者经验：开启战利品容器 +4
+        if (player instanceof ServerPlayer serverPlayer) {
+            ChipExperience.grant(serverPlayer, ChipTypes.SCRAP_COLLECTOR.get(), 4);
+        }
 
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SCRAP_COLLECTOR).ifPresent(chipInstance -> {
             ScrapCollector chip = chipInstance.getChip();
@@ -72,6 +78,9 @@ public class DefaultLootFillerMixin {
                 }
             }
             if (added.isEmpty() || !(player instanceof ServerPlayer serverPlayer)) return;
+
+            // 废品收集者经验：额外掉落触发 +5
+            ChipExperience.grant(serverPlayer, ChipTypes.SCRAP_COLLECTOR.get(), 5);
 
             Vec3 pos = provider.getInfoVec();
             serverLevel.sendParticles(ParticleTypes.FIREWORK,

@@ -9,10 +9,12 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforgespi.Environment;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.slf4j.Logger;
 
@@ -36,7 +38,9 @@ public class GeneChip {
         GCItems.ITEMS.register(modEventBus);
         LootItemConditions.LOOT_ITEM_CONDITION_TYPES.register(modEventBus);
         GCAttributes.ATTRIBUTE_DEFERRED_REGISTER.register(modEventBus);
-        ClothConfig.build(modContainer);
+        if (Environment.get().getDist().isClient() && ModList.get().isLoaded("cloth_config")) {
+            ClothConfig.build(modContainer);
+        }
         modEventBus.addListener(this::FMLCommonSetupEvent);
         modEventBus.addListener(this::FMLClientSetupEvent);
         GeneChipClient.init();

@@ -6,12 +6,14 @@ import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
 import com.hexagram2021.fiahi.common.event.ApplySpecialEatEffectEvent;
 import com.immunity.ImmunityTags;
+import com.immunity.data.InfectionZoneManager;
 import com.wu_meng.winterscavenge.event.HealingItemUsedEvent;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.API.tags.EntityTypeTags;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.chips.combat.*;
 import com.chen1335.geneChip.chip.chips.mutation.AdrenalGlandBurst;
 import com.chen1335.geneChip.chip.chips.tactics.SilentWalker;
@@ -59,6 +61,10 @@ public class GamePlayEventHandler {
         if (event.getTarget() instanceof LivingEntity target && event.getTarget().getType().is(EntityTypeTags.HEAD_SHOT_HUNTER_TARGET)) {
             GeneChipAPI.getPlayerEquippedChip(event.getEntity(), ChipTypes.HEAD_SHOT_HUNTER).ifPresent(chipInstance -> {
                 float killChanceValue = chipInstance.getChip().killChance.getValue(chipInstance.getLvl());
+                // 爆头猎手经验：对目标生物暴击 +5（同目标 1 秒去重）
+                if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.HEAD_SHOT_HUNTER.get(), 5, "crit:" + target.getUUID(), 20);
+                }
                 if (event.getEntity().getRandom().nextFloat() < killChanceValue) {
                     target.hurt(target.level().damageSources().playerAttack(event.getEntity()), Float.MAX_VALUE);
                     // 爆头触发：在怪物头顶生成一个爆头 icon 飘浮特效（发给追踪该实体的客户端）
@@ -78,6 +84,11 @@ public class GamePlayEventHandler {
     @SubscribeEvent
     public static void ProjectileHitEvent(ProjectileHitEvent.HitEntity event) {
         if (event.getOwner() instanceof ServerPlayer player) {
+            // 精准射击经验：爆头命中 +5（同目标 10 tick 去重）
+            if (event.isHeadshot()) {
+                ChipExperience.grant(player, ChipTypes.PRECISION_SHOOTING.get(), 5,
+                        "headshot:" + event.getTarget().getUUID(), 10);
+            }
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.MAKE_LIVING).ifPresent(chipInstance -> {
                 MakeLiving chip = chipInstance.getChip();
                 GunData data = GunData.from(player.getMainHandItem());
@@ -92,6 +103,8 @@ public class GamePlayEventHandler {
                 if (WorldFactorSynergy.isZombieRiot() && player.getRandom().nextFloat() < 0.05F) recycled++;
                 if (recycled > 0) {
                     data.ammo.set(data.ammo.get() + recycled);
+                    // 维持生计经验：成功回收弹药 +3
+                    ChipExperience.grant(player, ChipTypes.MAKE_LIVING.get(), 3);
                     CardHudSyncService.feedback(player, CardFeedbackPacket.FeedbackType.AMMO_RECYCLED, recycled);
                 }
             });
@@ -136,6 +149,13 @@ public class GamePlayEventHandler {
                 // 应用伤害减免：使用伤害倍数
                 // reductionRatio为减免比例，所以damageMultiplier = 1 - reductionRatio
                 event.setDamageMultiplier(event.getDamageMultiplier() * 1 - reductionRatio);
+                // 静步者经验：坠落减免实际生效，每 3 格坠落 +2（单次上限 12）
+                if (player instanceof ServerPlayer serverPlayer) {
+                    int exp = Math.min(12, (int) (event.getDistance() / 3.0F) * 2);
+                    if (exp > 0) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.SILENT_WALKER.get(), exp);
+                    }
+                }
             });
 
 
@@ -175,11 +195,23 @@ public class GamePlayEventHandler {
                     }
                     event.setAmount(event.getAmount() * (1 + value));
                 });
+                // 快速调整经验（兜底）：远程命中 +1（同目标 10 tick 去重）
+                if (player instanceof ServerPlayer serverPlayer && event.getEntity() instanceof LivingEntity hitTarget) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.QUICK_ADJUSTMENT.get(), 1,
+                            "rangedhit:" + hitTarget.getUUID(), 10);
+                }
             }
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.MELEE_ATTACK_MASTER).ifPresent(chipInstance -> {
                 float value = chipInstance.getChip().damageMul.getValue(chipInstance.getLvl());
                 event.setAmount(event.getAmount() * (1 + value));
             });
+            // 近战专家经验：近战命中 +2（同目标 10 tick 去重）
+            if (!(event.getSource().getDirectEntity() instanceof ProjectileEntity)
+                    && event.getEntity() instanceof LivingEntity hitTarget
+                    && player instanceof ServerPlayer serverPlayer) {
+                ChipExperience.grant(serverPlayer, ChipTypes.MELEE_ATTACK_MASTER.get(), 2,
+                        "melee:" + hitTarget.getUUID(), 10);
+            }
 
             // 痛觉封锁 - 近战伤害加成（无防具时生效）
             PlayerRunTimeData attackerData = GeneChipAPI.getPlayerRunTimeData(player);
@@ -188,6 +220,11 @@ public class GamePlayEventHandler {
                     float bonus = chipInstance.getChip().meleeDamageBonus.getValue(chipInstance.getLvl());
                     event.setAmount(event.getAmount() * (1 + bonus));
                 });
+                // 痛觉封锁经验：无甲近战命中，每 2 点伤害 +1（单次上限 8）
+                if (player instanceof ServerPlayer serverPlayer) {
+                    int expAmount = Math.min(8, Math.max(1, Math.round(event.getAmount() / 2.0F)));
+                    ChipExperience.grant(serverPlayer, ChipTypes.PAIN_BLOCKADE.get(), expAmount);
+                }
             }
 
             // 反击风暴 - 附加累积受到的伤害
@@ -202,6 +239,8 @@ public class GamePlayEventHandler {
                     if (player instanceof ServerPlayer serverPlayer) {
                         CardHudSyncService.feedback(serverPlayer, CardFeedbackPacket.FeedbackType.COUNTER_RELEASED, Math.round(bonus));
                         CardHudSyncService.sync(serverPlayer);
+                        // 反击风暴经验：反击命中 +12
+                        ChipExperience.grant(serverPlayer, ChipTypes.COUNTER_STORM.get(), 12);
                     }
                 }
             });
@@ -217,6 +256,10 @@ public class GamePlayEventHandler {
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TACTICAL_ROLL).ifPresent(chipInstance -> {
                 if (playerRunTimeData.tacticalRollInvincible) {
                     event.setCanceled(true);
+                    // 战术翻滚经验：翻滚无敌期间躲过伤害 +12
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.TACTICAL_ROLL.get(), 12, "roll-dodge", 10);
+                    }
                 }
             });
 
@@ -234,6 +277,22 @@ public class GamePlayEventHandler {
     public static void LivingDamageEvent$Post(LivingDamageEvent.Post event) {
         if (event.getEntity().level().isClientSide) return;
         if (event.getEntity() instanceof Player player) {
+            PlayerRunTimeData hurtRuntime = GeneChipAPI.getPlayerRunTimeData(player);
+            if (player instanceof ServerPlayer serverPlayer) {
+                // 肾上腺爆发经验：爆发期间受伤 +3
+                if (hurtRuntime.adrenalBurstTicks > 0) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.ADRENAL_GLAND_BURST.get(), 3, "burst-hurt", 20);
+                }
+                // 皮糙肉厚经验：受伤每 2 点 +1（单次上限 6），蹲下受伤额外 +2
+                int thickSkinnedExp = Math.min(6, Math.max(1, Math.round(event.getNewDamage() / 2.0F)));
+                if (player.isShiftKeyDown()) {
+                    thickSkinnedExp += 2;
+                }
+                ChipExperience.grant(serverPlayer, ChipTypes.THICK_SKINNED.get(), thickSkinnedExp);
+                // 复仇火焰经验（兜底）：受到伤害每 4 点 +1
+                ChipExperience.grant(serverPlayer, ChipTypes.VENGEFUL_FLAME.get(),
+                        Math.max(1, Math.round(event.getNewDamage() / 4.0F)), "vengeance-hurt", 20);
+            }
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.ADRENAL_GLAND_BURST).ifPresent(chipInstance -> {
                 int lvl = chipInstance.getLvl();
                 AdrenalGlandBurst chip = chipInstance.getChip();
@@ -256,6 +315,8 @@ public class GamePlayEventHandler {
                                 false
                         ));
                         GeneChipAPI.addChipCooldown(player, chipInstance.getChip(), (int) (chip.cooldown.getValue(lvl) * 20));
+                        // 记录爆发窗口，用于"爆发期间击杀/受伤"的经验来源
+                        GeneChipAPI.getPlayerRunTimeData(player).adrenalBurstTicks = (int) (20 * timeValue);
                         if (player instanceof ServerPlayer serverPlayer) {
                             serverPlayer.serverLevel().sendParticles(ParticleTypes.FIREWORK,
                                     player.getX(), player.getY() + 1.0, player.getZ(), 12, 0.5, 0.6, 0.5, 0.045);
@@ -271,7 +332,11 @@ public class GamePlayEventHandler {
                 PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
                 playerRunTimeData.counterStormAccumulatedDamage += event.getNewDamage();
                 playerRunTimeData.counterStormTimer = (int) (chipInstance.getChip().reflectWindow.getValue(chipInstance.getLvl()) * 20);
-                if (player instanceof ServerPlayer serverPlayer) CardHudSyncService.sync(serverPlayer);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    // 反击风暴经验：触发反击窗口 +5
+                    ChipExperience.grant(serverPlayer, ChipTypes.COUNTER_STORM.get(), 5, "counter-window", 10);
+                    CardHudSyncService.sync(serverPlayer);
+                }
             });
 
         }
@@ -280,11 +345,46 @@ public class GamePlayEventHandler {
     @SubscribeEvent
     public static void LivingDeathEvent(LivingDeathEvent event) {
         if (event.getEntity().level().isClientSide) return;
+        // 猎手本能经验：被标记目标死亡 +10
+        if (HUNTER_MARKED.remove(event.getEntity().getUUID()) != null
+                && event.getSource().getEntity() instanceof ServerPlayer hunter) {
+            ChipExperience.grant(hunter, ChipTypes.HUNTER_INSTINCT.get(), 10);
+        }
+        // 野外猎手经验：击杀动物 +5
+        if (event.getSource().getEntity() instanceof ServerPlayer animalHunter
+                && event.getEntity().getType().is(EntityTypeTags.ANIMALS)) {
+            ChipExperience.grant(animalHunter, ChipTypes.WILD_HUNTER.get(), 5);
+        }
         if (event.getSource().getEntity() instanceof Player player) {
+            PlayerRunTimeData killRuntime = GeneChipAPI.getPlayerRunTimeData(player);
+            if (player instanceof ServerPlayer serverPlayer) {
+                // 肾上腺爆发经验：爆发期间击杀 +10
+                if (killRuntime.adrenalBurstTicks > 0) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.ADRENAL_GLAND_BURST.get(), 10);
+                }
+                // 近战击杀经验：近战专家 +6 / 杀戮渴望 +7
+                if (event.getSource().isDirect()) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.MELEE_ATTACK_MASTER.get(), 6);
+                    ChipExperience.grant(serverPlayer, ChipTypes.DESIRE_FOR_SLAUGHTER.get(), 7);
+                }
+                // 突变适应经验：感染区内击杀 +3
+                InfectionZoneManager zoneManager = InfectionZoneManager.get(serverPlayer.getServer());
+                if (zoneManager != null && zoneManager.getDrain(serverPlayer.serverLevel(), serverPlayer.blockPosition()) > 0) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.MUTATION_ADAPTATION.get(), 3);
+                }
+                // 暗夜猎手经验：夜间击杀 +4
+                if (serverPlayer.level().isNight()) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.NIGHT_HUNTER.get(), 4);
+                }
+            }
             GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.COMBO_FEVER).ifPresent(chipInstance -> {
                 PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
                 ComboFever chip = chipInstance.getChip();
                 int window = (int) (chip.maxTime.getValue(chipInstance.getLvl()) * 20);
+                // 连击热潮经验：热度窗口内每个击杀 +10
+                if (playerRunTimeData.comboFeverTicks > 0 && player instanceof ServerPlayer serverPlayer) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.COMBO_FEVER.get(), 10);
+                }
                 playerRunTimeData.recordKill(player.level().getGameTime(), window);
                 if (playerRunTimeData.isComboFever(window)) {
                     int time = (int) (chip.effectTime.getValue(chipInstance.getLvl()) * 20);
@@ -306,6 +406,10 @@ public class GamePlayEventHandler {
                 float chanceValue = chip.healChance.getValue(chipInstance.getLvl());
                 if (player.getRandom().nextFloat() < chanceValue) {
                     player.heal(chip.healAmount.getValue(chipInstance.getLvl()));
+                    // 嗜血经验：实际触发回血 +3
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.BLOODTHIRSTY.get(), 3);
+                    }
                 }
             });
 
@@ -325,6 +429,10 @@ public class GamePlayEventHandler {
                             false,
                             false
                     ));
+                    // 快速调整经验：枪械/弓箭击杀 +7
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.QUICK_ADJUSTMENT.get(), 7);
+                    }
                 }
             });
 
@@ -348,6 +456,10 @@ public class GamePlayEventHandler {
                 if (hasNoArmor(player)) {
                     float healAmount = chipInstance.getChip().healOnKill.getValue(chipInstance.getLvl());
                     player.heal(healAmount);
+                    // 痛觉封锁经验：无甲近战击杀 +10
+                    if (event.getSource().isDirect() && player instanceof ServerPlayer serverPlayer) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.PAIN_BLOCKADE.get(), 10);
+                    }
                 }
             });
 
@@ -382,10 +494,19 @@ public class GamePlayEventHandler {
                 );
 
                 // 对周围实体施加燃烧
+                int burned = 0;
                 for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class,
                         player.getBoundingBox().inflate(radius))) {
                     if (entity != player && entity.isAlive()) {
                         entity.setRemainingFireTicks(burnDuration);
+                        burned++;
+                    }
+                }
+                // 复仇火焰经验：死亡触发 +25，每点燃一个敌人 +5
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.VENGEFUL_FLAME.get(), 25);
+                    if (burned > 0) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.VENGEFUL_FLAME.get(), burned * 5);
                     }
                 }
 
@@ -422,6 +543,11 @@ public class GamePlayEventHandler {
                     IronHeart chip = chipInstance.getChip();
                     float reduction = chip.durationReduction.getValue(chipInstance.getLvl());
                     effectInstance.duration = (int) (effectInstance.getDuration() * (1 - reduction));
+                    // 钢铁之心经验：负面效果被实际缩短 +3
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.IRON_HEART.get(), 3,
+                                "debuff:" + effectInstance.getEffect(), 10);
+                    }
                 }
             });
 
@@ -433,6 +559,10 @@ public class GamePlayEventHandler {
                     if (effectInstance.getEffect().value().isBeneficial()) {
                         float extension = chipInstance.getChip().effectExtension.getValue(chipInstance.getLvl());
                         effectInstance.duration = (int) (effectInstance.getDuration() * (1 + extension));
+                        // 感染者经验：正面效果被延长实际生效 +2
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            ChipExperience.grant(serverPlayer, ChipTypes.INFECTED.get(), 2, "buff-extend", 10);
+                        }
                     }
                 });
             }
@@ -451,6 +581,10 @@ public class GamePlayEventHandler {
 
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.ROTTEN_FLESH_TOLERANCE).ifPresent(chipInstance -> {
             event.setCancelled(true);
+            // 腐肉耐受经验：食用腐坏食物 +8
+            if (player instanceof ServerPlayer serverPlayer) {
+                ChipExperience.grant(serverPlayer, ChipTypes.ROTTEN_FLESH_TOLERANCE.get(), 8);
+            }
             if (player.getRandom().nextFloat() < 0.1F) {
                 player.heal(1.0F);
             }
@@ -466,7 +600,13 @@ public class GamePlayEventHandler {
         if (totalHealing <= 0.0F) return;
 
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.TRAUMA_FIRST_AID)
-                .ifPresent(chipInstance -> player.heal(totalHealing));
+                .ifPresent(chipInstance -> {
+                    player.heal(totalHealing);
+                    // 外伤急救经验：使用治疗类物品 +5
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        ChipExperience.grant(serverPlayer, ChipTypes.TRAUMA_FIRST_AID.get(), 5, "heal-item", 5);
+                    }
+                });
     }
 
     @SubscribeEvent

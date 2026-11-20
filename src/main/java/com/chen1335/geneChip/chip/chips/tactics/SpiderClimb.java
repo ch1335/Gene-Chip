@@ -3,6 +3,7 @@ package com.chen1335.geneChip.chip.chips.tactics;
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
 import com.chen1335.geneChip.chip.Chip;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
@@ -47,6 +48,10 @@ public class SpiderClimb extends Chip {
             }
             playerRunTimeData.spiderClimbing = true;
             player.fallDistance = 0;
+            // 蛛行经验：攀爬每 5 秒 +3
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                ChipExperience.grant(serverPlayer, this, 3, "climb", 100);
+            }
         }
 
         boolean noCollision = player.level().noCollision(player, player.getBoundingBox().inflate(0.1, 0, 0.1));

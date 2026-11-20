@@ -5,6 +5,8 @@ import com.chen1335.geneChip.API.object.ChipTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.chip.chips.tactics.FlyingKick;
 import com.chen1335.geneChip.chip.chips.tactics.TacticalRoll;
+import com.chen1335.geneChip.chip.ChipExperience;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -14,6 +16,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 //运行时数据，均不保存
 public class PlayerRunTimeData {
@@ -92,6 +96,21 @@ public class PlayerRunTimeData {
     // 感染者芯片 - 是否处于感染区（用于效果延长判断）
     public boolean infectedInZone = false;
 
+    // 芯片经验 - 去重表：key = "chipId|sourceKey"，value = 上次结算的 gameTime
+    public final Map<String, Long> chipExpDedupe = new HashMap<>();
+
+    // 芯片经验 - 被动型累计 tick：key = chipId，value = 已累计 tick（满 1200 结算一次）
+    public final Map<String, Integer> chipExpPassiveTicks = new HashMap<>();
+
+    // 无尽饥饿(耐力)芯片经验 - 饥饿消耗累计（每 4.0 点折算 1 点饥饿）
+    public float enduranceHungerAccum = 0.0F;
+
+    // 肾上腺爆发芯片 - 爆发持续时间（用于"爆发期间击杀/受伤"经验判断）
+    public int adrenalBurstTicks = 0;
+
+    // 芯片经验 - 上次同步经验条的时间（节流，避免每次加经验都发全量同步包）
+    public long chipExpLastSync = 0L;
+
     public void recordKill(long time, int windowTicks) {
         comboFeversTime.removeIf(killTime -> time - killTime >= windowTicks);
         if (comboFeversTime.size() >= 3) {
@@ -125,6 +144,9 @@ public class PlayerRunTimeData {
         }
         if (comboFeverTicks > 0) {
             comboFeverTicks--;
+        }
+        if (adrenalBurstTicks > 0) {
+            adrenalBurstTicks--;
         }
 
         if (!entity.level().isClientSide) {
@@ -280,6 +302,10 @@ public class PlayerRunTimeData {
             player.addDeltaMovement(add.multiply(-1,0,-1));
             target.setDeltaMovement(add);
             target.hurtMarked = true;
+            if (player instanceof ServerPlayer serverPlayer) {
+                // 飞身踢经验：飞踢命中 +10
+                ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), 10);
+            }
             stopFlyingKick(player);
         });
     }
@@ -320,6 +346,11 @@ public class PlayerRunTimeData {
                 ));
                 target.setDeltaMovement(Vec3.ZERO);
                 target.hurtMarked = true;
+                if (player instanceof ServerPlayer serverPlayer) {
+                    // 飞身踢经验：撞击追加伤害 +5 / 眩晕目标 +5
+                    ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), 5);
+                    ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), 5);
+                }
             });
             flyingKickImpactHandled = true;
             clearFlyingKickTarget();

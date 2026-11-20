@@ -2,7 +2,9 @@ package com.chen1335.geneChip.mixins;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.API.object.ChipTypes;
+import com.chen1335.geneChip.chip.ChipExperience;
 import com.chen1335.geneChip.chip.chips.survival.IronLung;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,6 +29,10 @@ public abstract class LivingEntityMixin extends Entity {
                 float value = chip.decreaseAirSupplyMul.getValue(chipInstance.getLvl());
                 if (cir.getReturnValue() < currentAir && player.getRandom().nextDouble() < value) {
                     cir.setReturnValue(currentAir);
+                }
+                // 铁肺经验：水下憋气每秒 +2
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ChipExperience.grant(serverPlayer, ChipTypes.IRON_LUNG.get(), 2, "breath", 20);
                 }
             });
         }
