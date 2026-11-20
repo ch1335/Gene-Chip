@@ -1,10 +1,12 @@
 package com.chen1335.geneChip.chip.chips.combat;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 
 public class Bloodthirsty extends Chip {
+    public final JsValueCalculator healExp = expValue("heal_exp", "3");
     public final JsValueCalculator healChance = new JsValueCalculator("0.3",true);
     public final JsValueCalculator healAmount = new JsValueCalculator("2");
 
@@ -19,4 +21,9 @@ public class Bloodthirsty extends Chip {
         return ChipType.COMBAT;
     }
 
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(healChance.getArgValue(lvl), healAmount.getArgValue(lvl));
+    }
 }

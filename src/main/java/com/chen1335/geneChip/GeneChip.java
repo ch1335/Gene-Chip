@@ -1,7 +1,6 @@
 package com.chen1335.geneChip;
 
 import com.chen1335.geneChip.API.object.*;
-import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
 import com.chen1335.geneChip.client.GeneChipClient;
 import com.chen1335.geneChip.config.ClothConfig;
 import com.chen1335.geneChip.config.GameplayConfig;
@@ -11,8 +10,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforgespi.Environment;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
@@ -38,17 +37,17 @@ public class GeneChip {
         GCItems.ITEMS.register(modEventBus);
         LootItemConditions.LOOT_ITEM_CONDITION_TYPES.register(modEventBus);
         GCAttributes.ATTRIBUTE_DEFERRED_REGISTER.register(modEventBus);
+        // 全部配置合并为 server 配置：config/gene_chip/server.toml（世界 serverconfig 可覆盖），
+        // 由服务端加载并同步客户端，文件修改时通过 ModConfigEvent.Reloading 自动重载。
+        GameplayConfig.prepareLegacyMigration();
+        modContainer.registerConfig(ModConfig.Type.SERVER, GameplayConfig.SPEC, GameplayConfig.CONFIG_FILE_NAME);
+        modEventBus.addListener(GameplayConfig::onConfigLoading);
+        modEventBus.addListener(GameplayConfig::onConfigReloading);
         if (Environment.get().getDist().isClient() && ModList.get().isLoaded("cloth_config")) {
             ClothConfig.build(modContainer);
         }
-        modEventBus.addListener(this::FMLCommonSetupEvent);
         modEventBus.addListener(this::FMLClientSetupEvent);
         GeneChipClient.init();
-    }
-
-    public void FMLCommonSetupEvent(FMLCommonSetupEvent setupEvent) {
-        GameplayConfig.load();
-        ChipConfig.load();
     }
 
     public void FMLClientSetupEvent(FMLClientSetupEvent setupEvent) {

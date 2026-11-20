@@ -69,9 +69,32 @@ public final class CardHudRenderer {
         }
 
         renderFeedback(graphics, minecraft, screenWidth, screenHeight);
-        AmmoRecycleFeedback.render(graphics, minecraft, screenWidth, screenHeight);
         renderLevelUp(graphics, minecraft, screenWidth, screenHeight);
         renderFeverOverlay(graphics, screenWidth, screenHeight);
+    }
+
+    /**
+     * 「维持生计」的 +N 飘字放在**独立的监听器**里，避免上面任何一个 HUD 步骤异常时把它跳过。
+     * <p>
+     * 这里还会把姿势栈与渲染状态重置到默认：其它模组的 HUD 图层（例如 Superb Warfare）会按图层
+     * 逐层抬高 Z 值并可能残留 shader 颜色，若不清掉，飘字可能被遮住或被染色成透明。
+     */
+    @SubscribeEvent
+    public static void renderAmmoRecycle(RenderGuiEvent.Post event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null || minecraft.options.hideGui) return;
+        GuiGraphics graphics = event.getGuiGraphics();
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+        com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.pose().pushPose();
+        graphics.pose().setIdentity();
+        try {
+            AmmoRecycleFeedback.render(graphics, minecraft, graphics.guiWidth(), graphics.guiHeight());
+        } finally {
+            graphics.pose().popPose();
+            com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        }
     }
 
     /** 芯片升级提示：屏幕中下方一行文字，60 tick 内线性淡出。 */

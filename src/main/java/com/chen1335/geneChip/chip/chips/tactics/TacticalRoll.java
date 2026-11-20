@@ -1,10 +1,14 @@
 package com.chen1335.geneChip.chip.chips.tactics;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 
 public class TacticalRoll extends Chip {
+    public final JsValueCalculator rollExp = expValue("roll_exp", "6");
+    public final JsValueCalculator dodgeExp = expValue("dodge_exp", "12");
+
     public final JsValueCalculator rollDistance = new JsValueCalculator("3");
     public final JsValueCalculator invincibleTime = new JsValueCalculator("0.5");
     public final JsValueCalculator offBalanceTime = new JsValueCalculator("1");
@@ -23,5 +27,10 @@ public class TacticalRoll extends Chip {
     @Override
     public ChipType getType() {
         return ChipType.TACTICS;
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(rollDistance.getArgValue(lvl), invincibleTime.getArgValue(lvl), offBalanceTime.getArgValue(lvl), offBalanceSlow.getArgValue(lvl), cooldown.getArgValue(lvl));
     }
 }

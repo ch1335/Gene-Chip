@@ -1,4 +1,5 @@
 package com.chen1335.geneChip.chip.chips.survival;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
@@ -17,6 +18,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 
 public class Infected extends Chip {
+    public final JsValueCalculator passiveExp = expValue("passive_exp", "12");
+    public final JsValueCalculator buffExtendExp = expValue("buff_extend_exp", "2");
+
     public final JsValueCalculator effectExtension = new JsValueCalculator("0.5", true);
 
     public Infected() {
@@ -44,7 +48,7 @@ public class Infected extends Chip {
 
         if (inZone) {
             // 感染者经验：处于感染区每分钟 +12
-            ChipExperience.grantPassive(serverPlayer, this, 12);
+            ChipExperience.grantPassive(serverPlayer, this, "passive_exp");
             int strengthLevel = 1; // 力量 II (amplifier=1)
 
             // 血月联动：力量提升至III，但每分钟损失10点免疫力
@@ -74,5 +78,10 @@ public class Infected extends Chip {
         InfectionZoneManager zoneManager = InfectionZoneManager.get(player.getServer());
         if (zoneManager == null) return false;
         return zoneManager.getDrain(player.serverLevel(), player.blockPosition()) > 0;
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(effectExtension.getArgValue(lvl));
     }
 }

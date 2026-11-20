@@ -31,6 +31,11 @@ public class PlayerRunTimeData {
 
     public int cardHudSyncTicker = 0;
 
+    // 大胃王芯片 - 上一次的饥饿值（用于按「消化恢复的饥饿值」结算经验，-1 表示尚未初始化）
+    public int bigEaterLastFoodLevel = -1;
+    // 大胃王芯片 - 上一次的 HRR 胃内容总量（用于确认饥饿值上升确实来自消化）
+    public int bigEaterLastStomach = -1;
+
     // 皮糙肉厚芯片 - 是否处于蹲下激活护甲加成状态
     public boolean thickSkinnedActive = false;
 
@@ -304,7 +309,7 @@ public class PlayerRunTimeData {
             target.hurtMarked = true;
             if (player instanceof ServerPlayer serverPlayer) {
                 // 飞身踢经验：飞踢命中 +10
-                ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), 10);
+                ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), "hit_exp");
             }
             stopFlyingKick(player);
         });
@@ -348,8 +353,8 @@ public class PlayerRunTimeData {
                 target.hurtMarked = true;
                 if (player instanceof ServerPlayer serverPlayer) {
                     // 飞身踢经验：撞击追加伤害 +5 / 眩晕目标 +5
-                    ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), 5);
-                    ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), 5);
+                    ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), "impact_exp");
+                    ChipExperience.grant(serverPlayer, ChipTypes.FLYING_KICK.get(), "stun_exp");
                 }
             });
             flyingKickImpactHandled = true;

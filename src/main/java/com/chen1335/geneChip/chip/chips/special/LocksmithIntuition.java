@@ -1,10 +1,14 @@
 package com.chen1335.geneChip.chip.chips.special;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 
 public class LocksmithIntuition extends Chip {
+    public final JsValueCalculator openExp = expValue("open_exp", "10");
+    public final JsValueCalculator perfectExp = expValue("perfect_exp", "20");
+
     public final JsValueCalculator difficultyReduction = new JsValueCalculator("0.6",true);
     public final JsValueCalculator qualityThreshold = new JsValueCalculator("1.8");
 
@@ -17,5 +21,10 @@ public class LocksmithIntuition extends Chip {
     @Override
     public ChipType getType() {
         return ChipType.SPECIAL;
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(difficultyReduction.getArgValue(lvl));
     }
 }

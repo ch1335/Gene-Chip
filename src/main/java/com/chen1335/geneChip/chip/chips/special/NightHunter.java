@@ -1,4 +1,6 @@
 package com.chen1335.geneChip.chip.chips.special;
+import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipExperience;
@@ -11,8 +13,17 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 
 public class NightHunter extends Chip {
+    public final JsValueCalculator passiveExp = expValue("passive_exp", "10");
+    public final JsValueCalculator killExp = expValue("kill_exp", "4");
+
     public NightHunter() {
         super(makeTexture("night_hunter"));
+    }
+
+    @Override
+    public boolean updateable() {
+        // 效果全部硬编码（没有可配置算法），不参与升级
+        return false;
     }
 
     @Override
@@ -25,7 +36,7 @@ public class NightHunter extends Chip {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         if (isNight(player)) {
             // 暗夜猎手经验：夜间每分钟 +10
-            ChipExperience.grantPassive(serverPlayer, this, 10);
+            ChipExperience.grantPassive(serverPlayer, this, "passive_exp");
         }
         if (player.level().getGameTime() % 20 == 0) {
             if (isNight(player)) {
@@ -47,5 +58,10 @@ public class NightHunter extends Chip {
 
     private boolean isNight(Player player) {
         return player.level().isNight();
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc();
     }
 }

@@ -1,4 +1,6 @@
 package com.chen1335.geneChip.chip.chips.survival;
+import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.GeneChip;
@@ -13,14 +15,24 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
 
 public class Photosynthesis extends Chip {
+    public final JsValueCalculator stackExp = expValue("stack_exp", "3");
+    public final JsValueCalculator passiveExp = expValue("passive_exp", "4");
+    /** 每层提供的移速加成（0.01 = 每层 +1%）。 */
+    public final JsValueCalculator speedPerStack = new JsValueCalculator("0.01", true);
+    /** 每 30 秒恢复的饱和度（点）。 */
+    public final JsValueCalculator saturationRecovery = new JsValueCalculator("1");
+
     private static final ResourceLocation SPEED_ID = GeneChip.id("photosynthesis_speed");
     private static final int BASE_INTERVAL = 30 * 20;
     private static final int BASE_MAX_STACKS = 5;
 
     public Photosynthesis() {
         super(makeTexture("photosynthesis"));
+        registerConfigValue("speed_per_stack", speedPerStack);
+        registerConfigValue("saturation_recovery", saturationRecovery);
     }
 
     @Override
@@ -33,6 +45,7 @@ public class Photosynthesis extends Chip {
         if (player.level().isClientSide) return;
         if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) return;
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
+        int lvl = instance.getLvl();
 
         int interval = BASE_INTERVAL;
         int maxStacks = BASE_MAX_STACKS;
@@ -57,25 +70,28 @@ public class Photosynthesis extends Chip {
             if (playerRunTimeData.photosynthesisCharging) {
                 if (playerRunTimeData.photosynthesisStacks < maxStacks) {
                     playerRunTimeData.photosynthesisStacks++;
-                    updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks);
+                    updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks, lvl);
                     // 光合作用经验：获得光照充能层 +3
-                    ChipExperience.grant(serverPlayer, this, 3);
+                    ChipExperience.grant(serverPlayer, this, "stack_exp");
                 }
             } else {
                 if (playerRunTimeData.photosynthesisStacks > 0) {
                     playerRunTimeData.photosynthesisStacks--;
-                    updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks);
+                    updateMovementSpeed(player, playerRunTimeData.photosynthesisStacks, lvl);
                 }
             }
 
+            // 有充能层数时恢复饱和度
             if (playerRunTimeData.photosynthesisStacks > 0) {
-                GeneChipAPI.consumeFood(player,2,instance);
+                FoodData foodData = player.getFoodData();
+                float recovery = saturationRecovery.getValue(lvl);
+                foodData.setSaturation(Math.min(foodData.getSaturationLevel() + recovery, foodData.getFoodLevel()));
             }
         }
 
         // 光合作用经验：白天户外持续充能每分钟 +4
         if (playerRunTimeData.photosynthesisCharging) {
-            ChipExperience.grantPassive(serverPlayer, this, 4);
+            ChipExperience.grantPassive(serverPlayer, this, "passive_exp");
         }
     }
 
@@ -86,12 +102,12 @@ public class Photosynthesis extends Chip {
                 && !player.level().isThundering();
     }
 
-    private void updateMovementSpeed(Player player, int stacks) {
+    private void updateMovementSpeed(Player player, int stacks, int lvl) {
         AttributeInstance attributeInstance = player.getAttributes().getInstance(Attributes.MOVEMENT_SPEED);
         if (attributeInstance != null) {
             attributeInstance.removeModifier(SPEED_ID);
             if (stacks > 0) {
-                double speedBonus = stacks * 0.01;
+                double speedBonus = stacks * speedPerStack.getValue(lvl);
                 attributeInstance.addTransientModifier(new AttributeModifier(SPEED_ID, speedBonus, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
             }
         }
@@ -108,5 +124,10 @@ public class Photosynthesis extends Chip {
         if (attributeInstance != null) {
             attributeInstance.removeModifier(SPEED_ID);
         }
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(speedPerStack.getArgValue(lvl), saturationRecovery.getArgValue(lvl));
     }
 }

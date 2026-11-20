@@ -1,4 +1,5 @@
 package com.chen1335.geneChip.chip.chips.mutation;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
@@ -10,6 +11,9 @@ import com.immunity.util.ImmunityServerUtil;
 import net.minecraft.world.entity.player.Player;
 
 public class PainBlockade extends Chip {
+    public final JsValueCalculator hitExp = expValue("hit_exp", "1");
+    public final JsValueCalculator killExp = expValue("kill_exp", "10");
+
     public final JsValueCalculator damageReduction = new JsValueCalculator("0.3", true);
     public final JsValueCalculator meleeDamageBonus = new JsValueCalculator("0.5", true);
     public final JsValueCalculator healOnKill = new JsValueCalculator("2");
@@ -44,5 +48,10 @@ public class PainBlockade extends Chip {
     public void onUnEquipped(Player player, ChipInstance<?> instance) {
         PlayerRunTimeData runtimeData = GeneChipAPI.getPlayerRunTimeData(player);
         runtimeData.painBlockadeActive = false;
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(damageReduction.getArgValue(lvl), meleeDamageBonus.getArgValue(lvl), healOnKill.getArgValue(lvl), immunityCost.getArgValue(lvl));
     }
 }

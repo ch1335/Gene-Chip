@@ -44,11 +44,11 @@ public abstract class ClavisLootMixin {
             LocksmithIntuition chip = chipInstance.getChip();
             float threshold = chip.qualityThreshold.getValue(chipInstance.getLvl());
             // 锁匠直觉经验：开锁成功 +10
-            ChipExperience.grant(player, ChipTypes.LOCKSMITH_INTUITION.get(), 10);
+            ChipExperience.grant(player, ChipTypes.LOCKSMITH_INTUITION.get(), "open_exp");
 
             if (quality >= threshold) {
                 // 锁匠直觉经验：完美开锁 +20
-                ChipExperience.grant(player, ChipTypes.LOCKSMITH_INTUITION.get(), 20);
+                ChipExperience.grant(player, ChipTypes.LOCKSMITH_INTUITION.get(), "perfect_exp");
                 ResourceKey<LootTable> lootTableKey = ResourceKey.create(
                         Registries.LOOT_TABLE,
                         GENE_CHIP$BONUS_LOOT_TABLE

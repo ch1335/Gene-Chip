@@ -45,7 +45,7 @@
 
   "gene_chip.chip.mutation_adaptation.name": "Mutation Adaptation",
   "gene_chip.chip.mutation_adaptation.desc": "The enhancer induces cellular mutation, giving you a strange tolerance to abyssal contamination",
-  "gene_chip.chip.mutation_adaptation.desc.detailed": "In infection zones, immunity decay rate slowed by 30%",
+  "gene_chip.chip.mutation_adaptation.desc.detailed": "In infection zones, immunity decay rate slowed by 30%%",
 
   "gene_chip.chip.adrenal_gland_burst.name": "Adrenal Gland Burst",
   "gene_chip.chip.adrenal_gland_burst.desc": "When near death, the enhancer forcibly triggers the adrenal medulla, squeezing out your last potential",
@@ -53,7 +53,7 @@
 
   "gene_chip.chip.growing_fervor.name": "Growing Fervor",
   "gene_chip.chip.growing_fervor.desc": "The virus coexists with you—the lower your immunity, the more the abyss bestows upon your body",
-  "gene_chip.chip.growing_fervor.desc.detailed": "Attack speed and movement speed based on immunity: >75% no bonus; 50~75% +5%% AS +5%% MS; 25~50% +10%% AS +10%% MS; <25% +20%% AS +15%% MS",
+  "gene_chip.chip.growing_fervor.desc.detailed": "Attack speed and movement speed based on immunity: >75%% no bonus; 50~75%% +5%% AS +5%% MS; 25~50%% +10%% AS +10%% MS; <25%% +20%% AS +15%% MS",
 
   "gene_chip.chip.pain_blockade.name": "Pain Blockade",
   "gene_chip.chip.pain_blockade.desc": "The enhancer completely severs pain nerves and tactile feedback, trading defense for pure power",
@@ -77,11 +77,11 @@
 
   "gene_chip.chip.rotten_flesh_tolerance.name": "Rotten Food Tolerance",
   "gene_chip.chip.rotten_flesh_tolerance.desc": "The enhancer fortifies your digestive system, making spoiled food harmless",
-  "gene_chip.chip.rotten_flesh_tolerance.desc.detailed": "When eating rotten food, negate its negative effects and have a 10%% chance to restore 1 health",
+  "gene_chip.chip.rotten_flesh_tolerance.desc.detailed": "When eating rotten food, negate its negative effects and have a %s chance to restore %s health",
 
   "gene_chip.chip.trauma_first_aid.name": "Trauma First Aid",
   "gene_chip.chip.trauma_first_aid.desc": "The enhancer accelerates tissue repair, allowing healing items to restore more health",
-  "gene_chip.chip.trauma_first_aid.desc.detailed": "When using a healing item, restore additional health equal to its original healing amount",
+  "gene_chip.chip.trauma_first_aid.desc.detailed": "When using a healing item, restore an additional %s of its original healing amount",
 
   "gene_chip.chip.permafrost_walkers.name": "Permafrost Walkers",
   "gene_chip.chip.permafrost_walkers.desc": "Metabolic heat production and peripheral circulation enhanced—ignore the bitter cold",
@@ -93,15 +93,15 @@
 
   "gene_chip.chip.thick_skinned.name": "Thick Skinned",
   "gene_chip.chip.thick_skinned.desc": "Skin stratum corneum and subcutaneous fat reinforced, allowing you to withstand more impact",
-  "gene_chip.chip.thick_skinned.desc.detailed": "Permanently gain Resistance I, crouching grants additional +4 armor",
+  "gene_chip.chip.thick_skinned.desc.detailed": "Permanently gain Resistance I, crouching grants additional +%s armor",
 
   "gene_chip.chip.photosynthesis.name": "Photosynthesis",
   "gene_chip.chip.photosynthesis.desc": "Induces cells to develop a plant-like photosynthesis mechanism, drawing energy from sunlight",
-  "gene_chip.chip.photosynthesis.desc.detailed": "In direct outdoor sunlight, gain Light Charge stacks (max 5). Each stack provides +1%% movement speed and restores 1 saturation every 30s. Indoors/night decays 1 stack every 30s",
+  "gene_chip.chip.photosynthesis.desc.detailed": "In direct outdoor sunlight, gain Light Charge stacks (max 5). Each stack provides +%s movement speed and restores %s saturation every 30s. Indoors/night decays 1 stack every 30s",
 
   "gene_chip.chip.sliding_tackle.name": "Sliding Tackle",
   "gene_chip.chip.sliding_tackle.desc": "Leg muscle enhancement and ground friction control training allow you to approach targets rapidly in a low stance while sprinting",
-  "gene_chip.chip.sliding_tackle.desc.detailed": "Press crouch while sprinting to slide forward %s blocks (costs 2 saturation). %s%% damage reduction during slide. Cooldown %s seconds",
+  "gene_chip.chip.sliding_tackle.desc.detailed": "Press crouch while sprinting to slide forward %s blocks (costs 2 saturation). %s damage reduction during slide. Cooldown %s seconds",
 
   "gene_chip.chip.silent_walker.name": "Silent Walker",
   "gene_chip.chip.silent_walker.desc": "The enhancer optimizes vestibular system and muscle coordination, achieving feline-like landing cushioning",
@@ -113,11 +113,11 @@
 
   "gene_chip.chip.spider_climb.name": "Spider Climb",
   "gene_chip.chip.spider_climb.desc": "The enhancer increases fingertip and sole friction, allowing you to cling to rough surfaces",
-  "gene_chip.chip.spider_climb.desc.detailed": "While pressed against a vertical block surface and moving forward, slowly climb at %s speed. Fall damage reduced by %s%% while climbing",
+  "gene_chip.chip.spider_climb.desc.detailed": "While pressed against a vertical block surface and moving forward, slowly climb at %s speed. Fall damage reduced by %s while climbing",
 
   "gene_chip.chip.tactical_roll.name": "Tactical Roll",
   "gene_chip.chip.tactical_roll.desc": "Adrenaline briefly surges, allowing you to dodge backward in critical moments",
-  "gene_chip.chip.tactical_roll.desc.detailed": "Double-tap the back key to roll backward %s blocks, invincible and knockback immune during roll (%s seconds). Afterward, %s seconds of imbalance with %s%% speed reduction. Cooldown %s seconds",
+  "gene_chip.chip.tactical_roll.desc.detailed": "Double-tap the back key to roll backward %s blocks, invincible and knockback immune during roll (%s seconds). Afterward, %s seconds of imbalance with %s speed reduction. Cooldown %s seconds",
 
   "gene_chip.chip.flying_kick.name": "Flying Kick",
   "gene_chip.chip.flying_kick.desc": "The enhancer radically rebuilds the explosive power of the quadriceps and pelvic ligaments, letting you turn your running momentum into the most savage kinetic battering ram",
@@ -125,7 +125,7 @@
 
   "gene_chip.chip.vengeful_flame.name": "Vengeful Flame",
   "gene_chip.chip.vengeful_flame.desc": "At the moment of death, the enhancer spirals out of control, triggering an internal energy rampage that becomes a scorching blaze",
-  "gene_chip.chip.vengeful_flame.desc.detailed": "On death, cause an explosion at your location (no terrain damage), igniting enemies within %s blocks for %s seconds",
+  "gene_chip.chip.vengeful_flame.desc.detailed": "On death, cause an explosion at your location, dealing a fixed damage to enemies within %s blocks (%s damage, no falloff) and igniting them for %s seconds",
 
   "gene_chip.chip.night_hunter.name": "Night Hunter",
   "gene_chip.chip.night_hunter.desc": "The enhancer activates nocturnal instincts, making you a true hunter at night",
@@ -155,11 +155,24 @@
   "gene_chip.config.gameplay": "Global Gameplay",
   "gene_chip.config.card": "Chip Parameters",
   "gene_chip.config.max_level": "Maximum Chip Level",
+  "gene_chip.config.max_level.tooltip": "Maximum level a chip can reach (1~1000).",
   "gene_chip.config.required_experience": "Experience Requirement Formula",
+  "gene_chip.config.required_experience.tooltip": "Formula for the experience required per level; variable lvl = current level, e.g. 100 * lvl. Invalid formulas fall back to the default.",
+  "gene_chip.config.chip_exp_level_up_notify": "Chip Level-up Notice",
+  "gene_chip.config.chip_exp_level_up_notify.tooltip": "Whether to show a HUD notice when a chip levels up. Level-ups only show a notice and grant no stat or item rewards.",
+  "gene_chip.config.chip_exp_multiplier": "Chip Experience Multiplier",
+  "gene_chip.config.chip_exp_multiplier.tooltip": "Global multiplier for all chip experience (0~100, default 1.0). It only affects leveling speed and is not an extra experience-bonus mechanic.",
 
   "gene_chip.config_value.burn_duration": "Burn Duration",
   "gene_chip.config_value.climb_speed": "Climb Speed",
   "gene_chip.config_value.cold_resistance": "Cold Resistance",
+  "gene_chip.config_value.recovery_chance": "Heal Chance",
+  "gene_chip.config_value.recovery_amount": "Heal Amount",
+  "gene_chip.config_value.speed_per_stack": "Speed per Stack",
+  "gene_chip.config_value.saturation_recovery": "Saturation Recovery",
+  "gene_chip.config_value.sneak_armor_bonus": "Sneak Armor Bonus",
+  "gene_chip.config_value.explosion_damage": "Explosion Damage",
+  "gene_chip.config_value.extra_heal_ratio": "Extra Heal Ratio",
   "gene_chip.config_value.cooldown": "Cooldown",
   "gene_chip.config_value.damage_boost": "Damage Boost",
   "gene_chip.config_value.damage_mul": "Damage Multiplier",
@@ -227,6 +240,7 @@
   "gene_chip.details.upgrade_effects": "Upgrade Effects",
   "gene_chip.details.upgrade_increase": "Upgrade increases %s",
   "gene_chip.details.upgrade_decrease": "Upgrade decreases %s",
+  "gene_chip.upgrade.iron_lung": "Upgrade extends underwater breathing time",
 
   "gene_chip.chip_type.combat": "Combat",
   "gene_chip.chip_type.mutation": "Mutation",

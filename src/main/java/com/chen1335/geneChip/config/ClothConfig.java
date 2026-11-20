@@ -25,24 +25,36 @@ public class ClothConfig {
             ConfigEntryBuilder entryBuilder = configBuilder.entryBuilder();
 
             gameplayConfig.addEntry(entryBuilder.startIntField(Component.translatable("gene_chip.config.max_level"), GameplayConfig.getMaxLevel())
-                    .setDefaultValue(10)
+                    .setDefaultValue(GameplayConfig.DEFAULT_MAX_LEVEL)
                     .setMin(1)
-                    .setMax(1000)
-                    .setSaveConsumer(value -> GameplayConfig.setMaxLevel(value))
+                    .setMax(GameplayConfig.MAX_ALLOWED_LEVEL)
+                    .setTooltip(Component.translatable("gene_chip.config.max_level.tooltip"))
+                    .setSaveConsumer(GameplayConfig::setMaxLevel)
                     .build());
             gameplayConfig.addEntry(entryBuilder.startStrField(Component.translatable("gene_chip.config.required_experience"), GameplayConfig.getRequiredExperienceFormula())
-                    .setDefaultValue("100 * lvl")
+                    .setDefaultValue(GameplayConfig.DEFAULT_FORMULA)
+                    .setTooltip(Component.translatable("gene_chip.config.required_experience.tooltip"))
                     .setSaveConsumer(GameplayConfig::setRequiredExperienceFormula)
+                    .build());
+            gameplayConfig.addEntry(entryBuilder.startBooleanToggle(Component.translatable("gene_chip.config.chip_exp_level_up_notify"), GameplayConfig.isChipExpLevelUpNotify())
+                    .setDefaultValue(true)
+                    .setTooltip(Component.translatable("gene_chip.config.chip_exp_level_up_notify.tooltip"))
+                    .setSaveConsumer(GameplayConfig::setChipExpLevelUpNotify)
+                    .build());
+            gameplayConfig.addEntry(entryBuilder.startDoubleField(Component.translatable("gene_chip.config.chip_exp_multiplier"), GameplayConfig.getChipExpMultiplier())
+                    .setDefaultValue(GameplayConfig.DEFAULT_CHIP_EXP_MULTIPLIER)
+                    .setMin(0.0D)
+                    .setMax(100.0D)
+                    .setTooltip(Component.translatable("gene_chip.config.chip_exp_multiplier.tooltip"))
+                    .setSaveConsumer(GameplayConfig::setChipExpMultiplier)
                     .build());
 
             for (Map.Entry<ResourceKey<Chip>, Chip> entry : RegisterTypes.CHIP.entrySet()) {
                 entry.getValue().buildClothConfig(entry.getKey().location(), configBuilder, cardConfig);
             }
 
-            configBuilder.setSavingRunnable(() -> {
-                GameplayConfig.save();
-                ChipConfig.save();
-            });
+            // 全局配置项由各自的 saveConsumer 直接写入 TOML，这里只需要保存芯片参数 JSON。
+            configBuilder.setSavingRunnable(ChipConfig::save);
             return configBuilder.build();
         });
 

@@ -1,4 +1,6 @@
 package com.chen1335.geneChip.chip.chips.mutation;
+import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.GeneChip;
@@ -20,11 +22,22 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 
 public class GrowingFervor extends Chip {
+    public final JsValueCalculator stage1Exp = expValue("stage1_exp", "6");
+    public final JsValueCalculator stage2Exp = expValue("stage2_exp", "10");
+    public final JsValueCalculator stage3Exp = expValue("stage3_exp", "14");
+    public final JsValueCalculator stage4Exp = expValue("stage4_exp", "18");
+
     private static final ResourceLocation ATTACK_SPEED = GeneChip.id("growing_fervor_attack_speed");
     private static final ResourceLocation MOVE_SPEED = GeneChip.id("growing_fervor_move_speed");
 
     public GrowingFervor() {
         super(makeTexture("growing_fervor"));
+    }
+
+    @Override
+    public boolean updateable() {
+        // 效果全部硬编码（没有可配置算法），不参与升级
+        return false;
     }
 
     @Override
@@ -100,12 +113,12 @@ public class GrowingFervor extends Chip {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         // 愈发狂热经验：按免疫档位每分钟结算（免疫越低给得越多）
         int stage = stageForImmunity(GeneChipAPI.getImmunityValue(player));
-        int rate = switch (stage) {
-            case 0 -> 6;
-            case 1 -> 10;
-            case 2 -> 14;
-            default -> 18;
-        };
-        ChipExperience.grantPassive(serverPlayer, this, rate);
+        
+        ChipExperience.grantPassive(serverPlayer, this, "stage" + (stage + 1) + "_exp");
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc();
     }
 }

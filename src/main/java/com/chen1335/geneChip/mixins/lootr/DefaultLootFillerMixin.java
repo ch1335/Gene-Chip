@@ -36,7 +36,7 @@ public class DefaultLootFillerMixin {
 
         // 废品收集者经验：开启战利品容器 +4
         if (player instanceof ServerPlayer serverPlayer) {
-            ChipExperience.grant(serverPlayer, ChipTypes.SCRAP_COLLECTOR.get(), 4);
+            ChipExperience.grant(serverPlayer, ChipTypes.SCRAP_COLLECTOR.get(), "open_exp");
         }
 
         GeneChipAPI.getPlayerEquippedChip(player, ChipTypes.SCRAP_COLLECTOR).ifPresent(chipInstance -> {
@@ -80,7 +80,7 @@ public class DefaultLootFillerMixin {
             if (added.isEmpty() || !(player instanceof ServerPlayer serverPlayer)) return;
 
             // 废品收集者经验：额外掉落触发 +5
-            ChipExperience.grant(serverPlayer, ChipTypes.SCRAP_COLLECTOR.get(), 5);
+            ChipExperience.grant(serverPlayer, ChipTypes.SCRAP_COLLECTOR.get(), "extra_loot_exp");
 
             Vec3 pos = provider.getInfoVec();
             serverLevel.sendParticles(ParticleTypes.FIREWORK,

@@ -60,7 +60,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
 
                     playerChipData.addCoolDown(chipInstance.getChip(), (int) (chipInstance.getChip().cooldown.getValue(chipInstance.getLvl()) * 20));
                     // 战术滑铲经验：成功滑铲 +6
-                    ChipExperience.grant(player, ChipTypes.SLIDING_TACKLE.get(), 6);
+                    ChipExperience.grant(player, ChipTypes.SLIDING_TACKLE.get(), "slide_exp");
                     accepted[0] = true;
                 });
             } else if (action == ActionType.DOUBLE_JUMP) {
@@ -95,7 +95,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.DOUBLE_JUMP.get(), cooldown);
                     // 二段跳经验：成功二段跳 +3
-                    ChipExperience.grant(player, ChipTypes.DOUBLE_JUMP.get(), 3);
+                    ChipExperience.grant(player, ChipTypes.DOUBLE_JUMP.get(), "jump_exp");
                     accepted[0] = true;
                 });
             } else if (action == ActionType.TACTICAL_ROLL) {
@@ -115,7 +115,7 @@ public record PlayerActionPacket(ActionType action, CompoundTag compoundTag) imp
                     int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
                     GeneChipAPI.addChipCooldown(player, ChipTypes.TACTICAL_ROLL.get(), cooldown);
                     // 战术翻滚经验：成功翻滚 +6
-                    ChipExperience.grant(player, ChipTypes.TACTICAL_ROLL.get(), 6);
+                    ChipExperience.grant(player, ChipTypes.TACTICAL_ROLL.get(), "roll_exp");
                     accepted[0] = true;
                 });
             } else if (action == ActionType.FLYING_KICK) {

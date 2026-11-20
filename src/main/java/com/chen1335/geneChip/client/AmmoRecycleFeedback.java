@@ -29,8 +29,10 @@ public final class AmmoRecycleFeedback {
     private static final long LIFETIME_MS = 900L;
     /** 存活期内总上浮高度（GUI 像素）。 */
     private static final float RISE = 12.0F;
-    /** 文字颜色（不含 alpha 位），与 SW 弹药数字（{@code AmmoBarOverlay} 里硬编码的 0xFFFFFF）保持一致。 */
-    private static final int COLOR = 0xFFFFFF;
+    /** 文字颜色 RGBA：R / G / B 与 SW 弹药数字（{@code AmmoBarOverlay} 里硬编码的 0xFFFFFF）一致，A 由存活时间决定。 */
+    private static final int COLOR_R = 0xFF;
+    private static final int COLOR_G = 0xFF;
+    private static final int COLOR_B = 0xFF;
     /** 兜底位置：距屏幕右下角的距离。 */
     private static final int FALLBACK_OFFSET_X = 60;
     private static final int FALLBACK_OFFSET_Y = 72;
@@ -65,7 +67,7 @@ public final class AmmoRecycleFeedback {
             return;
         }
 
-        Anchor anchor = resolveAnchor(minecraft, player, screenWidth, screenHeight);
+        Anchor anchor = resolveAnchorSafely(minecraft, player, screenWidth, screenHeight);
         Font font = minecraft.font;
         long now = Util.getMillis();
 
@@ -82,13 +84,29 @@ public final class AmmoRecycleFeedback {
             // alpha 下限取 8 而不是 0：Font#adjustColor 会把 alpha<=3 的颜色强制改成不透明，取 0 会在最后一帧突然变成实心。
             float rise = RISE * (1.0F - (1.0F - t) * (1.0F - t));
             int alpha = Mth.clamp((int) (255.0F * (1.0F - t)), 8, 255);
-            int color = alpha << 24 | COLOR;
+            // RGBA 打包成 ARGB：alpha 在最高 8 位，R / G / B 依次在后
+            int color = (alpha << 24) | (COLOR_R << 16) | (COLOR_G << 8) | COLOR_B;
 
+            int x = (int) (anchor.centerX() + entry.sideJitter());
+            int y = (int) (anchor.topY() - rise);
             String text = Component.translatable("gene_chip.feedback.ammo_recycled", entry.value()).getString();
-            graphics.drawCenteredString(font, text,
-                    (int) (anchor.centerX() + entry.sideJitter()),
-                    (int) (anchor.topY() - rise),
-                    color);
+            // 用 SEE_THROUGH（NO_DEPTH_TEST）绘制：避免被其它模组抬高 Z 的 HUD 图层遮住
+            font.drawInBatch(text, x - font.width(text) / 2.0F, y, color, false,
+                    graphics.pose().last().pose(), graphics.bufferSource(),
+                    Font.DisplayMode.SEE_THROUGH, 0, 0xF000F0);
+        }
+    }
+
+    /**
+     * 解析锚点；任何来自 Superb Warfare 的取值异常都不应该让整个 HUD 步骤失败，
+     * 失败时退回屏幕右下角的兜底位置，保证 +N 仍然可见。
+     */
+    private static Anchor resolveAnchorSafely(Minecraft minecraft, LocalPlayer player, int screenWidth, int screenHeight) {
+        try {
+            return resolveAnchor(minecraft, player, screenWidth, screenHeight);
+        } catch (Throwable throwable) {
+            // SW 的数据在版本差异 / 未同步等情况下可能取不到，此时退回兜底位置，保证 +N 仍然可见
+            return new Anchor(screenWidth - FALLBACK_OFFSET_X, screenHeight - FALLBACK_OFFSET_Y);
         }
     }
 

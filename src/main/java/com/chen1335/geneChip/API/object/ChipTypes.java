@@ -25,6 +25,9 @@ import com.chen1335.geneChip.chip.chips.special.HunterInstinct;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 public class ChipTypes {
     public static final DeferredRegister<Chip> CHIPS = DeferredRegister.create(RegisterTypes.CHIP, GeneChip.MODID);
 
@@ -102,4 +105,54 @@ public class ChipTypes {
     public static final DeferredHolder<Chip, LocksmithIntuition> LOCKSMITH_INTUITION = CHIPS.register("locksmith_intuition", LocksmithIntuition::new);
 
     public static final DeferredHolder<Chip, HunterInstinct> HUNTER_INSTINCT = CHIPS.register("hunter_instinct", HunterInstinct::new);
+
+    /**
+     * 芯片清单：供配置系统在注册表填充前枚举每颗芯片的参数（生成 TOML 分段与注释）。
+     * <p>
+     * 这里的 id / 工厂必须与上面的 {@code CHIPS.register(...)} 保持一致；
+     * {@code ChipConfig} 在加载时会做一次一致性校验，不一致会打日志。
+     */
+    public record ChipEntry(String id, String chineseName, Supplier<Chip> factory) {
+    }
+
+    public static final List<ChipEntry> CHIP_ENTRIES = List.of(
+            new ChipEntry("head_shot_hunter", "爆头猎手", HeadShotHunter::new),
+            new ChipEntry("make_living", "维持生计", MakeLiving::new),
+            new ChipEntry("precision_shooting", "精准射击", PrecisionShooting::new),
+            new ChipEntry("bloodthirsty", "嗜血", Bloodthirsty::new),
+            new ChipEntry("wild_hunter", "野外猎手", WildHunter::new),
+            new ChipEntry("sewage_purification_pack", "污水净化包", SewagePurificationPack::new),
+            new ChipEntry("endurance", "持久耐力", Endurance::new),
+            new ChipEntry("combo_fever", "连击热潮", ComboFever::new),
+            new ChipEntry("melee_attack_master", "近战专家", MeleeAttackMaster::new),
+            new ChipEntry("quick_adjustment", "快速调整", QuickAdjustment::new),
+            new ChipEntry("desire_for_slaughter", "杀戮渴望", DesireForSlaughter::new),
+            new ChipEntry("mutation_adaptation", "突变适应", MutationAdaptation::new),
+            new ChipEntry("adrenal_gland_burst", "肾上腺爆发", AdrenalGlandBurst::new),
+            new ChipEntry("growing_fervor", "愈发狂热", GrowingFervor::new),
+            new ChipEntry("pain_blockade", "痛觉封锁", PainBlockade::new),
+            new ChipEntry("big_eater", "大胃王", BigEater::new),
+            new ChipEntry("infected", "感染者", Infected::new),
+            new ChipEntry("scrap_collector", "废品收集者", ScrapCollector::new),
+            new ChipEntry("nutrient_extraction", "养分萃取", NutrientExtraction::new),
+            new ChipEntry("rotten_flesh_tolerance", "腐肉耐受", RottenFleshTolerance::new),
+            new ChipEntry("trauma_first_aid", "外伤急救", TraumaFirstAid::new),
+            new ChipEntry("permafrost_walkers", "冻土行者", () -> new PermafrostWalkers(GeneChip.id("permafrost_walkers"))),
+            new ChipEntry("iron_lung", "铁肺", IronLung::new),
+            new ChipEntry("thick_skinned", "皮糙肉厚", ThickSkinned::new),
+            new ChipEntry("photosynthesis", "光合作用", Photosynthesis::new),
+            new ChipEntry("sliding_tackle", "战术滑铲", SlidingTackle::new),
+            new ChipEntry("silent_walker", "静步者", SilentWalker::new),
+            new ChipEntry("double_jump", "二段跳", DoubleJump::new),
+            new ChipEntry("spider_climb", "蛛行", SpiderClimb::new),
+            new ChipEntry("tactical_roll", "战术翻滚", TacticalRoll::new),
+            new ChipEntry("flying_kick", "飞身踢", FlyingKick::new),
+            new ChipEntry("vengeful_flame", "复仇火焰", VengefulFlame::new),
+            new ChipEntry("night_hunter", "暗夜猎手", NightHunter::new),
+            new ChipEntry("dawn_awakening", "黎明觉醒", DawnAwakening::new),
+            new ChipEntry("iron_heart", "钢铁之心", IronHeart::new),
+            new ChipEntry("counter_storm", "反击风暴", CounterStorm::new),
+            new ChipEntry("locksmith_intuition", "锁匠直觉", LocksmithIntuition::new),
+            new ChipEntry("hunter_instinct", "猎手本能", HunterInstinct::new)
+    );
 }

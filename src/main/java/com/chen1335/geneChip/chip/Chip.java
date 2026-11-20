@@ -50,23 +50,34 @@ public abstract class Chip {
     }
 
     public Component detailDesc(int lvl) {
+        return getDesc();
+    }
+
+    /**
+     * 生成「详细描述」的本地化文本（{@code <命名空间>.chip.<id>.desc.detailed}）。
+     * <p>
+     * 参数由各芯片在自己的 {@link #detailDesc(int)} 覆写里手动选择，基类不再从
+     * {@link #configValue} 自动读取——不是所有配置项都需要展示，顺序也未必与配置注册顺序一致。
+     */
+    protected Component detailedDesc(Object... args) {
         ResourceKey<Chip> chipResourceKey = RegisterTypes.CHIP.getResourceKey(this).orElseThrow();
         ResourceLocation location = chipResourceKey.location();
-        List<Object> objects = new ArrayList<>();
-        configValue.forEach((key, jsValueCalculator) -> {
-            if (!key.equals("weight")) {
-                objects.add(jsValueCalculator.getArgValue(lvl));
-            }
-        });
-        Object[] args = objects.toArray();
         return Component.translatable("%s.chip.%s.desc.detailed".formatted(location.getNamespace(), location.getPath()), args);
-
     }
 
 
     private Component displayId;
     private Component descId;
-    private Component detailDescId;
+
+    /**
+     * 是否参与升级（即配置里有没有可调的效果算法）。
+     * <p>
+     * 返回 {@code false} 的芯片不显示等级与经验条，也不会结算经验——
+     * 这类芯片的效果是硬编码/由战利品表实现的，升级没有可改变的数值。
+     */
+    public boolean updateable() {
+        return true;
+    }
 
     public Component getDisplayName() {
         if (displayId == null) {
@@ -87,6 +98,16 @@ public abstract class Chip {
         registerConfigValue(id, calculator, defaultUpgradeSemantic(id));
     }
 
+    /**
+     * 注册一个「芯片经验」配置项：值同样是 JS 公式（可在 server.toml 里调整），
+     * 经验结算时由 {@code ChipExperience} 按当前芯片等级求值。
+     */
+    protected JsValueCalculator expValue(String id, String defaultFormula) {
+        JsValueCalculator calculator = new JsValueCalculator(defaultFormula);
+        registerConfigValue(id, calculator);
+        return calculator;
+    }
+
     public void registerConfigValue(String id, JsValueCalculator calculator, UpgradeSemantic semantic) {
         configValue.put(id, calculator);
         upgradeSemantics.put(id, semantic);
@@ -101,7 +122,8 @@ public abstract class Chip {
         List<UpgradeEffect> effects = new ArrayList<>();
         for (Map.Entry<String, JsValueCalculator> entry : configValue.entrySet()) {
             String id = entry.getKey();
-            if (id.equals("weight")) {
+            // weight 不展示升级箭头；经验值属于「获取速率」而不是芯片效果，也不展示
+            if (id.equals("weight") || id.endsWith("_exp")) {
                 continue;
             }
 
@@ -158,6 +180,18 @@ public abstract class Chip {
     public record UpgradeEffect(String configId, UpgradeDirection direction) {
     }
 
+    /**
+     * 「升级效果」里每一行的文案。默认是「升级增加/降低 + 配置项名」；
+     * 文案需要改写成效果本身的芯片可以覆写（例如铁肺写成「升级延长水下呼吸时间」）。
+     */
+    public Component upgradeEffectText(String configId, UpgradeDirection direction) {
+        Component attribute = Component.translatable("gene_chip.config_value.%s".formatted(configId));
+        String key = direction == UpgradeDirection.INCREASE
+                ? "gene_chip.details.upgrade_increase"
+                : "gene_chip.details.upgrade_decrease";
+        return Component.translatable(key, attribute);
+    }
+
     public enum UpgradeDirection {
         INCREASE,
         DECREASE;
@@ -172,8 +206,12 @@ public abstract class Chip {
         SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(getDisplayName());
 
         configValue.forEach((id, calculator) -> {
+            boolean expValue = id.endsWith("_exp");
+            Component label = expValue
+                    ? Component.literal(com.chen1335.geneChip.config.ChipParamDescriptions.expLabel(location.getPath(), id))
+                    : Component.translatable("gene_chip.config_value.%s".formatted(id));
             @NotNull
-            StringListEntry config = entryBuilder.startStrField(Component.translatable("gene_chip.config_value.%s".formatted(id)), calculator.getCalculator())
+            StringListEntry config = entryBuilder.startStrField(label, calculator.getCalculator())
                     .setDefaultValue(calculator.getDefaultCalculator())
                     .setSaveConsumer(strings -> {
                         calculator.restCalculator();

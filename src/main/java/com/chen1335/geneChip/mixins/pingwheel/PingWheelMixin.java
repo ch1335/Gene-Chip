@@ -54,7 +54,7 @@ public abstract class PingWheelMixin {
             int cooldown = (int) (chip.cooldown.getValue(chipInstance.getLvl()) * 20);
             GeneChipAPI.addChipCooldown(player, chipInstance.getChip(), cooldown);
             // 猎手本能经验：标记实体 +5
-            ChipExperience.grant(player, ChipTypes.HUNTER_INSTINCT.get(), 5);
+            ChipExperience.grant(player, ChipTypes.HUNTER_INSTINCT.get(), "mark_exp");
         });
     }
 }

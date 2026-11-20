@@ -3,7 +3,13 @@
   "gene_chip.config.gameplay": "游戏全局配置",
   "gene_chip.config.card": "芯片参数配置",
   "gene_chip.config.max_level": "最高芯片等级",
+  "gene_chip.config.max_level.tooltip": "芯片可升至的最高等级（1~1000）。",
   "gene_chip.config.required_experience": "每级升级所需经验公式",
+  "gene_chip.config.required_experience.tooltip": "每级升级所需经验公式，变量 lvl 为当前等级，例如 100 * lvl；公式非法时回退到默认值。",
+  "gene_chip.config.chip_exp_level_up_notify": "芯片升级提示",
+  "gene_chip.config.chip_exp_level_up_notify.tooltip": "芯片升级时是否在屏幕中下方显示提示；升级只给提示，不提供属性或物品奖励。",
+  "gene_chip.config.chip_exp_multiplier": "芯片经验全局倍率",
+  "gene_chip.config.chip_exp_multiplier.tooltip": "所有芯片经验获取的全局倍率（0~100，默认 1.0），只影响升级速度，不是额外的经验加成机制。",
 
   "gene_chip.chip.head_shot_hunter.name": "爆头猎手",
   "gene_chip.chip.head_shot_hunter.desc": "强化剂精准作用于视觉神经与反射弧，使你更擅长捕捉敌人弱点",
@@ -51,7 +57,7 @@
 
   "gene_chip.chip.mutation_adaptation.name": "突变适应",
   "gene_chip.chip.mutation_adaptation.desc": "强化剂诱导细胞产生异变，使你对深渊污染产生奇异的耐性",
-  "gene_chip.chip.mutation_adaptation.desc.detailed": "在感染区内，免疫力下降速度减缓30%",
+  "gene_chip.chip.mutation_adaptation.desc.detailed": "在感染区内，免疫力下降速度减缓30%%",
 
   "gene_chip.chip.adrenal_gland_burst.name": "肾上腺爆发",
   "gene_chip.chip.adrenal_gland_burst.desc": "濒死时，强化剂强制激发肾上腺髓质，榨干最后一丝潜能",
@@ -59,7 +65,7 @@
 
   "gene_chip.chip.growing_fervor.name": "愈发狂热",
   "gene_chip.chip.growing_fervor.desc": "病毒与你共生，免疫力越低，深渊之力对你身体的馈赠越明显",
-  "gene_chip.chip.growing_fervor.desc.detailed": "根据免疫值提供攻击速度与移动速度加成：>75%无加成；50~75%攻速+5%，移速+5%；25~50%攻速+10%，移速+10%；<25%攻速+20%，移速+15%",
+  "gene_chip.chip.growing_fervor.desc.detailed": "根据免疫值提供攻击速度与移动速度加成：>75%%无加成；50~75%%攻速+5%%，移速+5%%；25~50%%攻速+10%%，移速+10%%；<25%%攻速+20%%，移速+15%%",
 
   "gene_chip.chip.pain_blockade.name": "痛觉封锁",
   "gene_chip.chip.pain_blockade.desc": "强化剂彻底切断痛觉神经与触觉反馈，以牺牲防御换取纯粹的力量",
@@ -83,11 +89,11 @@
 
   "gene_chip.chip.rotten_flesh_tolerance.name": "腐肉耐受",
   "gene_chip.chip.rotten_flesh_tolerance.desc": "强化剂重塑消化系统，使腐坏食物不再威胁你的身体",
-  "gene_chip.chip.rotten_flesh_tolerance.desc.detailed": "食用腐坏食物时免疫负面效果，并有10%%概率恢复1点生命值",
+  "gene_chip.chip.rotten_flesh_tolerance.desc.detailed": "食用腐坏食物时免疫负面效果，并有%s概率恢复%s点生命值",
 
   "gene_chip.chip.trauma_first_aid.name": "外伤急救",
   "gene_chip.chip.trauma_first_aid.desc": "强化剂加速受损组织修复，使治疗物品发挥更强的恢复效果",
-  "gene_chip.chip.trauma_first_aid.desc.detailed": "使用治疗类物品时，额外恢复等同于原治疗量的生命值",
+  "gene_chip.chip.trauma_first_aid.desc.detailed": "使用治疗类物品时，额外恢复原治疗量%s的生命值",
 
   "gene_chip.chip.permafrost_walkers.name": "冻土行者",
   "gene_chip.chip.permafrost_walkers.desc": "代谢产热与末梢循环强化，使你无视严寒",
@@ -99,15 +105,15 @@
 
   "gene_chip.chip.thick_skinned.name": "皮糙肉厚",
   "gene_chip.chip.thick_skinned.desc": "皮肤角质层与皮下脂肪强化，使你更能承受冲击",
-  "gene_chip.chip.thick_skinned.desc.detailed": "永久获得抗性I，蹲下时额外获得+4 护甲值",
+  "gene_chip.chip.thick_skinned.desc.detailed": "永久获得抗性I，蹲下时额外获得+%s 护甲值",
 
   "gene_chip.chip.photosynthesis.name": "光合作用",
   "gene_chip.chip.photosynthesis.desc": "诱导细胞产生类似植物的光合作用机制，在阳光下汲取能量",
-  "gene_chip.chip.photosynthesis.desc.detailed": "在户外阳光直射下获得光照充能层数（最高5层），每层提供+1%%移速和每30秒恢复1点饱和度，室内/夜晚每30秒衰减1层",
+  "gene_chip.chip.photosynthesis.desc.detailed": "在户外阳光直射下获得光照充能层数（最高5层），每层提供+%s移速和每30秒恢复%s点饱和度，室内/夜晚每30秒衰减1层",
 
   "gene_chip.chip.sliding_tackle.name": "战术滑铲",
   "gene_chip.chip.sliding_tackle.desc": "腿部肌肉强化与地面摩擦控制训练，使你在冲刺时能以低姿态快速接近目标",
-  "gene_chip.chip.sliding_tackle.desc.detailed": "冲刺时按下蹲键向前滑铲%s格（消耗2点饱和度），滑铲过程中伤害减免%s%%。冷却%s秒",
+  "gene_chip.chip.sliding_tackle.desc.detailed": "冲刺时按下蹲键向前滑铲%s格（消耗2点饱和度），滑铲过程中伤害减免%s。冷却%s秒",
 
   "gene_chip.chip.silent_walker.name": "静步者",
   "gene_chip.chip.silent_walker.desc": "强化剂优化前庭系统与肌肉协调性，实现猫科动物般的落地缓冲",
@@ -119,11 +125,11 @@
 
   "gene_chip.chip.spider_climb.name": "蛛行",
   "gene_chip.chip.spider_climb.desc": "强化剂增强指尖与脚掌的摩擦力，让你能攀附粗糙表面",
-  "gene_chip.chip.spider_climb.desc.detailed": "紧贴垂直的方块表面且向前移动时，可缓慢攀爬，攀爬速度为%s。攀爬时摔落伤害减免%s%%",
+  "gene_chip.chip.spider_climb.desc.detailed": "紧贴垂直的方块表面且向前移动时，可缓慢攀爬，攀爬速度为%s。攀爬时摔落伤害减免%s",
 
   "gene_chip.chip.tactical_roll.name": "战术翻滚",
   "gene_chip.chip.tactical_roll.desc": "肾上腺素短暂激发，让你能在危急时刻向后规避",
-  "gene_chip.chip.tactical_roll.desc.detailed": "双击后退键执行后向翻滚%s格，翻滚期间无敌并免疫击退（持续%s秒），之后获得%s秒失衡，移动速度降低%s%%。冷却%s秒",
+  "gene_chip.chip.tactical_roll.desc.detailed": "双击后退键执行后向翻滚%s格，翻滚期间无敌并免疫击退（持续%s秒），之后获得%s秒失衡，移动速度降低%s。冷却%s秒",
 
   "gene_chip.chip.flying_kick.name": "飞身踢",
   "gene_chip.chip.flying_kick.desc": "强化剂大幅重构股四头肌与骨盆韧带的爆发力，使你能够利用奔跑的惯性，将整个身体化为最狂暴的动力撞槌",
@@ -131,7 +137,7 @@
 
   "gene_chip.chip.vengeful_flame.name": "复仇火焰",
   "gene_chip.chip.vengeful_flame.desc": "死亡瞬间，强化剂失控引发体内能量暴走，化为焚尽一切的烈焰",
-  "gene_chip.chip.vengeful_flame.desc.detailed": "死亡时在原地引发爆炸（不破坏地形），点燃半径%s格内的敌人，持续%s秒",
+  "gene_chip.chip.vengeful_flame.desc.detailed": "死亡时在原地引发爆炸，对半径%s格内的敌人造成固定%s点伤害（不随距离衰减），并点燃他们%s秒",
 
   "gene_chip.chip.night_hunter.name": "暗夜猎手",
   "gene_chip.chip.night_hunter.desc": "强化剂激活夜行性本能，让你在夜晚成为真正的猎手",
@@ -160,6 +166,13 @@
   "gene_chip.config_value.burn_duration": "燃烧持续时间",
   "gene_chip.config_value.climb_speed": "攀爬速度",
   "gene_chip.config_value.cold_resistance": "抗寒值",
+  "gene_chip.config_value.recovery_chance": "回血概率",
+  "gene_chip.config_value.recovery_amount": "回血量",
+  "gene_chip.config_value.speed_per_stack": "每层移速加成",
+  "gene_chip.config_value.saturation_recovery": "饱和度恢复",
+  "gene_chip.config_value.sneak_armor_bonus": "蹲下护甲加成",
+  "gene_chip.config_value.explosion_damage": "爆炸伤害",
+  "gene_chip.config_value.extra_heal_ratio": "额外治疗比例",
   "gene_chip.config_value.cooldown": "冷却时间",
   "gene_chip.config_value.damage_boost": "伤害加成",
   "gene_chip.config_value.damage_mul": "伤害倍率",
@@ -227,6 +240,7 @@
   "gene_chip.details.upgrade_effects": "升级效果",
   "gene_chip.details.upgrade_increase": "升级增加%s",
   "gene_chip.details.upgrade_decrease": "升级降低%s",
+  "gene_chip.upgrade.iron_lung": "升级延长水下呼吸时间",
 
   "gene_chip.chip_type.combat": "战斗",
   "gene_chip.chip_type.mutation": "变异",

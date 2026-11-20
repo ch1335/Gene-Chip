@@ -1,4 +1,5 @@
 package com.chen1335.geneChip.chip.chips.special;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipExperience;
@@ -12,6 +13,10 @@ import net.minecraft.world.entity.player.Player;
 import java.util.List;
 
 public class DawnAwakening extends Chip {
+    public final JsValueCalculator dawnExp = expValue("dawn_exp", "15");
+    public final JsValueCalculator clearedExp = expValue("cleared_exp", "10");
+    public final JsValueCalculator passiveExp = expValue("passive_exp", "3");
+
     public final JsValueCalculator healthRestore = new JsValueCalculator("2");
 
     public DawnAwakening() {
@@ -47,9 +52,9 @@ public class DawnAwakening extends Chip {
                 }
             }
             // 黎明觉醒经验：黎明结算触发 +15，实际清除负面效果 +10
-            ChipExperience.grant(serverPlayer, this, 15);
+            ChipExperience.grant(serverPlayer, this, "dawn_exp");
             if (cleared > 0) {
-                ChipExperience.grant(serverPlayer, this, 10);
+                ChipExperience.grant(serverPlayer, this, "cleared_exp");
             }
 
             // 恢复生命值
@@ -69,7 +74,12 @@ public class DawnAwakening extends Chip {
 
         // 黎明觉醒经验（补充）：白天户外每分钟 +3
         if (player.level().isDay() && player.level().canSeeSky(player.blockPosition())) {
-            ChipExperience.grantPassive(serverPlayer, this, 3);
+            ChipExperience.grantPassive(serverPlayer, this, "passive_exp");
         }
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(healthRestore.getArgValue(lvl));
     }
 }

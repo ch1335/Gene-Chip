@@ -1,4 +1,5 @@
 package com.chen1335.geneChip.chip.chips.mutation;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.ChipExperience;
@@ -12,6 +13,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class MutationAdaptation extends Chip {
+    public final JsValueCalculator zonePassiveExp = expValue("zone_passive_exp", "15");
+    public final JsValueCalculator zoneKillExp = expValue("zone_kill_exp", "3");
+
     public final JsValueCalculator drainReduction = new JsValueCalculator("0.3", true);
 
     public MutationAdaptation() {
@@ -33,7 +37,7 @@ public class MutationAdaptation extends Chip {
 
         if (inZone) {
             // 突变适应经验：处于感染区每分钟 +15
-            ChipExperience.grantPassive(serverPlayer, this, 15);
+            ChipExperience.grantPassive(serverPlayer, this, "zone_passive_exp");
             float drainMult = 1 - reduction;
 
             // 感染溢出/免疫激增联动：减缓提升至50%
@@ -65,5 +69,10 @@ public class MutationAdaptation extends Chip {
         InfectionZoneManager zoneManager = InfectionZoneManager.get(player.getServer());
         if (zoneManager == null) return false;
         return zoneManager.getDrain(player.serverLevel(), player.blockPosition()) > 0;
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc();
     }
 }

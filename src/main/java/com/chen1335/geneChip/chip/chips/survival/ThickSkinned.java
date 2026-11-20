@@ -1,4 +1,6 @@
 package com.chen1335.geneChip.chip.chips.survival;
+import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.GeneChip;
@@ -17,11 +19,16 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 
 public class ThickSkinned extends Chip {
+    public final JsValueCalculator hurtExp = expValue("hurt_exp", "1");
+    /** 蹲下时额外获得的护甲值（点）。 */
+    public final JsValueCalculator sneakArmorBonus = new JsValueCalculator("4");
+
 
     private static final ResourceLocation ARMOR_ID = GeneChip.id("thick_skinned");
 
     public ThickSkinned() {
         super(makeTexture("thick_skinned"));
+        registerConfigValue("sneak_armor_bonus", sneakArmorBonus);
     }
 
     @Override
@@ -38,7 +45,7 @@ public class ThickSkinned extends Chip {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
         if (!playerRunTimeData.thickSkinnedActive && player.isShiftKeyDown()) {
             playerRunTimeData.thickSkinnedActive = true;
-            addAttribute(player);
+            addAttribute(player, instance.getLvl());
             serverPlayer.serverLevel().sendParticles(ParticleTypes.FIREWORK,
                     player.getX(), player.getY() + 1.0, player.getZ(), 8, 0.4, 0.45, 0.4, 0.035);
         } else if (playerRunTimeData.thickSkinnedActive && !player.isShiftKeyDown()) {
@@ -54,7 +61,7 @@ public class ThickSkinned extends Chip {
         PlayerRunTimeData playerRunTimeData = GeneChipAPI.getPlayerRunTimeData(player);
         if (player.isShiftKeyDown()) {
             playerRunTimeData.thickSkinnedActive = true;
-            addAttribute(player);
+            addAttribute(player, instance.getLvl());
         }
     }
 
@@ -67,11 +74,12 @@ public class ThickSkinned extends Chip {
         }
     }
 
-    private void addAttribute(Player player) {
+    private void addAttribute(Player player, int lvl) {
         AttributeInstance attributeInstance = player.getAttributes().getInstance(Attributes.ARMOR);
         if (attributeInstance != null) {
             attributeInstance.removeModifier(ARMOR_ID);
-            attributeInstance.addTransientModifier(new AttributeModifier(ARMOR_ID, 4, AttributeModifier.Operation.ADD_VALUE));
+            attributeInstance.addTransientModifier(new AttributeModifier(ARMOR_ID, sneakArmorBonus.getValue(lvl),
+                    AttributeModifier.Operation.ADD_VALUE));
         }
     }
 
@@ -80,5 +88,10 @@ public class ThickSkinned extends Chip {
         if (attributeInstance != null) {
             attributeInstance.removeModifier(ARMOR_ID);
         }
+    }
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(sneakArmorBonus.getArgValue(lvl));
     }
 }

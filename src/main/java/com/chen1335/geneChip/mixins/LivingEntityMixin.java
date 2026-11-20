@@ -32,7 +32,7 @@ public abstract class LivingEntityMixin extends Entity {
                 }
                 // 铁肺经验：水下憋气每秒 +2
                 if (player instanceof ServerPlayer serverPlayer) {
-                    ChipExperience.grant(serverPlayer, ChipTypes.IRON_LUNG.get(), 2, "breath", 20);
+                    ChipExperience.grant(serverPlayer, ChipTypes.IRON_LUNG.get(), "breath_exp", "breath", 20);
                 }
             });
         }

@@ -417,12 +417,8 @@ public class ChipConfigScreen extends Screen {
                     Component.translatable("gene_chip.details.upgrade_effects"),
                     contentLeft, titleY, contentWidth, textScale, 0xFF72D6FF);
             for (Chip.UpgradeEffect effect : effects) {
-                Component attribute = Component.translatable("gene_chip.config_value." + effect.configId());
-                String key = effect.direction() == Chip.UpgradeDirection.INCREASE
-                        ? "gene_chip.details.upgrade_increase"
-                        : "gene_chip.details.upgrade_decrease";
                 y += layout.length(2);
-                y = drawWrappedText(guiGraphics, Component.translatable(key, attribute),
+                y = drawWrappedText(guiGraphics, chip.upgradeEffectText(effect.configId(), effect.direction()),
                         contentLeft, y, contentWidth, textScale, 0xFFB8E8FF);
             }
         } finally {
@@ -431,6 +427,8 @@ public class ChipConfigScreen extends Screen {
     }
 
     private void renderExperienceFooter(GuiGraphics guiGraphics, LayoutRect panel, ChipInstance<?> instance) {
+        // 没有可升级效果的芯片不显示等级与经验条
+        if (!instance.getChip().updateable()) return;
         float scale = layout.scale();
         LayoutRect bar = layout.experienceBarRect();
         int required = instance.getLvl() >= GameplayConfig.getMaxLevel() ? 0 : ChipProgression.requiredExperience(instance.getLvl());

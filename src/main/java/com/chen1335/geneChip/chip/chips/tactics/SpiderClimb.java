@@ -1,4 +1,5 @@
 package com.chen1335.geneChip.chip.chips.tactics;
+import net.minecraft.network.chat.Component;
 
 import com.chen1335.geneChip.API.GeneChipAPI;
 import com.chen1335.geneChip.attachmentData.PlayerRunTimeData;
@@ -8,11 +9,14 @@ import com.chen1335.geneChip.chip.ChipInstance;
 import com.chen1335.geneChip.chip.ChipType;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
 import com.chen1335.geneChip.client.animation.SpiderClimbAnimation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class SpiderClimb extends Chip {
+    public final JsValueCalculator climbExp = expValue("climb_exp", "3");
+
     public final JsValueCalculator climbSpeed = new JsValueCalculator("0.3");
-    public final JsValueCalculator fallDamageReduction = new JsValueCalculator("0.8");
+    public final JsValueCalculator fallDamageReduction = new JsValueCalculator("0.8",true);
 
     public SpiderClimb() {
         super(makeTexture("spider_climb"));
@@ -48,10 +52,13 @@ public class SpiderClimb extends Chip {
             }
             playerRunTimeData.spiderClimbing = true;
             player.fallDistance = 0;
-            // 蛛行经验：攀爬每 5 秒 +3
-            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                ChipExperience.grant(serverPlayer, this, 3, "climb", 100);
-            }
+        }
+
+        // 蛛行经验：服务端玩家的 horizontalCollision 不会随客户端输入更新（服务端没有移动输入），
+        // 所以改用「贴墙 + 离地」自行判定：攀爬/贴墙悬停每 5 秒 +3
+        if (player instanceof ServerPlayer serverPlayer && !player.onGround()
+                && !player.level().noCollision(player, player.getBoundingBox().inflate(0.1, 0, 0.1))) {
+            ChipExperience.grant(serverPlayer, this, "climb_exp", "climb", 100);
         }
 
         boolean noCollision = player.level().noCollision(player, player.getBoundingBox().inflate(0.1, 0, 0.1));
@@ -80,4 +87,9 @@ public class SpiderClimb extends Chip {
 
     }
 
+
+    @Override
+    public Component detailDesc(int lvl) {
+        return detailedDesc(climbSpeed.getArgValue(lvl), fallDamageReduction.getArgValue(lvl));
+    }
 }
