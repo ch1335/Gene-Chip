@@ -2,13 +2,11 @@ package com.chen1335.geneChip;
 
 import com.chen1335.geneChip.API.object.*;
 import com.chen1335.geneChip.client.GeneChipClient;
-import com.chen1335.geneChip.config.ClothConfig;
 import com.chen1335.geneChip.config.GameplayConfig;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -18,7 +16,6 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.slf4j.Logger;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.nio.file.Path;
 
 @Mod(GeneChip.MODID)
@@ -43,11 +40,12 @@ public class GeneChip {
         modContainer.registerConfig(ModConfig.Type.SERVER, GameplayConfig.SPEC, GameplayConfig.CONFIG_FILE_NAME);
         modEventBus.addListener(GameplayConfig::onConfigLoading);
         modEventBus.addListener(GameplayConfig::onConfigReloading);
-        if (Environment.get().getDist().isClient() && ModList.get().isLoaded("cloth_config")) {
-            ClothConfig.build(modContainer);
+        // 客户端专用初始化（Cloth Config 界面、player animation 注册）只在客户端执行；
+        // 专用服务器不会加载 ClientBootstrap 引用的客户端类。
+        if (Environment.get().getDist().isClient()) {
+            com.chen1335.geneChip.client.ClientBootstrap.init(modContainer);
         }
         modEventBus.addListener(this::FMLClientSetupEvent);
-        GeneChipClient.init();
     }
 
     public void FMLClientSetupEvent(FMLClientSetupEvent setupEvent) {

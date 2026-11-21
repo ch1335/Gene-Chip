@@ -77,6 +77,15 @@ public class GeneChipClient {
         PLAYER_CHIP_DATA = new PlayerChipData();
     }
 
+    /** 打开/更新芯片选择界面（只在客户端被网络包 handler 调用）。 */
+    public static void openChipSelectMenu(java.util.List<com.chen1335.geneChip.chip.ChipInstance<?>> candidates, int refreshMask) {
+        if (Minecraft.getInstance().screen instanceof com.chen1335.geneChip.client.gui.screen.ChipSelectScreen screen) {
+            screen.updateCandidates(candidates, refreshMask);
+        } else {
+            Minecraft.getInstance().setScreen(new com.chen1335.geneChip.client.gui.screen.ChipSelectScreen(candidates, refreshMask));
+        }
+    }
+
     public static void handlePlayerAnimation(int entityId, ResourceLocation animationLocation, IPayloadContext iPayloadContext) {
         iPayloadContext.enqueueWork(() -> {
             Entity entity = iPayloadContext.player().level().getEntity(entityId);

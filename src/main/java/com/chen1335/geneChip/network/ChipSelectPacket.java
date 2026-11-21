@@ -2,8 +2,7 @@ package com.chen1335.geneChip.network;
 
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.chip.ChipInstance;
-import com.chen1335.geneChip.client.gui.screen.ChipSelectScreen;
-import net.minecraft.client.Minecraft;
+import com.chen1335.geneChip.client.GeneChipClient;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -31,11 +30,8 @@ public record ChipSelectPacket(List<ChipInstance<?>> candidates, int refreshMask
     public void handler(IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player().isLocalPlayer()) {
-                if (Minecraft.getInstance().screen instanceof ChipSelectScreen screen) {
-                    screen.updateCandidates(candidates, refreshMask);
-                } else {
-                    Minecraft.getInstance().setScreen(new ChipSelectScreen(candidates, refreshMask));
-                }
+                // 界面代码在客户端类里，避免公共类直接引用客户端 Screen
+                GeneChipClient.openChipSelectMenu(candidates, refreshMask);
             }
         });
     }

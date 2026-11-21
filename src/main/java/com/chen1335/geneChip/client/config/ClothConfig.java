@@ -1,8 +1,9 @@
-package com.chen1335.geneChip.config;
+package com.chen1335.geneChip.client.config;
 
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.chip.Chip;
 import com.chen1335.geneChip.chip.chipConfig.ChipConfig;
+import com.chen1335.geneChip.config.GameplayConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -13,6 +14,10 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import java.util.Map;
 
+/**
+ * 客户端专用：注册 Cloth Config 配置界面。
+ * 只能在客户端调用（由 {@code ClientBootstrap} 在 dist 判断之后调用）。
+ */
 public class ClothConfig {
     public static void build(ModContainer modContainer) {
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, (mc, parent) -> {
@@ -50,7 +55,7 @@ public class ClothConfig {
                     .build());
 
             for (Map.Entry<ResourceKey<Chip>, Chip> entry : RegisterTypes.CHIP.entrySet()) {
-                entry.getValue().buildClothConfig(entry.getKey().location(), configBuilder, cardConfig);
+                ChipClothConfig.addChip(entry.getValue(), entry.getKey().location(), configBuilder, cardConfig);
             }
 
             // 全局配置项由各自的 saveConsumer 直接写入 TOML，这里只需要保存芯片参数 JSON。

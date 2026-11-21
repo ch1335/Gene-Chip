@@ -1,11 +1,11 @@
 package com.chen1335.geneChip.chip.chipConfig;
 
 import com.chen1335.geneChip.GeneChip;
-import com.chen1335.geneChip.client.gui.GuiUtil;
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
 
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class JsValueCalculator {
@@ -67,9 +67,14 @@ public class JsValueCalculator {
         float value = getValue(lvl);
         if (isPercentage) {
             value = value * 100;
-            return GuiUtil.format(value, 1)+"%";
+            return format(value, 1) + "%";
         }
-        return GuiUtil.format(value, 1);
+        return format(value, 1);
+    }
+
+    /** 客户端无关的数值格式化（原实现放在客户端 GuiUtil 里，这里内联避免公共类加载客户端类）。 */
+    private static String format(float value, int digits) {
+        return new BigDecimal(String.format("%." + digits + "f", value)).stripTrailingZeros().toPlainString();
     }
 
     public void cleanCapturedValue() {

@@ -3,17 +3,11 @@ package com.chen1335.geneChip.chip;
 import com.chen1335.geneChip.API.object.RegisterTypes;
 import com.chen1335.geneChip.GeneChip;
 import com.chen1335.geneChip.chip.chipConfig.JsValueCalculator;
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.gui.entries.StringListEntry;
-import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -199,31 +193,6 @@ public abstract class Chip {
         public UpgradeDirection opposite() {
             return this == INCREASE ? DECREASE : INCREASE;
         }
-    }
-
-    public void buildClothConfig(ResourceLocation location, ConfigBuilder configBuilder, ConfigCategory configCategory) {
-        ConfigEntryBuilder entryBuilder = configBuilder.entryBuilder();
-        SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(getDisplayName());
-
-        configValue.forEach((id, calculator) -> {
-            boolean expValue = id.endsWith("_exp");
-            Component label = expValue
-                    ? Component.literal(com.chen1335.geneChip.config.ChipParamDescriptions.expLabel(location.getPath(), id))
-                    : Component.translatable("gene_chip.config_value.%s".formatted(id));
-            @NotNull
-            StringListEntry config = entryBuilder.startStrField(label, calculator.getCalculator())
-                    .setDefaultValue(calculator.getDefaultCalculator())
-                    .setSaveConsumer(strings -> {
-                        calculator.restCalculator();
-                        calculator.cleanCapturedValue();
-                        calculator.setCalculator(strings);
-                    })
-                    .build();
-
-            subCategoryBuilder.add(config);
-        });
-
-        configCategory.addEntry(subCategoryBuilder.build());
     }
 
     public void onImmunityValueChanged(Player player, ChipInstance<?> instance, int immunityValue) {
